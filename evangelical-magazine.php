@@ -6,11 +6,18 @@ Plugin URI: http://www.evangelicalmagazine.com/
 Version: 0.1
 Author: Mark Barnes
 Author URI: http://www.markbarnes.net/
-Text Domian: evangelical-magazine
 */
 
+/**
+* This class contains all the main functions for the plugin, mostly as static methods.
+* We're using a class mostly to avoid name clashes.
+*/
 class evangelical_magazine {
     
+    /**
+    * Main hooks and activation
+    * 
+    */
     public function __construct() {
         //Make sure classes autoload
         spl_autoload_register(array(__CLASS__, 'autoload_classes'));
@@ -27,7 +34,7 @@ class evangelical_magazine {
     }
 
     /**
-    * Runs when plugin is activated. Can be extended through actions.
+    * Runs when plugin is activated. Setup in this way so it can be extended through actions.
     * 
     */
     public static function on_activation() {
@@ -356,14 +363,12 @@ class evangelical_magazine {
             $issue = new evangelical_magazine_issue ($post_id);
             $issue->save_meta_data();
         }
-
-        
-        
     }
     
     /**
     * Returns true if we're creating a post in admin
     * 
+    * @return boolean
     */
     public static function is_creating_post() {
         $screen = get_current_screen();
@@ -374,10 +379,15 @@ class evangelical_magazine {
         }
     }
     
+    /**
+    * Removes unwanted admin menus
+    * 
+    */
     public static function remove_admin_menus() {
         remove_menu_page ('edit.php');
         remove_menu_page ('edit-comments.php');
     }
 }
 
+// Initialise
 $evangelical_magazine = new evangelical_magazine();
