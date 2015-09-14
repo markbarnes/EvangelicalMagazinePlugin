@@ -112,19 +112,19 @@ class evangelical_magazine_author {
         }
     }
 
-    public static function get_all_authors_weighted_by_recent ($args = array()) {
+    public static function get_all_authors_weighted_by_recent ($args = array(), $issues_to_consider = 18) {
         $authors = self::get_all_author_ids($args);
         if ($authors) {
             $authors = array_flip ($authors);
             $authors = array_fill_keys (array_keys($authors), 0); // Now we have an array with all the author ids as keys, and the value 0
-            $issues = evangelical_magazine_issue::get_all_issues(18);
+            $issues = evangelical_magazine_issue::get_all_issues($issues_to_consider);
             if ($issues) {
-                $issue_weighting = 18;
+                $issue_weighting = $issues_to_consider;
                 foreach ($issues as $issue) {
                     $issue_authors = $issue->get_all_author_ids();
                     if ($issue_authors) {
                         foreach ($issue_authors as $issue_author) {
-                            $authors[$issue_author] = $authors[$issue_author] + ($issue_weighting/6);
+                            $authors[$issue_author] = $authors[$issue_author] + (pow($issue_weighting,2)/pow($issues_to_consider,2));
                         }
                     }
                     $issue_weighting--;
@@ -139,8 +139,8 @@ class evangelical_magazine_author {
         }
     }
     
-    public static function get_author_grid_html($limit = -1) {
-        $authors = self::get_all_authors_weighted_by_recent();
+    public static function get_author_grid_html($limit = -1, $issues = 18) {
+        $authors = self::get_all_authors_weighted_by_recent(array(), $issues);
         if ($authors) {
             if ($limit != -1) {
                 $authors = array_slice($authors, 0, $limit);
