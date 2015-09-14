@@ -75,8 +75,8 @@ class evangelical_magazine_section {
                 $url = $class == '' ? $article->get_image_url('width_150') : $article->get_image_url('width_400');
                 $output .= "<li><a href=\"{$article->get_link()}\"><div class=\"section-info-box-image{$class}\" style=\"background-image: url('{$url}')\"></div></a>";
                 $title = $article->get_title();
-                $style = strlen($title) > 40 ? ' style="font-size:'.round(40/strlen($title)*100,0).'%"' : '';
-                $output .= "<span{$style} class=\"section-info-box-title\">{$article->get_title(true)}</span><br/><span class=\"section-info-box-author\">by {$article->get_author_names(true)}</span></li>";
+                $style = strlen($title) > 40 ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
+                $output .= "<span class=\"section-info-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"section-info-box-author\">by {$article->get_author_names(true)}</span></li>";
                 $ids[] = $article->get_id();
                 $class='';
             }
