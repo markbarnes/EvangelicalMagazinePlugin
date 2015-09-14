@@ -138,4 +138,18 @@ class evangelical_magazine_author {
             }
         }
     }
+    
+    public static function get_author_grid_html($limit = -1) {
+        $authors = self::get_all_authors_weighted_by_recent();
+        if ($authors) {
+            if ($limit != -1) {
+                $authors = array_slice($authors, 0, $limit);
+            }
+            $output = "<aside id=\"author-grid\">";
+            foreach ($authors as $author) {
+                $output .= "<a href=\"{$author->get_link()}\"><div class=\"author-grid\" style=\"background-image:url('{$author->get_image_url('width_150')}')\"><div class=\"author-description\">{$author->get_filtered_description()}</div></div></a>";
+            }
+            return "{$output}</aside>";
+        }
+    }
 }
