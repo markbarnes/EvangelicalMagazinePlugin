@@ -45,5 +45,23 @@
         public function get_author_info_html() {
             return "<div class=\"author-info\"><a href=\"{$this->get_link()}\"><img class=\"author-image\" src=\"{$this->get_image_url('thumbnail_75')}\"/></a><div class=\"author-description\">{$this->get_description()}</div></div>";
         }
+
+        /**
+        * Returns an array of all the author objects
+        * 
+        * @param string $order_by
+        * @return evangelical_magazine_author[]
+        */
+        private static function get_all_authors($order_by = 'title') {
+            $args = array ('post_type' => 'em_author', 'orderby' => $order_by, 'order' => 'ASC', 'posts_per_page' => -1);
+            $query = new WP_Query($args);
+            if ($query->posts) {
+                $authors = array();
+                foreach ($query->posts as $author) {
+                    $authors[] = new evangelical_magazine_author ($author);
+                }
+                return $authors;
+            }
+        }
+
     }
-?>

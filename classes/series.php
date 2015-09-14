@@ -39,4 +39,23 @@ class evangelical_magazine_series {
         }
     }
 
+    /**
+    * Returns an array of all the series objects
+    * 
+    * @param string $order_by
+    * @return evangelical_magazine_series[]
+    */
+    private static function get_all_series() {
+        $args = array ('post_type' => 'em_series', 'orderby' => 'post_title', 'order' => 'ASC');
+        $query = new WP_Query($args);
+        if ($query->posts) {
+            $series = array();
+            foreach ($query->posts as $s) {
+                $series[] = new evangelical_magazine_series ($s);
+            }
+            return $series;
+        }
+    }
+
+
 }
