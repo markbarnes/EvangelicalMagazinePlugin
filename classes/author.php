@@ -38,8 +38,12 @@ class evangelical_magazine_author {
         }
     }
     
-    public function get_description() {
-        return $this->post_data->post_content;
+    public function get_description($link_name = true) {
+        if ($link_name) {
+            return str_replace($this->get_name(), "<a href=\"{$this->get_link()}\">{$this->get_name()}</a>", $this->post_data->post_content);
+        } else {
+            return $this->post_data->post_content;
+        }
     }
     
     public function get_author_info_html() {
