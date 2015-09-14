@@ -52,7 +52,7 @@ class evangelical_magazine_author {
     * @param string $order_by
     * @return evangelical_magazine_author[]
     */
-    private static function get_all_authors($order_by = 'title') {
+    public static function get_all_authors($order_by = 'title') {
         $args = array ('post_type' => 'em_author', 'orderby' => $order_by, 'order' => 'ASC', 'posts_per_page' => -1);
         $query = new WP_Query($args);
         if ($query->posts) {

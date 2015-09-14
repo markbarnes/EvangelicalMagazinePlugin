@@ -279,10 +279,10 @@ class evangelical_magazine_article {
     * @param mixed $article
     */
     public static function do_author_meta_box($article) {
-        $authors = evangelical_magazine_authors::get_all_authors();
+        $authors = evangelical_magazine_author::get_all_authors();
         if ($authors) {
             wp_nonce_field ('em_author_meta_box', 'em_author_meta_box_nonce');
-            if (!self::is_creating_post()) {
+            if (!evangelical_magazine::is_creating_post()) {
                 $article_id = (int)$_GET['post'];
                 $article = new evangelical_magazine_article ($article_id);
                 $existing_author_ids = $article->get_author_ids();
@@ -308,7 +308,7 @@ class evangelical_magazine_article {
         $issues = evangelical_magazine_issue::get_all_issues();
         if ($issues) {
             wp_nonce_field ('em_issue_meta_box', 'em_issue_meta_box_nonce');
-            if (!self::is_creating_post()) {
+            if (!evangelical_magazine::is_creating_post()) {
                 $article = new evangelical_magazine_article ($post);
                 $existing_issue = $article->get_issue_id();
                 $existing_page_num = $article->get_issue_page_num();
@@ -335,7 +335,7 @@ class evangelical_magazine_article {
         $series = evangelical_magazine_series::get_all_series();
         if ($series) {
             wp_nonce_field ('em_series_meta_box', 'em_series_meta_box_nonce');
-            if (!self::is_creating_post()) {
+            if (!evangelical_magazine::is_creating_post()) {
                 $article = new evangelical_magazine_article ($post);
                 $existing_series = $article->get_series_id();
                 $existing_order = $article->get_series_order();
@@ -363,7 +363,7 @@ class evangelical_magazine_article {
     */
     public static function do_issue_date_meta_box($post) {
         wp_nonce_field ('em_issue_date_meta_box', 'em_issue_date_meta_box_nonce');
-        if (!self::is_creating_post()) {
+        if (!evangelical_magazine::is_creating_post()) {
             $issue = new evangelical_magazine_issue ($post);
             $existing_issue_date = $issue->get_date();
         } else {
