@@ -74,7 +74,7 @@ class evangelical_magazine_issue {
     * @param string $order_by
     * @return evangelical_magazine_issue[]
     */
-    public static function get_all_issues($limit = 999) {
+    public static function get_all_issues($limit = -1) {
         $args = array ('post_type' => 'em_issue', 'meta_key' => evangelical_magazine_issue::ISSUE_DATE_META_NAME, 'orderby' => 'meta_value', 'order' => 'DESC', 'posts_per_page' => $limit);
         $query = new WP_Query($args);
         if ($query->posts) {
@@ -88,7 +88,7 @@ class evangelical_magazine_issue {
     
     public function get_all_articles() {
         $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
-        $args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC');
+        $args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
         $query = new WP_Query($args);
         if ($query->posts) {
             $articles = array();
@@ -97,7 +97,17 @@ class evangelical_magazine_issue {
             }
             return $articles;
         }
-        
+    }
+    
+    public function get_all_author_ids() {
+        $articles = $this->get_all_articles();
+        if ($articles) {
+            $all_authors = array();
+            foreach ($articles as $article) {
+                $all_authors = array_merge($all_authors, $article->get_author_ids());
+            }
+            return $all_authors;
+        }
     }
 
 }

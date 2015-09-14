@@ -46,7 +46,7 @@ class evangelical_magazine_series {
     * @return evangelical_magazine_series[]
     */
     public static function get_all_series() {
-        $args = array ('post_type' => 'em_series', 'orderby' => 'post_title', 'order' => 'ASC');
+        $args = array ('post_type' => 'em_series', 'orderby' => 'post_title', 'order' => 'ASC', 'posts_per_page' => -1);
         $query = new WP_Query($args);
         if ($query->posts) {
             $series = array();

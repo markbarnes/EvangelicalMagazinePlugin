@@ -46,6 +46,10 @@ class evangelical_magazine_author {
         }
     }
     
+    public function get_filtered_description() {
+        return wp_strip_all_tags($this->get_description(false));
+    }
+    
     public function get_author_info_html() {
         return "<div class=\"author-info\"><a href=\"{$this->get_link()}\"><img class=\"author-image\" src=\"{$this->get_image_url('thumbnail_75')}\"/></a><div class=\"author-description\">{$this->get_description()}</div></div>";
     }
@@ -53,16 +57,36 @@ class evangelical_magazine_author {
     /**
     * Returns an array of all the author objects
     * 
-    * @param string $order_by
+    * @param array $args
     * @return evangelical_magazine_author[]
     */
-    public static function get_all_authors($order_by = 'title') {
-        $args = array ('post_type' => 'em_author', 'orderby' => $order_by, 'order' => 'ASC', 'posts_per_page' => -1);
+    public static function get_all_authors($args = array()) {
+        $default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
+        $args = wp_parse_args ($args, $default_args);
         $query = new WP_Query($args);
         if ($query->posts) {
             $authors = array();
             foreach ($query->posts as $author) {
                 $authors[] = new evangelical_magazine_author ($author);
+            }
+            return $authors;
+        }
+    }
+    
+    /**
+    * Returns an array of all the author ids
+    * 
+    * @param array $args
+    * @return integer[]
+    */
+    public static function get_all_author_ids($args = array()) {
+        $default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
+        $args = wp_parse_args ($args, $default_args);
+        $query = new WP_Query($args);
+        if ($query->posts) {
+            $authors = array();
+            foreach ($query->posts as $author) {
+                $authors[] = $author->ID;
             }
             return $authors;
         }
@@ -88,4 +112,30 @@ class evangelical_magazine_author {
         }
     }
 
+    public static function get_all_authors_weighted_by_recent ($args = array()) {
+        $authors = self::get_all_author_ids($args);
+        if ($authors) {
+            $authors = array_flip ($authors);
+            $authors = array_fill_keys (array_keys($authors), 0); // Now we have an array with all the author ids as keys, and the value 0
+            $issues = evangelical_magazine_issue::get_all_issues(18);
+            if ($issues) {
+                $issue_weighting = 18;
+                foreach ($issues as $issue) {
+                    $issue_authors = $issue->get_all_author_ids();
+                    if ($issue_authors) {
+                        foreach ($issue_authors as $issue_author) {
+                            $authors[$issue_author] = $authors[$issue_author] + ($issue_weighting/6);
+                        }
+                    }
+                    $issue_weighting--;
+                }
+                arsort($authors);
+                $all_authors = array();
+                foreach ($authors as $author => $weighting) {
+                    $all_authors[] = new evangelical_magazine_author($author);
+                }
+                return $all_authors;
+            }
+        }
+    }
 }
