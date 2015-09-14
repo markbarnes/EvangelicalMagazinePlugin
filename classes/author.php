@@ -63,5 +63,25 @@ class evangelical_magazine_author {
             return $authors;
         }
     }
+    
+    /**
+    * Returns all articles by this author
+    * 
+    * @param integer $limit
+    * @param integer[] $exclude_article_ids
+    * @return evangelical_magazine_article[]
+    */
+    public function get_articles ($limit = 9999, $exclude_article_ids = array()) {
+        $meta_query = array(array('key' => evangelical_magazine_article::AUTHOR_META_NAME, 'value' => $this->get_id()));
+        $args = array ('post_type' => 'em_article', 'posts_per_page' => $limit, 'meta_query' => $meta_query, 'post__not_in' => $exclude_article_ids);
+        $query = new WP_Query($args);
+        if ($query->posts) {
+            $also_by = array();
+            foreach ($query->posts as $article) {
+                $also_by[] = new evangelical_magazine_article($article);
+            }
+            return $also_by;
+        }
+    }
 
 }
