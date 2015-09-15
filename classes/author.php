@@ -2,9 +2,7 @@
 /**
 * Accepts either a WP_Post object, or a post_id
 */
-class evangelical_magazine_author {
-    
-    private $post_data;
+class evangelical_magazine_author extends evangelical_magazine_template {
     
     /**
     * Instantiate the class by passing the WP_Post object or a post_id
@@ -18,56 +16,12 @@ class evangelical_magazine_author {
         $this->post_data = $post;
     }
     
-    /**
-    * Returns the post ID
-    * 
-    * @return integer
-    */
-    public function get_id() {
-        return $this->post_data->ID;
-    }
-    
-    /**
-    * Returns the name of the author
-    * 
-    * @param boolean $link - include a HTML link
-    * @return string
-    */
-    public function get_name($link = false) {
-        if ($link) {
-            return "<a href=\"{$this->get_link()}\">{$this->post_data->post_title}</a>";
-        } else {
-            return $this->post_data->post_title;
-        }
-    }
-    
-    public function get_link() {
-        return get_permalink($this->post_data->ID);
-    }
-    
-    public function get_slug() {
-        return $this->post_data->post_name;
-    }
-    
-    public function get_image_url($image_size = 'thumbnail') {
-        if (has_post_thumbnail($this->get_id())) {
-            $src = wp_get_attachment_image_src (get_post_thumbnail_id($this->get_id()), $image_size);
-            if ($src) {
-                return $src[0];
-            }
-        }
-    }
-    
     public function get_description($link_name = true) {
         if ($link_name) {
             return str_replace($this->get_name(), "<a href=\"{$this->get_link()}\">{$this->get_name()}</a>", $this->post_data->post_content);
         } else {
             return $this->post_data->post_content;
         }
-    }
-    
-    public function get_filtered_description() {
-        return wp_strip_all_tags($this->get_description(false));
     }
     
     public function get_author_info_html() {
@@ -167,7 +121,7 @@ class evangelical_magazine_author {
             }
             $output = "<aside id=\"author-grid\">";
             foreach ($authors as $author) {
-                $output .= "<a href=\"{$author->get_link()}\"><div class=\"author-grid\" style=\"background-image:url('{$author->get_image_url('width_150')}')\"><div class=\"author-description\">{$author->get_filtered_description()}</div></div></a>";
+                $output .= "<a href=\"{$author->get_link()}\"><div class=\"author-grid\" style=\"background-image:url('{$author->get_image_url('width_150')}')\"><div class=\"author-description\">{$author->get_filtered_content()}</div></div></a>";
             }
             return "{$output}</aside>";
         }

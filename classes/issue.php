@@ -1,10 +1,10 @@
 <?php
-class evangelical_magazine_issue {
+class evangelical_magazine_issue extends evangelical_magazine_template {
     
     const ISSUE_DATE_META_NAME = 'evangelical_magazine_issue_date';
     const EARLIEST_YEAR = 2010;
     
-    private $post_data, $year, $month;
+    private $year, $month;
     
     /**
     * Instantiate the class by passing the WP_Post object or a post_id
@@ -25,59 +25,12 @@ class evangelical_magazine_issue {
         }
     }
     
-    /**
-    * Returns the post ID
-    * 
-    * @return integer
-    */
-    public function get_id() {
-        return $this->post_data->ID;
-    }
-        
-    /**
-    * Returns the name of the issue
-    * 
-    * @param boolean $link - include a HTML link
-    * @return string
-    */
-    public function get_name($link = false) {
-        if ($link) {
-            return "<a href=\"{$this->get_link()}\">{$this->post_data->post_title}</a>";
-        } else {
-            return $this->post_data->post_title;
-        }
-    }
-        
-    public function get_link() {
-        return get_permalink($this->post_data->ID);
-    }
-        
     public static function get_possible_issues() {
         return array ('01' => 'January/February', '03' => 'March/April', '05' => 'May/June', '07' => 'July/August', '09' => 'September/October', '11' => 'November/December');
     }
     
     public function get_date() {
         return array ('year' => $this->year, 'month' => $this->month);
-    }
-    
-    public function get_image_url($image_size = 'thumbnail') {
-        if (has_post_thumbnail($this->get_id())) {
-            $src = wp_get_attachment_image_src (get_post_thumbnail_id($this->get_id()), $image_size);
-            if ($src) {
-                return $src[0];
-            }
-        }
-    }
-
-    public function get_image_html($image_size = 'thumbnail', $class = '', $link=false) {
-        if (has_post_thumbnail($this->get_id())) {
-            $src = wp_get_attachment_image_src (get_post_thumbnail_id($this->get_id()), $image_size);
-            $class = (bool)$class ? " class=\"{$class}\"" : '';
-            if ($src) {
-                $html = "<img src=\"{$src[0]}\" width=\"{$src[1]}\" height=\"{$src[2]}\"{$class}/>";
-                return $link ? "<a href=\"{$this->get_link()}\">{$html}</a>" : $html;
-            }
-        }
     }
     
     public function save_meta_data() {

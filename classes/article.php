@@ -1,5 +1,5 @@
 <?php
-class evangelical_magazine_article {
+class evangelical_magazine_article extends evangelical_magazine_template {
     
     const AUTHOR_META_NAME = 'evangelical_magazine_authors';
     const ISSUE_META_NAME = 'evangelical_magazine_issue';
@@ -9,7 +9,7 @@ class evangelical_magazine_article {
     const VIEW_COUNT_META_NAME = 'evangelical_magazine_view_count';
     const SECTION_TAXONOMY_NAME = 'em_section';
 
-    private $post_data, $issue, $authors, $page_num, $order, $sections;
+    private $issue, $authors, $page_num, $order, $sections;
     
     /**
     * Instantiate the class by passing the WP_Post object or a post_id
@@ -40,34 +40,27 @@ class evangelical_magazine_article {
     }
     
     /**
-    * Returns the post ID
-    * 
-    * @return integer
-    */
-    public function get_id() {
-        return $this->post_data->ID;
-    }
-    
-    /**
-    * Returns the name of the author
+    * Returns the title of the article
     * 
     * @param boolean $link - include a HTML link
     * @return string
     */
     public function get_title($link = false) {
         if ($link && !$this->is_future()) {
-            return "<a href=\"{$this->get_link()}\">{$this->post_data->post_title}</a>";
+            return "<a class=\"article-link\" href=\"{$this->get_link()}\">{$this->post_data->post_title}</a>";
         } else {
             return $this->post_data->post_title;
         }
     }
     
-    public function is_future() {
-        return ($this->post_data->post_status == 'future');
-    }
-    
-    public function get_link() {
-        return get_permalink($this->get_id());
+    /**
+    * Wrapper for get_title()
+    * 
+    * @param boolean $link
+    * @return string
+    */
+    public function get_name ($link = false) {
+        return $this->get_title ($link);
     }
     
     public function has_issue() {
@@ -90,7 +83,7 @@ class evangelical_magazine_article {
         }
     }
     
-    public function get_issue_page_num() {
+    public function get_page_num() {
         return $this->page_num;
     }
     
@@ -336,7 +329,7 @@ class evangelical_magazine_article {
             if (!evangelical_magazine::is_creating_post()) {
                 $article = new evangelical_magazine_article ($post);
                 $existing_issue = $article->get_issue_id();
-                $existing_page_num = $article->get_issue_page_num();
+                $existing_page_num = $article->get_page_num();
             } else {
                 $existing_issue = $existing_page_num = '';
             }

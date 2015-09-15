@@ -7,14 +7,7 @@
 * @author Mark Barnes
 * @access public
 */
-class evangelical_magazine_series {
-    
-    /**
-    * All the custom posttype data is stored in $post_data as a WP_Post object
-    * 
-    * @var WP_Post
-    */
-    private $post_data;
+class evangelical_magazine_series extends evangelical_magazine_template {
     
     /**
     * Instantiate the class by passing the WP_Post object or a post_id
@@ -26,33 +19,6 @@ class evangelical_magazine_series {
             $post = get_post ((int)$post);
         }
         $this->post_data = $post;
-    }
-    
-    /**
-    * Returns the post ID
-    * 
-    * @return integer
-    */
-    public function get_id() {
-        return $this->post_data->ID;
-    }
-        
-    /**
-    * Returns the name of the series
-    * 
-    * @param boolean $link - include a HTML link
-    * @return string
-    */
-    public function get_name($link = false) {
-        if ($link) {
-            return "<a class=\"series-link\" href=\"{$this->get_link()}\">{$this->post_data->post_title}</a>";
-        } else {
-            return $this->post_data->post_title;
-        }
-    }
-        
-    public function get_link() {
-        return get_permalink($this->post_data->ID);
     }
     
     public function get_articles_in_this_series ($limit = 99, $exclude_article_ids = array()) {
