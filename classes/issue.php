@@ -25,37 +25,26 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
         }
     }
     
-    public static function get_possible_issues() {
-        return array ('01' => 'January/February', '03' => 'March/April', '05' => 'May/June', '07' => 'July/August', '09' => 'September/October', '11' => 'November/December');
-    }
-    
+    /**
+    * Returns an array contain the date of this issue
+    * 
+    * @return array
+    */
     public function get_date() {
         return array ('year' => $this->year, 'month' => $this->month);
     }
     
+    /**
+    * Saves the metadata when a post is edited
+    * 
+    * Called on the 'save_post_action
+    * 
+    */
     public function save_meta_data() {
         if (isset($_POST['em_issue_month']) && isset($_POST['em_issue_year'])) {
             update_post_meta ($this->get_id(), self::ISSUE_DATE_META_NAME, "{$_POST['em_issue_year']}-{$_POST['em_issue_month']}");
         } else {
             delete_post_meta ($this->get_id(), self::ISSUE_DATE_META_NAME);
-        }
-    }
-    
-    /**
-    * Returns an array of all the issue objects
-    * 
-    * @param string $order_by
-    * @return evangelical_magazine_issue[]
-    */
-    public static function get_all_issues($limit = -1) {
-        $args = array ('post_type' => 'em_issue', 'meta_key' => evangelical_magazine_issue::ISSUE_DATE_META_NAME, 'orderby' => 'meta_value', 'order' => 'DESC', 'posts_per_page' => $limit);
-        $query = new WP_Query($args);
-        if ($query->posts) {
-            $issues = array();
-            foreach ($query->posts as $issue) {
-                $issues[] = new evangelical_magazine_issue ($issue);
-            }
-            return $issues;
         }
     }
     
@@ -68,15 +57,7 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
     public function get_articles($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
-        $args = wp_parse_args ($args, $default_args);
-        $query = new WP_Query($args);
-        if ($query->posts) {
-            $articles = array();
-            foreach ($query->posts as $article) {
-                $articles[] = new evangelical_magazine_article ($article);
-            }
-            return $articles;
-        }
+        return self::_get_articles($args, $default_args);
     }
     
     /**
@@ -88,17 +69,14 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
     public function get_article_ids($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
-        $args = wp_parse_args ($args, $default_args);
-        $query = new WP_Query($args);
-        if ($query->posts) {
-            $articles = array();
-            foreach ($query->posts as $article) {
-                $articles[] = $article->ID;
-            }
-            return $articles;
-        }
+        return self::_get_object_ids($args, $default_args);
     }
     
+    /**
+    * Returns an array of author IDs for all authors in the issue
+    * 
+    * @return integer[]
+    */
     public function get_author_ids() {
         $articles = $this->get_articles();
         if ($articles) {
@@ -202,5 +180,25 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
             $output .= '</div>';
             return $output;
         }
+    }
+
+    /**
+    * Returns an array of the possible values for the issue date
+    * 
+    * @return array
+    */
+    public static function get_possible_issue_dates() {
+        return array ('01' => 'January/February', '03' => 'March/April', '05' => 'May/June', '07' => 'July/August', '09' => 'September/October', '11' => 'November/December');
+    }
+    
+    /**
+    * Returns an array of all the issue objects
+    * 
+    * @param string $order_by
+    * @return evangelical_magazine_issue[]
+    */
+    public static function get_all_issues($limit = -1) {
+        $args = array ('post_type' => 'em_issue', 'meta_key' => evangelical_magazine_issue::ISSUE_DATE_META_NAME, 'orderby' => 'meta_value', 'order' => 'DESC', 'posts_per_page' => $limit);
+        return self::_get_issues($args);
     }
 }

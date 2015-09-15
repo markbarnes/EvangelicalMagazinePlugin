@@ -16,6 +16,12 @@ class evangelical_magazine_author extends evangelical_magazine_template {
         $this->post_data = $post;
     }
     
+    /**
+    * Returns the post content of an author post
+    * 
+    * @param boolean $link_name
+    * @return string
+    */
     public function get_description($link_name = true) {
         if ($link_name) {
             return str_replace($this->get_name(), "<a href=\"{$this->get_link()}\">{$this->get_name()}</a>", $this->post_data->post_content);
@@ -24,48 +30,15 @@ class evangelical_magazine_author extends evangelical_magazine_template {
         }
     }
     
+    /**
+    * Returns the HTML of a thumbnail and name of the author
+    * 
+    * @return string
+    */
     public function get_author_info_html() {
         return "<div class=\"author-info\"><a href=\"{$this->get_link()}\"><img class=\"author-image\" src=\"{$this->get_image_url('thumbnail_75')}\"/></a><div class=\"author-description\">{$this->get_description()}</div></div>";
     }
 
-    /**
-    * Returns an array of all the author objects
-    * 
-    * @param array $args
-    * @return evangelical_magazine_author[]
-    */
-    public static function get_all_authors($args = array()) {
-        $default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
-        $args = wp_parse_args ($args, $default_args);
-        $query = new WP_Query($args);
-        if ($query->posts) {
-            $authors = array();
-            foreach ($query->posts as $author) {
-                $authors[] = new evangelical_magazine_author ($author);
-            }
-            return $authors;
-        }
-    }
-    
-    /**
-    * Returns an array of all the author ids
-    * 
-    * @param array $args
-    * @return integer[]
-    */
-    public static function get_all_author_ids($args = array()) {
-        $default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
-        $args = wp_parse_args ($args, $default_args);
-        $query = new WP_Query($args);
-        if ($query->posts) {
-            $authors = array();
-            foreach ($query->posts as $author) {
-                $authors[] = $author->ID;
-            }
-            return $authors;
-        }
-    }
-    
     /**
     * Returns all articles by this author
     * 
@@ -76,16 +49,38 @@ class evangelical_magazine_author extends evangelical_magazine_template {
     public function get_articles ($limit = 9999, $exclude_article_ids = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::AUTHOR_META_NAME, 'value' => $this->get_id()));
         $args = array ('post_type' => 'em_article', 'posts_per_page' => $limit, 'meta_query' => $meta_query, 'post__not_in' => $exclude_article_ids);
-        $query = new WP_Query($args);
-        if ($query->posts) {
-            $also_by = array();
-            foreach ($query->posts as $article) {
-                $also_by[] = new evangelical_magazine_article($article);
-            }
-            return $also_by;
-        }
+        return self::_get_articles($args);
     }
 
+    /**
+    * Returns an array of all the author objects
+    * 
+    * @param array $args
+    * @return evangelical_magazine_author[]
+    */
+    public static function get_all_authors($args = array()) {
+        $default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
+        return self::_get_authors($args, $default_args);
+    }
+    
+    /**
+    * Returns an array of all the author ids
+    * 
+    * @param array $args
+    * @return integer[]
+    */
+    public static function get_all_author_ids($args = array()) {
+        $default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
+        return self::_get_object_ids($args, $default_args);
+    }
+    
+    /**
+    * Returns an array of authors, with those writing most recently and most frequently ordered first
+    * 
+    * @param array $args
+    * @param integer $issues_to_consider
+    * @return evangelical_magazine_author[]
+    */
     public static function get_all_authors_weighted_by_recent ($args = array(), $issues_to_consider = 18) {
         $authors = self::get_all_author_ids($args);
         if ($authors) {
@@ -110,20 +105,6 @@ class evangelical_magazine_author extends evangelical_magazine_template {
                 }
                 return $all_authors;
             }
-        }
-    }
-    
-    public static function get_author_grid_html($limit = -1, $issues = 18) {
-        $authors = self::get_all_authors_weighted_by_recent(array(), $issues);
-        if ($authors) {
-            if ($limit != -1) {
-                $authors = array_slice($authors, 0, $limit);
-            }
-            $output = "<aside id=\"author-grid\">";
-            foreach ($authors as $author) {
-                $output .= "<a href=\"{$author->get_link()}\"><div class=\"author-grid\" style=\"background-image:url('{$author->get_image_url('width_150')}')\"><div class=\"author-description\">{$author->get_filtered_content()}</div></div></a>";
-            }
-            return "{$output}</aside>";
         }
     }
 }

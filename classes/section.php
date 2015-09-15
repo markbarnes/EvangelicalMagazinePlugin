@@ -38,11 +38,23 @@ class evangelical_magazine_section {
         }
     }
         
+    /**
+    * Returns the link to this section
+    * 
+    * @return string
+    */
     public function get_link() {
         return get_term_link($this->term_data);
     }
     
-    public function get_articles ($limit = 99, $exclude_article_ids = array()) {
+    /**
+    * Returns an array of all articles in this section
+    * 
+    * @param int $limit
+    * @param int[] $exclude_article_ids
+    * @return evangelical_magazine_article[]
+    */
+    public function get_articles ($limit = -1, $exclude_article_ids = array()) {
         $tax_query = array(array('taxonomy' => evangelical_magazine_article::SECTION_TAXONOMY_NAME, 'field' => 'term_id', 'terms' => $this->get_id(), 'operator' => 'IN'));
         $args = array ('post_type' => 'em_article', 'posts_per_page' => $limit, 'tax_query' => $tax_query, 'post__not_in' => (array)$exclude_article_ids);
         $query = new WP_Query($args);
@@ -56,30 +68,21 @@ class evangelical_magazine_section {
     }
     
     /**
-    * Gets all available sections
+    * Returns the total number of articles in this section
     * 
-    * @param mixed $args
-    * @uses get_terms
-    * @return evangelical_magazine_section[]
     */
-    public static function get_all_sections($args = array()) {
-        $taxonomy = evangelical_magazine_article::SECTION_TAXONOMY_NAME;
-        $args = wp_parse_args ($args, array ('hide_empty' => false));
-        $terms = get_terms ((array)$taxonomy, $args);
-        if ($terms) {
-            $sections = array();
-            foreach ($terms as $term) {
-                $sections[] = new evangelical_magazine_section($term);
-            }
-            return $sections;
-        }
-    }
-    
     public function get_count() {
         return $this->term_data->count;
     }
     
-    public function get_info_box($limit, $exlude_article_ids = array()) {
+    /**
+    * Returns the HTML of a list of articles in this section
+    * 
+    * @param int $limit
+    * @param int[] $exlude_article_ids
+    * @return string
+    */
+    public function article_list_box($limit, $exlude_article_ids = array()) {
         $articles = $this->get_articles($limit, $exlude_article_ids);
         if ($articles) {
             $ids = array();
@@ -101,6 +104,26 @@ class evangelical_magazine_section {
             return array ('output' => $output, 'ids' => $ids);
         } else {
             return array ('output' => null, 'ids' => array());
+        }
+    }
+
+    /**
+    * Gets all available sections
+    * 
+    * @param mixed $args
+    * @uses get_terms
+    * @return evangelical_magazine_section[]
+    */
+    public static function get_all_sections($args = array()) {
+        $taxonomy = evangelical_magazine_article::SECTION_TAXONOMY_NAME;
+        $args = wp_parse_args ($args, array ('hide_empty' => false));
+        $terms = get_terms ((array)$taxonomy, $args);
+        if ($terms) {
+            $sections = array();
+            foreach ($terms as $term) {
+                $sections[] = new evangelical_magazine_section($term);
+            }
+            return $sections;
         }
     }
 }

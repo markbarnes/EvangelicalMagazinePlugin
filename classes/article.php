@@ -63,62 +63,119 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         return $this->get_title ($link);
     }
     
+    /**
+    * Returns true if this article has an issue specified
+    * 
+    * @return bool
+    */
     public function has_issue() {
         return is_a($this->issue, 'evangelical_magazine_issue');
     }
     
+    /**
+    * Returns the post id of the issue
+    * 
+    * @return integer
+    */
     public function get_issue_id() {
         if ($this->has_issue()) {
             return $this->issue->get_id();
         }
     }
     
+    /**
+    * Returns the name of the issue
+    * 
+    * @param bool $link
+    * @return string
+    */
     public function get_issue_name($link = false) {
         if ($this->has_issue()) {
-            if ($link) {
-                return "<a class=\"issue-link\" href=\"{$this->issue->get_link()}\">{$this->issue->get_name()}</a>";
-            } else {
-                return $this->issue->get_name();
-            }
+            return $this->issue->get_name($link);
         }
     }
     
+    /**
+    * Returns the article's page number
+    * 
+    * @return integer
+    */
     public function get_page_num() {
         return $this->page_num;
     }
     
+    /**
+    * Returns true if the article is part of a series
+    * 
+    * @return bool
+    */
     public function has_series() {
         return is_a($this->series, 'evangelical_magazine_series');
     }
     
+    /**
+    * Returns the series object
+    * 
+    * @return evangelical_magazine_series
+    * 
+    */
     public function get_series() {
         return $this->series;
     }
     
+    /**
+    * Returns the post ID of the series
+    * 
+    * @return integer
+    */
     public function get_series_id() {
         if ($this->has_series()) {
             return $this->series->get_id();
         }
     }
     
+    /**
+    * Returns the name of the series
+    * 
+    * @param bool $link
+    * @return string
+    */
     public function get_series_name($link = false) {
         if ($this->has_series()) {
             return $this->series->get_name($link);
         }
     }
     
+    /**
+    * Returns the article's position in the series
+    * 
+    * @return int
+    */
     public function get_series_order() {
         return $this->order;
     }
     
+    /**
+    * Returns true if the article is in a section
+    * 
+    * @return bool
+    */
     public function has_sections() {
         return (bool)$this->sections;
     }
     
+    /**
+    * Returns an array of sections objects for this article
+    * 
+    * @return evangelical_magazine_section[]
+    */
     public function get_sections() {
         return $this->sections;
     }
     
+    /**
+    * Populates $this->sections
+    */
     private function generate_sections_array() {
         $sections = get_the_terms($this->get_id(), self::SECTION_TAXONOMY_NAME);
         if ($sections) {
@@ -131,15 +188,28 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         }
     }
     
+    /**
+    * Returns an array of author objects for this article
+    * 
+    * @return evangelical_magazine_author[]
+    */
     public function get_authors() {
         return $this->authors;
     }
     
+    /**
+    * Returns an array of author post IDs for this article
+    * 
+    * @return integer[]
+    */
     public function get_author_ids() {
         $authors = get_post_meta ($this->get_id(), self::AUTHOR_META_NAME);
         return (array)$authors;
     }
     
+    /**
+    * Populates $this->authors
+    */
     private function generate_authors_array() {
         $authors_ids = $this->get_author_ids();
         if ($authors_ids) {
@@ -154,6 +224,12 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         }
     }
     
+    /**
+    * Returns a list of author names
+    * 
+    * @param bool $link
+    * @return string
+    */
     public function get_author_names($link = false) {
         if (is_array($this->authors)) {
             $output = array();
@@ -173,16 +249,34 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         }
     }
 
+    
+    /**
+    * Returns the date of the issue
+    * 
+    * @return array
+    */
     public function get_issue_date() {
         if ($this->has_issue()) {
             return $this->issue->get_date();
         }
     }
     
+    /**
+    * Returns the date the post was/will be published online
+    * 
+    * @param string $date_format
+    * @return string
+    */
     public function get_publish_date ($date_format = 'j F Y') {
         return date($date_format, strtotime($this->post_data->post_date));
     }
     
+    /**
+    * Saves the metadata when the post is edited
+    * 
+    * Called during the 'save_post' action
+    * 
+    */
     public function save_meta_data() {
         delete_post_meta ($this->get_id(), self::AUTHOR_META_NAME);
         if (isset($_POST['em_authors'])) {
@@ -223,6 +317,13 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         }
     }
     
+    /**
+    * Returns all articles by the same author(s) as this article
+    * 
+    * @param int $limit
+    * @param int[] $exclude_this_article - an array of post ids
+    * @return evangelical_magazine_article[]
+    */
     public function get_articles_by_same_authors($limit = 5, $exclude_this_article = true) {
         $author_ids = $this->get_author_ids();
         if ($author_ids) {
@@ -231,32 +332,50 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             if ($exclude_this_article) {
                 $args ['post__not_in'] = array($this->get_id());
             }
-            $query = new WP_Query($args);
-            if ($query->posts) {
-                $also_by = array();
-                foreach ($query->posts as $article) {
-                    $also_by[] = new evangelical_magazine_article($article);
-                }
-                return $also_by;
-            }
+            return self::_get_articles($args);
         }
     }
     
+    /**
+    * Returns all articles in the same series as this article
+    * 
+    * @param int $limit
+    * @param int[] $exclude_this_article
+    * @return evangelical_magazine_article[]
+    */
     public function get_articles_in_same_series($limit = 99, $exclude_this_article = false) {
         $series = $this->get_series();
         $exclude_ids = $exclude_this_article ? (array)$this->get_id() : array();
-        return $series->get_articles_in_this_series($limit, $exclude_ids);
+        return $series->get_articles($limit, $exclude_ids);
     }
     
-    public function get_image_url($image_size = 'thumbnail') {
-        if (has_post_thumbnail($this->get_id())) {
-            $src = wp_get_attachment_image_src (get_post_thumbnail_id($this->get_id()), $image_size);
-            if ($src) {
-                return $src[0];
-            }
-        }
+    /**
+    * Gets the number of views
+    * 
+    * @return integer
+    * 
+    */
+    public function get_view_count() {
+        return get_post_meta($this->get_id(), self::VIEW_COUNT_META_NAME, true);
     }
     
+    /**
+    * Increases the view count by one
+    * 
+    */
+    public function record_view_count()  {
+        $view_count = $this->get_view_count();
+        update_post_meta ($this->get_id(), self::VIEW_COUNT_META_NAME, $view_count+1);
+    }
+
+    /**
+    * Returns the HTML which produces the small article box
+    * 
+    * @param bool $add_links
+    * @param string $sub_title
+    * @param string $class
+    * @return string
+    */
     public function get_small_box_html($add_links = true, $sub_title = '', $class = '') {
         if (has_post_thumbnail($this->get_id())) {
             $src = $this->get_image_url($image_size = 'width_210');
@@ -389,7 +508,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             $existing_issue_date = array('year' => date('Y'), 'month' => str_pad($this_month+(($this_month+1) % 2), 2, '0', STR_PAD_LEFT));
         }
         echo '<select name="em_issue_month">';
-        $possible_issues = evangelical_magazine_issue::get_possible_issues();
+        $possible_issues = evangelical_magazine_issue::get_possible_issue_dates();
         foreach ($possible_issues as $index => $name) {
             $selected = ($existing_issue_date['month'] == $index) ? ' selected="selected"' : '';
             echo "<option value=\"{$index}\"{$selected}> {$name}</label></li>";
@@ -401,24 +520,5 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             echo "<option value=\"{$year}\"{$selected}> {$year}</label></li>";
         }
         echo '</select>';
-    }
-    
-    /**
-    * Gets the number of views
-    * 
-    * @return integer
-    * 
-    */
-    public function get_view_count() {
-        return get_post_meta($this->get_id(), self::VIEW_COUNT_META_NAME, true);
-    }
-    
-    /**
-    * Increases the view count by one
-    * 
-    */
-    public function record_view_count()  {
-        $view_count = $this->get_view_count();
-        update_post_meta ($this->get_id(), self::VIEW_COUNT_META_NAME, $view_count+1);
     }
 }

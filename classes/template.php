@@ -9,7 +9,7 @@
 * @author Mark Barnes
 * @access public
 */
-class evangelical_magazine_template {
+abstract class evangelical_magazine_template {
     
     /**
     * All the custom posttype data is stored in $post_data as a WP_Post object
@@ -121,6 +121,106 @@ class evangelical_magazine_template {
     * @return string
     */
     public function get_filtered_content() {
-        return wp_strip_all_tags($this->get_content);
+        return wp_strip_all_tags($this->get_content());
     }
+
+    /**
+    * Helper function to help subclasses return all the objects from a WP_Query
+    * 
+    * @param array $args
+    * @param array $default_args
+    * @param string $class - the class to return (without the 'evangelical_magazine_')
+    * @uses WP_Query
+    * @return array
+    */
+    protected static function _get_objects ($args, $default_args, $class) {
+        $class = "evangelical_magazine_{$class}";
+        $args = wp_parse_args($args, $default_args);
+        $query = new WP_Query($args);
+        if ($query->posts) {
+            $objects = array();
+            foreach ($query->posts as $post) {
+                $objects[] = new $class($post);
+            }
+            return $objects;
+        }
+    }
+
+    /**
+    * Helper function to help subclasses return all the articles from a WP_Query
+    * 
+    * Wrapper for _get_objects()
+    * 
+    * @param array $args
+    * @param array $default_args
+    * @uses evangelical_magazine_template::_get_objects()
+    * @return evangelical_magazine_article[]
+    */
+    protected static function _get_articles ($args, $default_args = '') {
+        return self::_get_objects($args, $default_args, 'article');
+    }
+
+    /**
+    * Helper function to help subclasses return all the series from a WP_Query
+    * 
+    * Wrapper for _get_objects()
+    * 
+    * @param array $args
+    * @param array $default_args
+    * @uses evangelical_magazine_template::_get_objects()
+    * @return evangelical_magazine_series[]
+    */
+    protected static function _get_series ($args, $default_args = '') {
+        return self::_get_objects($args, $default_args, 'series');
+    }
+
+   /**
+    * Helper function to help subclasses return all the issues from a WP_Query
+    * 
+    * Wrapper for _get_objects()
+    * 
+    * @param array $args
+    * @param array $default_args
+    * @uses evangelical_magazine_template::_get_objects()
+    * @return evangelical_magazine_issue[]
+    */
+    protected static function _get_issues ($args, $default_args = '') {
+        return self::_get_objects($args, $default_args, 'issue');
+    }
+
+   /**
+    * Helper function to help subclasses return all the authors from a WP_Query
+    * 
+    * Wrapper for _get_objects()
+    * 
+    * @param array $args
+    * @param array $default_args
+    * @uses evangelical_magazine_template::_get_objects()
+    * @return evangelical_magazine_author[]
+    */
+    protected static function _get_authors ($args, $default_args = '') {
+        return self::_get_objects($args, $default_args, 'author');
+    }
+
+    /**
+    * Helper function to help subclasses return all the object_ids from a WP_Query
+    * 
+    * @param array $args
+    * @param array $default_args
+    * @param string $class - the class to return (without the 'evangelical_magazine_')
+    * @uses WP_Query
+    * @return array
+    */
+    protected static function _get_object_ids ($args, $default_args) {
+        $args = wp_parse_args($args, $default_args);
+        $query = new WP_Query($args);
+        if ($query->posts) {
+            $post_ids = array();
+            foreach ($query->posts as $post) {
+                $post_ids[] = $post->ID;
+            }
+            return $post_ids;
+        }
+    }
+
 }
