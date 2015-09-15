@@ -90,6 +90,12 @@ class evangelical_magazine_issue {
         }
     }
     
+    /**
+    * Returns the articles from this issue
+    * 
+    * @param array $args
+    * @return evangelical_magazine_article[]
+    */
     public function get_articles($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
@@ -170,6 +176,38 @@ class evangelical_magazine_issue {
         $article_ids = $this->get_article_ids();
         if ($article_ids) {
             return count ($article_ids);
+        }
+    }
+    
+    /**
+    * Returns the HTML for a list of articles with thumbnails, title and author
+    * 
+    * @param integer $limit - the maximum number to return
+    * @param integer[] $exlude_article_ids - an array of article_ids to exclude
+    * @param boolean $include_future
+    */
+    public function get_html_article_list($limit, $exlude_article_ids = array(), $include_future = false) {
+        $articles = $this->get_articles ($limit, $exlude_article_ids);
+        if ($articles) {
+            $ids = array();
+            $output = "<div class=\"section-info-box\">";
+            $output .= "<h3>{$this->get_name(true)}</h3>";
+            $output .= "<ol>";
+            $class=' first';
+            foreach ($articles as $article) {
+                $url = $class == '' ? $article->get_image_url('width_150') : $article->get_image_url('width_400');
+                $output .= "<li><a href=\"{$article->get_link()}\"><div class=\"section-info-box-image{$class}\" style=\"background-image: url('{$url}')\"></div></a>";
+                $title = $article->get_title();
+                $style = strlen($title) > 40 ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
+                $output .= "<span class=\"section-info-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"section-info-box-author\">by {$article->get_author_names(true)}</span></li>";
+                $ids[] = $article->get_id();
+                $class='';
+            }
+            $output .= "</ol>";
+            $output .= '</div>';
+            return array ('output' => $output, 'ids' => $ids);
+        } else {
+            return array ('output' => null, 'ids' => array());
         }
     }
 }

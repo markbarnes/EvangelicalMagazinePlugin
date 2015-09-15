@@ -255,7 +255,7 @@ class evangelical_magazine_article {
             return "<aside class=\"{$class}\"><div class=\"article-image\"{$style}>{$sub_title}</div><div class=\"article-title\">{$this->get_title()}</div></aside>";
         }
     }
-
+    
     /**
     * Adds metaboxes to articles custom post type
     * 
