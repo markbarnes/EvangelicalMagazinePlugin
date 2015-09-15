@@ -3,6 +3,11 @@ class evangelical_magazine_section {
     
     private $term_data;
     
+    /**
+    * Instantiate the class by passing the WP_Post object or a post_id
+    * 
+    * @param integer|WP_Post $post
+    */
     public function __construct($term) {
         if (!is_a ($term, 'stdClass')) {
             $term = get_term ((int)$term, evangelical_magazine_article::SECTION_TAXONOMY_NAME);
@@ -10,10 +15,21 @@ class evangelical_magazine_section {
         $this->term_data = $term;
     }
     
+    /**
+    * Returns the post ID
+    * 
+    * @return integer
+    */
     public function get_id() {
         return $this->term_data->term_id;
     }
         
+    /**
+    * Returns the name of the section
+    * 
+    * @param boolean $link - include a HTML link
+    * @return string
+    */
     public function get_name($link = false) {
         if ($link) {
             return "<a href =\"{$this->get_link()}\">{$this->term_data->name}</a>";

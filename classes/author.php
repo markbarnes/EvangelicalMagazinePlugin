@@ -6,6 +6,11 @@ class evangelical_magazine_author {
     
     private $post_data;
     
+    /**
+    * Instantiate the class by passing the WP_Post object or a post_id
+    * 
+    * @param integer|WP_Post $post
+    */
     public function __construct ($post) {
         if (!is_a ($post, 'WP_Post')) {
             $post = get_post ((int)$post);
@@ -13,12 +18,27 @@ class evangelical_magazine_author {
         $this->post_data = $post;
     }
     
+    /**
+    * Returns the post ID
+    * 
+    * @return integer
+    */
     public function get_id() {
         return $this->post_data->ID;
     }
     
-    public function get_name() {
-        return $this->post_data->post_title;
+    /**
+    * Returns the name of the author
+    * 
+    * @param boolean $link - include a HTML link
+    * @return string
+    */
+    public function get_name($link = false) {
+        if ($link) {
+            return "<a href=\"{$this->get_link()}\">{$this->post_data->post_title}</a>";
+        } else {
+            return $this->post_data->post_title;
+        }
     }
     
     public function get_link() {
