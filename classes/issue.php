@@ -63,7 +63,7 @@ class evangelical_magazine_issue {
             }
         }
     }
-
+    
     public function save_meta_data() {
         if (isset($_POST['em_issue_month']) && isset($_POST['em_issue_year'])) {
             update_post_meta ($this->get_id(), self::ISSUE_DATE_META_NAME, "{$_POST['em_issue_year']}-{$_POST['em_issue_month']}");
@@ -180,34 +180,58 @@ class evangelical_magazine_issue {
     }
     
     /**
+    * Gets the articles with future post_dates in this issue
+    * 
+    * @return evangelical_magazine_article[]
+    */
+    public function get_future_articles($args = array()) {
+        $default_args = array ('post_status' => array ('future'));
+        $args = wp_parse_args($args, $default_args);
+        return $this->get_articles($args);
+    }
+    
+    /**
     * Returns the HTML for a list of articles with thumbnails, title and author
     * 
     * @param integer $limit - the maximum number to return
-    * @param integer[] $exlude_article_ids - an array of article_ids to exclude
     * @param boolean $include_future
     */
-    public function get_html_article_list($limit, $exlude_article_ids = array(), $include_future = false) {
-        $articles = $this->get_articles ($limit, $exlude_article_ids);
+    public function get_html_article_list($args = array()) {
+        $default_args = is_user_logged_in() ? array ('post_status' => array ('publish', 'future', 'private')) : array ('post_status' => array ('publish', 'future'));
+        $default_args['order'] = 'ASC';
+        $args = wp_parse_args($args, $default_args);
+        $articles = $this->get_articles ($args);
         if ($articles) {
-            $ids = array();
             $output = "<div class=\"section-info-box\">";
-            $output .= "<h3>{$this->get_name(true)}</h3>";
             $output .= "<ol>";
             $class=' first';
             foreach ($articles as $article) {
                 $url = $class == '' ? $article->get_image_url('width_150') : $article->get_image_url('width_400');
-                $output .= "<li><a href=\"{$article->get_link()}\"><div class=\"section-info-box-image{$class}\" style=\"background-image: url('{$url}')\"></div></a>";
+                if ($article->is_future()) {
+                    $output .= "<li><div class=\"section-info-box-image{$class}\" style=\"background-image: url('{$url}')\"></div>";
+                } else {
+                    $output .= "<li><a href=\"{$article->get_link()}\"><div class=\"section-info-box-image{$class}\" style=\"background-image: url('{$url}')\"></div></a>";
+                }
                 $title = $article->get_title();
                 $style = strlen($title) > 40 ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
-                $output .= "<span class=\"section-info-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"section-info-box-author\">by {$article->get_author_names(true)}</span></li>";
-                $ids[] = $article->get_id();
+                $output .= "<span class=\"section-info-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"section-info-box-author\">by {$article->get_author_names(true)}</span>";
+                if ($article->is_future()) {
+                    $publish_date = str_replace(' '.date('Y'), '', $article->get_publish_date());
+                    if ($publish_date == date('j F')) {
+                        $publish_date = 'later today';
+                    } elseif ($publish_date == date('j F', strtotime('tomorrow'))) {
+                        $publish_date = 'tomorrow';
+                    } else {
+                        $publish_date = "on {$publish_date}";
+                    }
+                    $output .= "<br/><span class=\"coming-soon\">Coming {$publish_date}</span>";
+                }
+                "</li>";
                 $class='';
             }
             $output .= "</ol>";
             $output .= '</div>';
-            return array ('output' => $output, 'ids' => $ids);
-        } else {
-            return array ('output' => null, 'ids' => array());
+            return $output;
         }
     }
 }

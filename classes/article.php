@@ -39,11 +39,15 @@ class evangelical_magazine_article {
     }
     
     public function get_title($link = false) {
-        if ($link) {
+        if ($link && !$this->is_future()) {
             return "<a href=\"{$this->get_link()}\">{$this->post_data->post_title}</a>";
         } else {
             return $this->post_data->post_title;
         }
+    }
+    
+    public function is_future() {
+        return ($this->post_data->post_status == 'future');
     }
     
     public function get_link() {
@@ -164,6 +168,10 @@ class evangelical_magazine_article {
         if ($this->has_issue()) {
             return $this->issue->get_date();
         }
+    }
+    
+    public function get_publish_date ($date_format = 'j F Y') {
+        return date($date_format, strtotime($this->post_data->post_date));
     }
     
     public function save_meta_data() {
