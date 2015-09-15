@@ -6,6 +6,7 @@ class evangelical_magazine_article {
     const PAGE_NUM_META_NAME = 'evangelical_magazine_page_num';
     const SERIES_META_NAME = 'evangelical_magazine_series';
     const ORDER_META_NAME = 'evangelical_magazine_order';
+    const VIEW_COUNT_META_NAME = 'evangelical_magazine_view_count';
     const SECTION_TAXONOMY_NAME = 'em_section';
 
     private $post_data, $issue, $authors, $page_num, $order, $sections;
@@ -383,5 +384,24 @@ class evangelical_magazine_article {
             echo "<option value=\"{$year}\"{$selected}> {$year}</label></li>";
         }
         echo '</select>';
+    }
+    
+    /**
+    * Gets the number of views
+    * 
+    * @return integer
+    * 
+    */
+    public function get_view_count() {
+        return get_post_meta($this->get_id(), self::VIEW_COUNT_META_NAME, true);
+    }
+    
+    /**
+    * Increases the view count by one
+    * 
+    */
+    public function record_view_count()  {
+        $view_count = $this->get_view_count();
+        update_post_meta ($this->get_id(), self::VIEW_COUNT_META_NAME, $view_count+1);
     }
 }
