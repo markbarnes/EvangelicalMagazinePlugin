@@ -558,4 +558,18 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         }
         echo '</select>';
     }
+    
+    /**
+    * Returns the next article to be published
+    * 
+    * @param array $args
+    * @return evangelical_magazine_article
+    */
+    public static function get_next_future_article($args) {
+        $default_args = array ('post_type' => 'em_article', 'orderby' => 'date', 'order' => 'ASC', 'posts_per_page' => 1, 'post_status' => 'future');
+        $articles = self::_get_articles($args, $default_args);
+        if (is_array($articles)) {
+            return $articles[0];
+        }
+    }
 }
