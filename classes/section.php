@@ -67,16 +67,16 @@ class evangelical_magazine_section {
         $articles = $this->get_articles($limit, $exlude_article_ids);
         if ($articles) {
             $ids = array();
-            $output = "<div class=\"section-info-box\">";
+            $output = "<div class=\"article-list-box\">";
             $output .= "<h3>{$this->get_name(true)}</h3>";
             $output .= "<ol>";
             $class=' first';
             foreach ($articles as $article) {
                 $url = $class == '' ? $article->get_image_url('width_150') : $article->get_image_url('width_400');
-                $output .= "<li><a href=\"{$article->get_link()}\"><div class=\"section-info-box-image{$class}\" style=\"background-image: url('{$url}')\"></div></a>";
+                $output .= "<li><a href=\"{$article->get_link()}\"><div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div></a>";
                 $title = $article->get_title();
                 $style = strlen($title) > 40 ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
-                $output .= "<span class=\"section-info-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"section-info-box-author\">by {$article->get_author_names(true)}</span></li>";
+                $output .= "<span class=\"article-list-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"article-list-box-author\">by {$article->get_author_names(true)}</span></li>";
                 $ids[] = $article->get_id();
                 $class='';
             }
