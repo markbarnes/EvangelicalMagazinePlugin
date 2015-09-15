@@ -24,8 +24,12 @@ class evangelical_magazine_issue {
         return $this->post_data->ID;
     }
         
-    public function get_name() {
-        return $this->post_data->post_title;
+    public function get_name($link = false) {
+        if ($link) {
+            return "<a href=\"{$this->get_link()}\">{$this->post_data->post_title}</a>";
+        } else {
+            return $this->post_data->post_title;
+        }
     }
         
     public function get_link() {
