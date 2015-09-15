@@ -213,7 +213,7 @@ class evangelical_magazine_issue {
                     $output .= "<li><a href=\"{$article->get_link()}\"><div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div></a>";
                 }
                 $title = $article->get_title();
-                $style = strlen($title) > 40 ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
+                $style = ($class & strlen($title) > 40) ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
                 $output .= "<span class=\"article-list-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"article-list-box-author\">by {$article->get_author_names(true)}</span>";
                 if ($article->is_future()) {
                     $publish_date = str_replace(' '.date('Y'), '', $article->get_publish_date());
@@ -224,7 +224,7 @@ class evangelical_magazine_issue {
                     } else {
                         $publish_date = "on {$publish_date}";
                     }
-                    $output .= "<br/><span class=\"coming-soon\">Coming {$publish_date}</span>";
+                    $output .= "<br/><span class=\"article-list-box-coming-soon\">Coming {$publish_date}</span>";
                 }
                 "</li>";
                 $class='';
