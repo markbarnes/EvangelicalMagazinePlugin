@@ -90,7 +90,7 @@ class evangelical_magazine_issue {
         }
     }
     
-    public function get_all_articles($args = array()) {
+    public function get_articles($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
         $args = wp_parse_args ($args, $default_args);
@@ -110,7 +110,7 @@ class evangelical_magazine_issue {
     * @param array $args
     * @return integer[]
     */
-    public function get_all_article_ids($args = array()) {
+    public function get_article_ids($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
         $args = wp_parse_args ($args, $default_args);
@@ -124,8 +124,8 @@ class evangelical_magazine_issue {
         }
     }
     
-    public function get_all_author_ids() {
-        $articles = $this->get_all_articles();
+    public function get_author_ids() {
+        $articles = $this->get_articles();
         if ($articles) {
             $all_authors = array();
             foreach ($articles as $article) {
@@ -143,7 +143,7 @@ class evangelical_magazine_issue {
     */
     public function get_top_articles ($limit = -1) {
         //We can't do this in one query, because WordPress won't return null values when you sort by meta_value
-        $article_ids = $this->get_all_article_ids();
+        $article_ids = $this->get_article_ids();
         if ($article_ids) {
             $articles = array();
             foreach ($article_ids as $article_id) {
@@ -167,7 +167,7 @@ class evangelical_magazine_issue {
     * @return integer
     */
     public function get_article_count() {
-        $article_ids = $this->get_all_article_ids();
+        $article_ids = $this->get_article_ids();
         if ($article_ids) {
             return count ($article_ids);
         }

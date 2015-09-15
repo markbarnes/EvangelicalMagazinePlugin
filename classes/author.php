@@ -121,7 +121,7 @@ class evangelical_magazine_author {
             if ($issues) {
                 $issue_weighting = $issues_to_consider;
                 foreach ($issues as $issue) {
-                    $issue_authors = $issue->get_all_author_ids();
+                    $issue_authors = $issue->get_author_ids();
                     if ($issue_authors) {
                         foreach ($issue_authors as $issue_author) {
                             $authors[$issue_author] = $authors[$issue_author] + (pow($issue_weighting,2)/pow($issues_to_consider,2));
