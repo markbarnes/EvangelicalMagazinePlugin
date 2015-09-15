@@ -26,7 +26,7 @@ class evangelical_magazine_section {
         return get_term_link($this->term_data);
     }
     
-    public function get_articles_in_this_section ($limit = 99, $exclude_article_ids = array()) {
+    public function get_articles ($limit = 99, $exclude_article_ids = array()) {
         $tax_query = array(array('taxonomy' => evangelical_magazine_article::SECTION_TAXONOMY_NAME, 'field' => 'term_id', 'terms' => $this->get_id(), 'operator' => 'IN'));
         $args = array ('post_type' => 'em_article', 'posts_per_page' => $limit, 'tax_query' => $tax_query, 'post__not_in' => (array)$exclude_article_ids);
         $query = new WP_Query($args);
@@ -64,7 +64,7 @@ class evangelical_magazine_section {
     }
     
     public function get_info_box($limit, $exlude_article_ids = array()) {
-        $articles = $this->get_articles_in_this_section($limit, $exlude_article_ids);
+        $articles = $this->get_articles($limit, $exlude_article_ids);
         if ($articles) {
             $ids = array();
             $output = "<div class=\"section-info-box\">";
