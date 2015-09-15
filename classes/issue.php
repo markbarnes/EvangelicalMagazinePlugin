@@ -90,14 +90,35 @@ class evangelical_magazine_issue {
         }
     }
     
-    public function get_all_articles() {
+    public function get_all_articles($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
-        $args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
+        $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
+        $args = wp_parse_args ($args, $default_args);
         $query = new WP_Query($args);
         if ($query->posts) {
             $articles = array();
             foreach ($query->posts as $article) {
                 $articles[] = new evangelical_magazine_article ($article);
+            }
+            return $articles;
+        }
+    }
+    
+    /**
+    * Returns an array of article IDs for all articles in the issue
+    * 
+    * @param array $args
+    * @return integer[]
+    */
+    public function get_all_article_ids($args = array()) {
+        $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
+        $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
+        $args = wp_parse_args ($args, $default_args);
+        $query = new WP_Query($args);
+        if ($query->posts) {
+            $articles = array();
+            foreach ($query->posts as $article) {
+                $articles[] = $article->ID;
             }
             return $articles;
         }
@@ -114,4 +135,41 @@ class evangelical_magazine_issue {
         }
     }
 
+    /**
+    * Gets the post popular articles in the issue
+    * 
+    * @param integer $limit - the maximum number of articles to return
+    * @return evangelical_magazine_article[]
+    */
+    public function get_top_articles ($limit = -1) {
+        //We can't do this in one query, because WordPress won't return null values when you sort by meta_value
+        $article_ids = $this->get_all_article_ids();
+        if ($article_ids) {
+            $articles = array();
+            foreach ($article_ids as $article_id) {
+                $articles[$article_id] = get_post_meta($article_id, evangelical_magazine_article::VIEW_COUNT_META_NAME, true);
+            }
+            arsort($articles);
+            if ($limit != -1) {
+                $articles = array_slice ($articles, 0, $limit, true);
+            }
+            $top_articles = array();
+            foreach ($articles as $article => $view_count) {
+                $top_articles[] = new evangelical_magazine_article($article);
+            }
+            return $top_articles;
+        }
+    }
+    
+    /**
+    * Returns the number of articles in this issue
+    * 
+    * @return integer
+    */
+    public function get_article_count() {
+        $article_ids = $this->get_all_article_ids();
+        if ($article_ids) {
+            return count ($article_ids);
+        }
+    }
 }
