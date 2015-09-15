@@ -46,10 +46,10 @@ class evangelical_magazine_author extends evangelical_magazine_template {
     * @param integer[] $exclude_article_ids
     * @return evangelical_magazine_article[]
     */
-    public function get_articles ($limit = 9999, $exclude_article_ids = array()) {
+    public function get_articles ($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::AUTHOR_META_NAME, 'value' => $this->get_id()));
-        $args = array ('post_type' => 'em_article', 'posts_per_page' => $limit, 'meta_query' => $meta_query, 'post__not_in' => $exclude_article_ids);
-        return self::_get_articles($args);
+        $default_args = array ('post_type' => 'em_article', 'posts_per_page' => -1, 'meta_query' => $meta_query);
+        return self::_get_articles($args, $default_args);
     }
 
     /**

@@ -257,8 +257,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * @return string
     */
     public function get_image_url($image_size = 'thumbnail') {
-        if ($image_size == 'width_150' && $this->is_future()) {
-            $image_size = 'width_150_bw';
+        $image_sizes = get_intermediate_image_sizes();
+        if ($this->is_future() && substr($image_size, -3) != '_bw' && in_array("{$image_size}_bw", $image_sizes)) {
+            $image_size = "{$image_size}_bw";
         }
         if (has_post_thumbnail($this->get_id())) {
             $src = wp_get_attachment_image_src (get_post_thumbnail_id($this->get_id()), $image_size);
@@ -287,6 +288,23 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     */
     public function get_publish_date ($date_format = 'j F Y') {
         return date($date_format, strtotime($this->post_data->post_date));
+    }
+    
+    /**
+    * Returns a friendly string with the date that the article will be coming
+    * 
+    * @return string
+    */
+    public function get_coming_date() {
+        $publish_date = str_replace(' '.date('Y'), '', $this->get_publish_date());
+        if ($publish_date == date('j F')) {
+            return 'later today';
+        } elseif ($publish_date == date('j F', strtotime('tomorrow'))) {
+            return 'tomorrow';
+        } else {
+            return "on {$publish_date}";
+        }
+        
     }
     
     /**
@@ -402,8 +420,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             $style = '';
         }
         $class = trim("small-article-box {$class}");
+        $class .= $this->is_future() ? ' future' : '';
         $sub_title = $sub_title ? "<span class=\"sub-title\">{$sub_title}</span>" : '';
-        if ($add_links) {
+        if ($add_links && !$this->is_future()) {
             return "<aside class=\"{$class}\">{$sub_title}<a href=\"{$this->get_link()}\"><div class=\"article-image\"{$style}></div></a><div class=\"article-title\">{$this->get_title(true)}</div></aside>";
         } else {
             return "<aside class=\"{$class}\"><div class=\"article-image\"{$style}>{$sub_title}</div><div class=\"article-title\">{$this->get_title()}</div></aside>";

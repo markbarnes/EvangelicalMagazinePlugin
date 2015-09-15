@@ -144,7 +144,7 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
     * @param boolean $include_future
     */
     public function get_html_article_list($args = array()) {
-        $default_args = is_user_logged_in() ? array ('post_status' => array ('publish', 'future', 'private')) : array ('post_status' => array ('publish', 'future'));
+        $default_args = self::_future_posts_args();
         $default_args['order'] = 'ASC';
         $args = wp_parse_args($args, $default_args);
         $articles = $this->get_articles ($args);
@@ -163,15 +163,7 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
                 $style = ($class & strlen($title) > 40) ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
                 $output .= "<span class=\"article-list-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"article-list-box-author\">by {$article->get_author_names(!$article->is_future())}</span>";
                 if ($article->is_future()) {
-                    $publish_date = str_replace(' '.date('Y'), '', $article->get_publish_date());
-                    if ($publish_date == date('j F')) {
-                        $publish_date = 'later today';
-                    } elseif ($publish_date == date('j F', strtotime('tomorrow'))) {
-                        $publish_date = 'tomorrow';
-                    } else {
-                        $publish_date = "on {$publish_date}";
-                    }
-                    $output .= "<br/><span class=\"article-list-box-coming-soon\">Coming {$publish_date}</span>";
+                    $output .= "<br/><span class=\"article-list-box-coming-soon\">Coming {$article->get_coming_date()}</span>";
                 }
                 "</li>";
                 $class='';

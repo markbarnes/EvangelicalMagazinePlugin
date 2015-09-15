@@ -223,4 +223,16 @@ abstract class evangelical_magazine_template {
         }
     }
 
+    /**
+    * Helper function that returns the arguments needed to return future posts in addition to what is normally returned
+    * 
+    * @return array
+    */
+    public static function _future_posts_args () {
+        if (is_user_logged_in()) {
+            return array ('post_status' => array ('publish', 'future', 'private'));
+        } else {
+            return array ('post_status' => array ('publish', 'future'));
+        }
+    }
 }
