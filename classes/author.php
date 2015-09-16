@@ -81,7 +81,7 @@ class evangelical_magazine_author extends evangelical_magazine_template {
     * @param integer $issues_to_consider
     * @return evangelical_magazine_author[]
     */
-    public static function get_all_authors_weighted_by_recent ($args = array(), $issues_to_consider = 18) {
+    public static function get_all_authors_weighted_by_recent ($max_authors = -1, $args = array(), $issues_to_consider = 18) {
         $authors = self::get_all_author_ids($args);
         if ($authors) {
             $authors = array_flip ($authors);
@@ -99,6 +99,7 @@ class evangelical_magazine_author extends evangelical_magazine_template {
                     $issue_weighting--;
                 }
                 arsort($authors);
+                $authors = ($max_authors == -1) ? $authors : array_slice($authors, 0, $max_authors, true);
                 $all_authors = array();
                 foreach ($authors as $author => $weighting) {
                     $all_authors[] = new evangelical_magazine_author($author);
