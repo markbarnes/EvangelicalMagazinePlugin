@@ -119,7 +119,7 @@ class evangelical_magazine {
                         'has_archive' => true,
                         'query_var' => 'issue',
                         'register_meta_box_cb' => array ('evangelical_magazine_article', 'issue_meta_boxes'),
-                        'rewrite' => array('slug' => 'issue', 'with_front' => false));
+                        'rewrite' => array('slug' => 'issues', 'with_front' => false));
         register_post_type ('em_issue', $args);
         //Series
         $args = array ( 'label' => 'Series',
@@ -157,7 +157,7 @@ class evangelical_magazine {
                         'menu_icon' => 'dashicons-media-text',
                         'supports' => array ('title', 'thumbnail', 'editor'),
                         'taxonomies' => array ('em_section'),
-                        'has_archive' => true,
+                        'has_archive' => false,
                         'query_var' => 'article',
                         'register_meta_box_cb' => array ('evangelical_magazine_article', 'article_meta_boxes'),
                         'rewrite' => array('slug' => 'article', 'with_front' => false));
