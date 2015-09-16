@@ -10,8 +10,8 @@ class evangelical_magazine_section extends evangelical_magazine_not_articles {
     */
     public function _get_articles ($args) {
         $meta_query = array(array('key' => evangelical_magazine_article::SECTION_META_NAME, 'value' => $this->get_id(), 'compare' => '='));
-        $args = array ('post_type' => 'em_article', 'meta_query' => $meta_query);
-        return self::_get_articles_from_query($args);
+        $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query);
+        return self::_get_articles_from_query($args, $default_args);
     }
 
     /**
