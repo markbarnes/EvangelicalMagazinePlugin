@@ -150,11 +150,11 @@ abstract class evangelical_magazine_template {
     * 
     * @param array $articles
     */
-    public function get_html_article_list($articles) {
+    public function get_html_article_list($articles, $add_class_to_first = true) {
         if ($articles) {
             $output = "<div class=\"article-list-box\">";
             $output .= "<ol>";
-            $class=' first';
+            $class = $add_class_to_first ? ' first' : '';
             foreach ($articles as $article) {
                 $url = ($class == '') ? $article->get_image_url('width_150') : $article->get_image_url('width_400');
                 if ($article->is_future()) {
