@@ -140,9 +140,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * @param bool $link
     * @return string
     */
-    public function get_series_name($link = false) {
+    public function get_series_name() {
         if ($this->has_series()) {
-            return $this->series->get_name($link);
+            return $this->series->get_name();
         }
     }
     

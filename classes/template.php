@@ -278,7 +278,7 @@ abstract class evangelical_magazine_template {
     * @uses WP_Query
     * @return array
     */
-    protected static function _get_object_ids_from_query ($args, $default_args) {
+    public static function _get_object_ids_from_query ($args, $default_args) {
         $args = wp_parse_args($args, $default_args);
         $query = new WP_Query($args);
         if ($query->posts) {

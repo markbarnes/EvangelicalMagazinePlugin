@@ -126,14 +126,13 @@ class evangelical_magazine {
         $args = array ( 'label' => 'Series',
                         'labels' => self::generate_post_label ('Series', 'Series'),
                         'description' => 'Information about each series is stored here',
-                        'public' => true,
+                        'public' => false,
+                        'show_ui' => true,
                         'show_in_menu' => true,
                         'menu_position' => 6,
                         'menu_icon' => 'dashicons-index-card',
                         'supports' => array ('title', 'editor'),
-                        'has_archive' => true,
-                        'query_var' => 'series',
-                        'rewrite' => array('slug' => 'series', 'with_front' => false));
+                        'has_archive' => false);
         register_post_type ('em_series', $args);
         //Authors
         $args = array ( 'label' => 'Authors',
