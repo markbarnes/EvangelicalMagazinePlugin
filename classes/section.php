@@ -1,80 +1,19 @@
 <?php
-class evangelical_magazine_section {
-    
-    private $term_data;
+class evangelical_magazine_section extends evangelical_magazine_template {
     
     /**
-    * Instantiate the class by passing the WP_Post object or a post_id
-    * 
-    * @param integer|WP_Post $post
-    */
-    public function __construct($term) {
-        if (!is_a ($term, 'stdClass')) {
-            $term = get_term ((int)$term, evangelical_magazine_article::SECTION_TAXONOMY_NAME);
-        }
-        $this->term_data = $term;
-    }
-    
-    /**
-    * Returns the post ID
-    * 
-    * @return integer
-    */
-    public function get_id() {
-        return $this->term_data->term_id;
-    }
-        
-    /**
-    * Returns the name of the section
-    * 
-    * @param boolean $link - include a HTML link
-    * @return string
-    */
-    public function get_name($link = false) {
-        if ($link) {
-            return "<a href =\"{$this->get_link()}\">{$this->term_data->name}</a>";
-        } else {
-            return $this->term_data->name;
-        }
-    }
-        
-    /**
-    * Returns the link to this section
-    * 
-    * @return string
-    */
-    public function get_link() {
-        return get_term_link($this->term_data);
-    }
-    
-    /**
-    * Returns an array of all articles in this section
+    * Returns all the articles in the series
     * 
     * @param int $limit
-    * @param int[] $exclude_article_ids
+    * @param array $exclude_article_ids
     * @return evangelical_magazine_article[]
     */
     public function get_articles ($limit = -1, $exclude_article_ids = array()) {
-        $tax_query = array(array('taxonomy' => evangelical_magazine_article::SECTION_TAXONOMY_NAME, 'field' => 'term_id', 'terms' => $this->get_id(), 'operator' => 'IN'));
-        $args = array ('post_type' => 'em_article', 'posts_per_page' => $limit, 'tax_query' => $tax_query, 'post__not_in' => (array)$exclude_article_ids);
-        $query = new WP_Query($args);
-        if ($query->posts) {
-            $also_in = array();
-            foreach ($query->posts as $article) {
-                $also_in[] = new evangelical_magazine_article($article);
-            }
-            return $also_in;
-        }
+        $meta_query = array(array('key' => evangelical_magazine_article::SECTION_META_NAME, 'value' => $this->get_id(), 'compare' => '='));
+        $args = array ('post_type' => 'em_article', 'posts_per_page' => $limit, 'post__not_in' => (array)$exclude_article_ids);
+        return self::_get_articles($args);
     }
-    
-    /**
-    * Returns the total number of articles in this section
-    * 
-    */
-    public function get_count() {
-        return $this->term_data->count;
-    }
-    
+
     /**
     * Returns the HTML of a list of articles in this section
     * 
@@ -108,22 +47,13 @@ class evangelical_magazine_section {
     }
 
     /**
-    * Gets all available sections
+    * Returns an array of all the section objects
     * 
-    * @param mixed $args
-    * @uses get_terms
+    * @param string $order_by
     * @return evangelical_magazine_section[]
     */
     public static function get_all_sections($args = array()) {
-        $taxonomy = evangelical_magazine_article::SECTION_TAXONOMY_NAME;
-        $args = wp_parse_args ($args, array ('hide_empty' => false));
-        $terms = get_terms ((array)$taxonomy, $args);
-        if ($terms) {
-            $sections = array();
-            foreach ($terms as $term) {
-                $sections[] = new evangelical_magazine_section($term);
-            }
-            return $sections;
-        }
+        $default_args = array ('post_type' => 'em_section', 'orderby' => 'post_title', 'order' => 'ASC', 'posts_per_page' => -1);
+        return self::_get_sections($args, $default_args);
     }
 }

@@ -19,6 +19,18 @@ abstract class evangelical_magazine_template {
     protected $post_data;
     
     /**
+    * Instantiate the class by passing the WP_Post object or a post_id
+    * 
+    * @param integer|WP_Post $post
+    */
+    public function __construct($post) {
+        if (!is_a ($post, 'WP_Post')) {
+            $post = get_post ((int)$post);
+        }
+        $this->post_data = $post;
+    }
+    
+    /**
     * Returns the post ID
     * 
     * @return integer
@@ -158,6 +170,20 @@ abstract class evangelical_magazine_template {
     */
     protected static function _get_articles ($args, $default_args = '') {
         return self::_get_objects($args, $default_args, 'article');
+    }
+
+    /**
+    * Helper function to help subclasses return all the sections from a WP_Query
+    * 
+    * Wrapper for _get_objects()
+    * 
+    * @param array $args
+    * @param array $default_args
+    * @uses evangelical_magazine_template::_get_objects()
+    * @return evangelical_magazine_section[]
+    */
+    protected static function _get_sections ($args, $default_args = '') {
+        return self::_get_objects($args, $default_args, 'section');
     }
 
     /**

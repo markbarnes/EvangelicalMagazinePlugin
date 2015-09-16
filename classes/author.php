@@ -5,18 +5,6 @@
 class evangelical_magazine_author extends evangelical_magazine_template {
     
     /**
-    * Instantiate the class by passing the WP_Post object or a post_id
-    * 
-    * @param integer|WP_Post $post
-    */
-    public function __construct ($post) {
-        if (!is_a ($post, 'WP_Post')) {
-            $post = get_post ((int)$post);
-        }
-        $this->post_data = $post;
-    }
-    
-    /**
     * Returns the post content of an author post
     * 
     * @param boolean $link_name

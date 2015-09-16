@@ -28,7 +28,6 @@ class evangelical_magazine {
         // Add main actions
         add_action ('evangelicalmagazine_activate', array(__CLASS__, 'flush_rewrite_rules'));
         add_action ('init', array (__CLASS__, 'register_custom_post_types'));
-        add_action ('init', array (__CLASS__, 'register_custom_taxonomies'));
         add_action ('save_post', array(__CLASS__, 'save_cpt_data'));
         add_action ('admin_menu', array(__CLASS__, 'remove_admin_menus'));
     }
@@ -92,21 +91,23 @@ class evangelical_magazine {
     }
 
     /**
-    * Generates an array of labels for custom taxonomies
-    *
-    * @param string $plural - the plural form of the word used in the labels
-    * @param string $singular - the singular form of the word used in the labels
-    * @return array - the label array
-    */
-    static function generate_taxonomy_label ($plural, $singular) {
-        return array('name' => $plural, 'singular_name' => $singular, 'search_items' => "Search {$plural}", 'popular_items' => "Popular {$plural}", 'all_items' => "All {$plural}", 'parent_item' => "Parent {$singular}", 'edit_item' => "Edit {$singular}", 'update_item' => "Update {$singular}", 'add_new_item' => "Add New {$singular}", 'new_item_name' => "New {$singular}", 'separate_items_with_commas' => "Separate {$plural} with a comma", 'add_or_remove_items' => "Add or remove {$plural}", 'choose_from_most_used' => "Choose from the most used {$plural}");
-    }
-
-    /**
     * Registers the custom post types
     * 
     */
     static function register_custom_post_types() {
+        //Sections
+        $args = array ( 'label' => 'Sections',
+                        'labels' => self::generate_post_label ('Sections', 'Section'),
+                        'description' => 'Information about each section is stored here',
+                        'public' => true,
+                        'show_in_menu' => true,
+                        'menu_position' => 4,
+                        'menu_icon' => 'dashicons-portfolio',
+                        'supports' => array ('title', 'thumbnail', 'editor'),
+                        'has_archive' => true,
+                        'query_var' => 'sections',
+                        'rewrite' => array('slug' => 'sections', 'with_front' => false));
+        register_post_type ('em_section', $args);
         //Issues
         $args = array ( 'label' => 'Issues',
                         'labels' => self::generate_post_label ('Issues', 'Issue'),
@@ -117,7 +118,7 @@ class evangelical_magazine {
                         'menu_icon' => 'dashicons-id-alt',
                         'supports' => array ('title', 'thumbnail', 'editor'),
                         'has_archive' => true,
-                        'query_var' => 'issue',
+                        'query_var' => 'issues',
                         'register_meta_box_cb' => array ('evangelical_magazine_article', 'issue_meta_boxes'),
                         'rewrite' => array('slug' => 'issues', 'with_front' => false));
         register_post_type ('em_issue', $args);
@@ -148,34 +149,19 @@ class evangelical_magazine {
                         'rewrite' => array('slug' => 'authors', 'with_front' => false));
         register_post_type ('em_author', $args);
         //Articles
-        $args = array ( 'label' => __('Articles', 'evangelical-magazine'),
-                        'labels' => self::generate_post_label (__('Articles', 'evangelical-magazine'), __('Article', 'evangelical-magazine')),
-                        'description' => __('Information about each article is stored here', 'evangelical-magazine'),
+        $args = array ( 'label' => 'Articles',
+                        'labels' => self::generate_post_label ('Articles', 'Article'),
+                        'description' => 'Information about each article is stored here',
                         'public' => true,
                         'show_in_menu' => true,
                         'menu_position' => 8,
                         'menu_icon' => 'dashicons-media-text',
                         'supports' => array ('title', 'thumbnail', 'editor'),
-                        'taxonomies' => array ('em_section'),
                         'has_archive' => false,
                         'query_var' => 'article',
                         'register_meta_box_cb' => array ('evangelical_magazine_article', 'article_meta_boxes'),
                         'rewrite' => array('slug' => 'article', 'with_front' => false));
         register_post_type ('em_article', $args);
-    }
-    
-    /**
-    * Registers the custom taxonomies
-    * 
-    */
-    public static function register_custom_taxonomies () {
-        // Sections
-        $args = array ( 'label' => __('Sections', 'evangelical-magazine'),
-                        'labels' => self::generate_taxonomy_label(__('Sections', 'evangelical-magazine'), __('Section', 'evangelical-magazine')),
-                        'hierarchical' => true,
-                        'rewrite' => array ('slug' => '/section')
-                      );
-        register_taxonomy(evangelical_magazine_article::SECTION_TAXONOMY_NAME, 'em_article', $args);
     }
     
     /**

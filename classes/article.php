@@ -6,8 +6,8 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     const PAGE_NUM_META_NAME = 'evangelical_magazine_page_num';
     const SERIES_META_NAME = 'evangelical_magazine_series';
     const ORDER_META_NAME = 'evangelical_magazine_order';
+    const SECTION_META_NAME = 'evangelical_magazine_section';
     const VIEW_COUNT_META_NAME = 'evangelical_magazine_view_count';
-    const SECTION_TAXONOMY_NAME = 'em_section';
 
     private $issue, $authors, $page_num, $order, $sections;
     
@@ -174,18 +174,40 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     }
     
     /**
+    * Returns an array of section post IDs for this article
+    * 
+    * @return integer[]
+    */
+    public function get_section_ids() {
+        $section = get_post_meta ($this->get_id(), self::SECTION_META_NAME);
+        return (array)$section;
+    }
+    
+    /**
+    * Helper function to generate author and section data
+    * 
+    * @param int[] $ids
+    * @param mixed $object_class
+    */
+    private function _generate_objects_array($ids, $object_class) {
+        if ($ids) {
+            $objects = array();
+            $object_class = "evangelical_magazine_{$object_class}";
+            foreach ($ids as $id) {
+                $object = new $object_class ($id);
+                $objects[$object->get_name()] = $object;
+            }
+            return $objects;
+        } else {
+            return null;
+        }
+    }
+    
+    /**
     * Populates $this->sections
     */
     private function generate_sections_array() {
-        $sections = get_the_terms($this->get_id(), self::SECTION_TAXONOMY_NAME);
-        if ($sections) {
-            $this->sections = array();
-            foreach ($sections as $section) {
-                $this->sections[$section->name] = new evangelical_magazine_section($section);
-            }
-        } else {
-            $this->sections = null;
-        }
+        $this->sections = $this->_generate_objects_array ($this->get_section_ids(), 'section');
     }
     
     /**
@@ -211,17 +233,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * Populates $this->authors
     */
     private function generate_authors_array() {
-        $authors_ids = $this->get_author_ids();
-        if ($authors_ids) {
-            $authors = array();
-            foreach ($authors_ids as $author_id) {
-                $author = new evangelical_magazine_author($author_id);
-                $authors[$author->get_name()] = $author;
-            }
-            $this->authors = $authors;
-        } else {
-            $this->authors = null;
-        }
+        $this->authors = $this->_generate_objects_array ($this->get_author_ids(), 'author');
     }
     
     /**
@@ -323,6 +335,15 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             }
         }
         $this->generate_authors_array();
+        delete_post_meta ($this->get_id(), self::SECTION_META_NAME);
+        if (isset($_POST['em_sections'])) {
+            if (is_array($_POST['em_sections'])) {
+                foreach ($_POST['em_sections'] as $section) {
+                    add_post_meta ($this->get_id(), self::SECTION_META_NAME, $section);
+                }
+            }
+        }
+        $this->generate_sections_array();
         if (isset($_POST['em_issue'])) {
             update_post_meta ($this->get_id(), self::ISSUE_META_NAME, $_POST['em_issue']);
             $this->issue = new evangelical_magazine_issue($_POST['em_issue']);
@@ -435,6 +456,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     */
     public static function article_meta_boxes() {
         add_meta_box ('em_issues', 'Issue', array(get_called_class(), 'do_issue_meta_box'), 'em_article', 'side', 'core');
+        add_meta_box ('em_sections', 'Section(s)', array(get_called_class(), 'do_section_meta_box'), 'em_article', 'side', 'core');
         add_meta_box ('em_authors', 'Author(s)', array(get_called_class(), 'do_author_meta_box'), 'em_article', 'side', 'core');
         add_meta_box ('em_series', 'Series', array(get_called_class(), 'do_series_meta_box'), 'em_article', 'side', 'core');
     }
@@ -448,29 +470,52 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     }
     
     /**
+    * Helper function to return a meta box where the user can choose multiple items of another post type
+    * 
+    * @param array $objects
+    * @param string $name
+    * @return string
+    */
+    public static function _get_checkbox_meta_box($objects, $name) {
+        if ($objects) {
+            wp_nonce_field ("em_{$name}_meta_box", "em_{$name}_meta_box_nonce");
+            if (!evangelical_magazine::is_creating_post()) {
+                $article_id = (int)$_GET['post'];
+                $article = new evangelical_magazine_article ($article_id);
+                $method_name = "get_{$name}_ids";
+                $existing_object_ids = $article->$method_name();
+            } else {
+                $existing_object_ids = array();
+            }
+            $output = "<ul id=\"em_{$name}checklist\" data-wp-lists=\"list:em_{$name}\" class=\"categorychecklist form-no-clear\">";
+            foreach ($objects as $object) {
+                $checked = in_array($object->get_id(), $existing_object_ids) ? ' checked="checked"' : '';
+                $output .= "<li><label class=\"selectit\"><input type=\"checkbox\" name=\"em_{$name}s[]\" value=\"{$object->get_id()}\"{$checked}> {$object->get_name()}</label></li>";
+            }
+            $output .= '</ul>';
+            $output .= "<h4><a href=\"#em_{$name}_add\" class=\"hide-if-no-js\">+ Add new {$name}</a></h4>";
+            return $output;
+        }
+    }
+    
+    /**
     * Outputs the author meta box
     * 
     * @param mixed $article
     */
     public static function do_author_meta_box($article) {
         $authors = evangelical_magazine_author::get_all_authors();
-        if ($authors) {
-            wp_nonce_field ('em_author_meta_box', 'em_author_meta_box_nonce');
-            if (!evangelical_magazine::is_creating_post()) {
-                $article_id = (int)$_GET['post'];
-                $article = new evangelical_magazine_article ($article_id);
-                $existing_author_ids = $article->get_author_ids();
-            } else {
-                $existing_author_ids = array();
-            }
-            echo '<ul id="em_authorchecklist" data-wp-lists="list:em_section" class="categorychecklist form-no-clear">';
-            foreach ($authors as $author) {
-                $checked = in_array($author->get_id(), $existing_author_ids) ? ' checked="checked"' : '';
-                echo "<li><label class=\"selectit\"><input type=\"checkbox\" name=\"em_authors[]\" value=\"{$author->get_id()}\"{$checked}> {$author->get_name()}</label></li>";
-            }
-            echo '</ul>';
-            echo '<h4><a href="#em_author_add" class="hide-if-no-js">+ Add New Author</a></h4>';
-        }
+        echo self::_get_checkbox_meta_box ($authors, 'author');
+    }
+    
+    /**
+    * Outputs the section meta box
+    * 
+    * @param mixed $article
+    */
+    public static function do_section_meta_box($article) {
+        $sections = evangelical_magazine_section::get_all_sections();
+        echo self::_get_checkbox_meta_box ($sections, 'section');
     }
     
     /**
@@ -531,7 +576,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     }
     
     /**
-    * Outputs the author meta box
+    * Outputs the issue meta box
     * 
     * @param mixed $article
     */

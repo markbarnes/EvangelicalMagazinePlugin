@@ -10,21 +10,10 @@
 class evangelical_magazine_series extends evangelical_magazine_template {
     
     /**
-    * Instantiate the class by passing the WP_Post object or a post_id
-    * 
-    * @param integer|WP_Post $post
-    */
-    public function __construct($post) {
-        if (!is_a ($post, 'WP_Post')) {
-            $post = get_post ((int)$post);
-        }
-        $this->post_data = $post;
-    }
-    
-    /**
     * Returns all the articles in the series
     * 
-    * @param array $args
+    * @param int $limit
+    * @param array $exclude_article_ids
     * @return evangelical_magazine_article[]
     */
     public function get_articles ($limit = -1, $exclude_article_ids = array()) {
@@ -43,6 +32,4 @@ class evangelical_magazine_series extends evangelical_magazine_template {
         $default_args = array ('post_type' => 'em_series', 'orderby' => 'post_title', 'order' => 'ASC', 'posts_per_page' => -1);
         return self::_get_series($args, $default_args);
     }
-
-
 }
