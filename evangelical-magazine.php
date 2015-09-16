@@ -103,7 +103,7 @@ class evangelical_magazine {
                         'show_in_menu' => true,
                         'menu_position' => 4,
                         'menu_icon' => 'dashicons-portfolio',
-                        'supports' => array ('title', 'thumbnail', 'editor'),
+                        'supports' => array ('title', 'editor'),
                         'has_archive' => true,
                         'query_var' => 'sections',
                         'rewrite' => array('slug' => 'sections', 'with_front' => false));

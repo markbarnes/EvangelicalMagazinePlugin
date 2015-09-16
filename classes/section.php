@@ -15,6 +15,28 @@ class evangelical_magazine_section extends evangelical_magazine_template {
     }
 
     /**
+    * Returns an array of article IDs for all articles a section
+    * 
+    * @param array $args
+    * @return integer[]
+    */
+    public function get_article_ids($args = array()) {
+        $meta_query = array(array('key' => evangelical_magazine_article::SECTION_META_NAME, 'value' => $this->get_id()));
+        $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'posts_per_page' => -1);
+        return self::_get_object_ids($args, $default_args);
+    }
+    
+    /**
+    * Gets the post popular articles in the issue
+    * 
+    * @param integer $limit - the maximum number of articles to return
+    * @return evangelical_magazine_article[]
+    */
+    public function get_top_articles ($limit = -1, $exclude_article_ids = array()) {
+        return $this->_get_top_articles ($limit, $this, $exclude_article_ids);
+    }
+    
+    /**
     * Returns the HTML of a list of articles in this section
     * 
     * @param int $limit

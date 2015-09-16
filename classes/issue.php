@@ -95,35 +95,7 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
     * @return evangelical_magazine_article[]
     */
     public function get_top_articles ($limit = -1) {
-        //We can't do this in one query, because WordPress won't return null values when you sort by meta_value
-        $article_ids = $this->get_article_ids();
-        if ($article_ids) {
-            $articles = array();
-            foreach ($article_ids as $article_id) {
-                $articles[$article_id] = get_post_meta($article_id, evangelical_magazine_article::VIEW_COUNT_META_NAME, true);
-            }
-            arsort($articles);
-            if ($limit != -1) {
-                $articles = array_slice ($articles, 0, $limit, true);
-            }
-            $top_articles = array();
-            foreach ($articles as $article => $view_count) {
-                $top_articles[] = new evangelical_magazine_article($article);
-            }
-            return $top_articles;
-        }
-    }
-    
-    /**
-    * Returns the number of articles in this issue
-    * 
-    * @return integer
-    */
-    public function get_article_count() {
-        $article_ids = $this->get_article_ids();
-        if ($article_ids) {
-            return count ($article_ids);
-        }
+        return $this->_get_top_articles ($limit, $this);
     }
     
     /**
