@@ -389,7 +389,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             if ($exclude_this_article) {
                 $args ['post__not_in'] = array($this->get_id());
             }
-            return self::_get_articles($args);
+            return self::_get_articles_from_query($args);
         }
     }
     
@@ -612,7 +612,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     */
     public static function get_next_future_article($args = array()) {
         $default_args = array ('post_type' => 'em_article', 'orderby' => 'date', 'order' => 'ASC', 'posts_per_page' => 1, 'post_status' => 'future');
-        $articles = self::_get_articles($args, $default_args);
+        $articles = self::_get_articles_from_query($args, $default_args);
         if (is_array($articles)) {
             return $articles[0];
         }

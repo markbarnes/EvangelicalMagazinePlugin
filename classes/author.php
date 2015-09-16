@@ -2,7 +2,7 @@
 /**
 * Accepts either a WP_Post object, or a post_id
 */
-class evangelical_magazine_author extends evangelical_magazine_template {
+class evangelical_magazine_author extends evangelical_magazine_not_articles {
     
     /**
     * Returns the post content of an author post
@@ -37,7 +37,7 @@ class evangelical_magazine_author extends evangelical_magazine_template {
     public function get_articles ($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::AUTHOR_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'posts_per_page' => -1, 'meta_query' => $meta_query);
-        return self::_get_articles($args, $default_args);
+        return self::_get_articles_from_query($args, $default_args);
     }
 
     /**
@@ -48,7 +48,7 @@ class evangelical_magazine_author extends evangelical_magazine_template {
     */
     public static function get_all_authors($args = array()) {
         $default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
-        return self::_get_authors($args, $default_args);
+        return self::_get_authors_from_query($args, $default_args);
     }
     
     /**
@@ -59,7 +59,7 @@ class evangelical_magazine_author extends evangelical_magazine_template {
     */
     public static function get_all_author_ids($args = array()) {
         $default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
-        return self::_get_object_ids($args, $default_args);
+        return self::_get_object_ids_from_query($args, $default_args);
     }
     
     /**

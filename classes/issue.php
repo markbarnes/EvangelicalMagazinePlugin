@@ -1,5 +1,5 @@
 <?php
-class evangelical_magazine_issue extends evangelical_magazine_template {
+class evangelical_magazine_issue extends evangelical_magazine_not_articles {
     
     const ISSUE_DATE_META_NAME = 'evangelical_magazine_issue_date';
     const EARLIEST_YEAR = 2010;
@@ -57,7 +57,7 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
     public function get_articles($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
-        return self::_get_articles($args, $default_args);
+        return self::_get_articles_from_query($args, $default_args);
     }
     
     /**
@@ -69,7 +69,7 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
     public function get_article_ids($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
-        return self::_get_object_ids($args, $default_args);
+        return self::_get_object_ids_from_query($args, $default_args);
     }
     
     /**
@@ -95,7 +95,7 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
     * @return evangelical_magazine_article[]
     */
     public function get_top_articles ($limit = -1) {
-        return $this->_get_top_articles ($limit, $this);
+        return $this->_get_top_articles_from_object ($limit, $this);
     }
     
     /**
@@ -109,43 +109,6 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
         return $this->get_articles($args);
     }
     
-    /**
-    * Returns the HTML for a list of articles with thumbnails, title and author
-    * 
-    * @param integer $limit - the maximum number to return
-    * @param boolean $include_future
-    */
-    public function get_html_article_list($args = array()) {
-        $default_args = self::_future_posts_args();
-        $default_args['order'] = 'ASC';
-        $args = wp_parse_args($args, $default_args);
-        $articles = $this->get_articles ($args);
-        if ($articles) {
-            $output = "<div class=\"article-list-box\">";
-            $output .= "<ol>";
-            $class=' first';
-            foreach ($articles as $article) {
-                $url = $class == '' ? $article->get_image_url('width_150') : $article->get_image_url('width_400');
-                if ($article->is_future()) {
-                    $output .= "<li class=\"future\"><div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div>";
-                } else {
-                    $output .= "<li><a href=\"{$article->get_link()}\"><div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div></a>";
-                }
-                $title = $article->get_title();
-                $style = ($class & strlen($title) > 40) ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
-                $output .= "<span class=\"article-list-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"article-list-box-author\">by {$article->get_author_names(!$article->is_future())}</span>";
-                if ($article->is_future()) {
-                    $output .= "<br/><span class=\"article-list-box-coming-soon\">Coming {$article->get_coming_date()}</span>";
-                }
-                "</li>";
-                $class='';
-            }
-            $output .= "</ol>";
-            $output .= '</div>';
-            return $output;
-        }
-    }
-
     /**
     * Returns an array of the possible values for the issue date
     * 
@@ -163,6 +126,6 @@ class evangelical_magazine_issue extends evangelical_magazine_template {
     */
     public static function get_all_issues($limit = -1) {
         $args = array ('post_type' => 'em_issue', 'meta_key' => evangelical_magazine_issue::ISSUE_DATE_META_NAME, 'orderby' => 'meta_value', 'order' => 'DESC', 'posts_per_page' => $limit);
-        return self::_get_issues($args);
+        return self::_get_issues_from_query($args);
     }
 }

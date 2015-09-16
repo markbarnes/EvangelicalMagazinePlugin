@@ -1,5 +1,5 @@
 <?php
-class evangelical_magazine_section extends evangelical_magazine_template {
+class evangelical_magazine_section extends evangelical_magazine_not_articles {
     
     /**
     * Returns all the articles in the series
@@ -11,7 +11,7 @@ class evangelical_magazine_section extends evangelical_magazine_template {
     public function get_articles ($limit = -1, $exclude_article_ids = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::SECTION_META_NAME, 'value' => $this->get_id(), 'compare' => '='));
         $args = array ('post_type' => 'em_article', 'posts_per_page' => $limit, 'meta_query' => $meta_query, 'post__not_in' => (array)$exclude_article_ids);
-        return self::_get_articles($args);
+        return self::_get_articles_from_query($args);
     }
 
     /**
@@ -23,7 +23,7 @@ class evangelical_magazine_section extends evangelical_magazine_template {
     public function get_article_ids($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::SECTION_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'posts_per_page' => -1);
-        return self::_get_object_ids($args, $default_args);
+        return self::_get_object_ids_from_query($args, $default_args);
     }
     
     /**
@@ -33,7 +33,7 @@ class evangelical_magazine_section extends evangelical_magazine_template {
     * @return evangelical_magazine_article[]
     */
     public function get_top_articles ($limit = -1, $exclude_article_ids = array()) {
-        return $this->_get_top_articles ($limit, $this, $exclude_article_ids);
+        return $this->_get_top_articles_from_object ($limit, $this, $exclude_article_ids);
     }
     
     /**
@@ -76,6 +76,6 @@ class evangelical_magazine_section extends evangelical_magazine_template {
     */
     public static function get_all_sections($args = array()) {
         $default_args = array ('post_type' => 'em_section', 'orderby' => 'post_title', 'order' => 'ASC', 'posts_per_page' => -1);
-        return self::_get_sections($args, $default_args);
+        return self::_get_sections_from_query($args, $default_args);
     }
 }
