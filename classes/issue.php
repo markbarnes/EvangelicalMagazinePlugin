@@ -49,12 +49,12 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
     }
     
     /**
-    * Returns the articles from this issue
+    * Helper function to returns the articles from this issue
     * 
     * @param array $args
     * @return evangelical_magazine_article[]
     */
-    public function get_articles($args = array()) {
+    public function _get_articles ($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::ISSUE_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::PAGE_NUM_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => -1);
         return self::_get_articles_from_query($args, $default_args);

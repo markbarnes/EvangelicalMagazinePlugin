@@ -16,9 +16,9 @@ class evangelical_magazine_series extends evangelical_magazine_not_articles {
     * @param array $exclude_article_ids
     * @return evangelical_magazine_article[]
     */
-    public function get_articles ($limit = -1, $exclude_article_ids = array()) {
+    public function _get_articles ($args) {
         $meta_query = array(array('key' => evangelical_magazine_article::SERIES_META_NAME, 'value' => $this->get_id(), 'compare' => '='));
-        $args = array ('post_type' => 'em_article', 'posts_per_page' => $limit, 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::ORDER_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'ASC', 'post__not_in' => (array)$exclude_article_ids);
+        $args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => evangelical_magazine_article::ORDER_META_NAME, 'orderby' => 'meta_value_num', 'order' => 'ASC');
         return self::_get_articles_from_query($args);
     }
 

@@ -34,7 +34,7 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
     * @param integer[] $exclude_article_ids
     * @return evangelical_magazine_article[]
     */
-    public function get_articles ($args = array()) {
+    public function _get_articles ($args = array()) {
         $meta_query = array(array('key' => evangelical_magazine_article::AUTHOR_META_NAME, 'value' => $this->get_id()));
         $default_args = array ('post_type' => 'em_article', 'posts_per_page' => -1, 'meta_query' => $meta_query);
         return self::_get_articles_from_query($args, $default_args);

@@ -146,6 +146,38 @@ abstract class evangelical_magazine_template {
     }
 
     /**
+    * Returns the HTML for a list of articles with thumbnails, title and author
+    * 
+    * @param array $articles
+    */
+    public function get_html_article_list($articles) {
+        if ($articles) {
+            $output = "<div class=\"article-list-box\">";
+            $output .= "<ol>";
+            $class=' first';
+            foreach ($articles as $article) {
+                $url = ($class == '') ? $article->get_image_url('width_150') : $article->get_image_url('width_400');
+                if ($article->is_future()) {
+                    $output .= "<li class=\"future\"><div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div>";
+                } else {
+                    $output .= "<li><a href=\"{$article->get_link()}\"><div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div></a>";
+                }
+                $title = $article->get_title();
+                $style = ($class & strlen($title) > 40) ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
+                $output .= "<span class=\"article-list-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"article-list-box-author\">by {$article->get_author_names(!$article->is_future())}</span>";
+                if ($article->is_future()) {
+                    $output .= "<br/><span class=\"article-list-box-coming-soon\">Coming {$article->get_coming_date()}</span>";
+                }
+                "</li>";
+                $class='';
+            }
+            $output .= "</ol>";
+            $output .= '</div>';
+            return $output;
+        }
+    }
+
+    /**
     * Helper function to help subclasses return all the objects from a WP_Query
     * 
     * @param array $args
@@ -270,4 +302,5 @@ abstract class evangelical_magazine_template {
             return array ('post_status' => array ('publish', 'future'));
         }
     }
+
 }
