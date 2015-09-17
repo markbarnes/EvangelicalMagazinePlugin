@@ -169,13 +169,13 @@ abstract class evangelical_magazine_template {
         if ($articles) {
             $output = "<div class=\"article-list-box\">";
             $output .= "<ol>";
-            $class = $add_class_to_first ? ' first' : '';
+            $class = ($add_class_to_first ? ' first' : '');
             foreach ($articles as $article) {
                 $url = ($class == '') ? $article->get_image_url('width_150') : $article->get_image_url('width_400');
                 if ($article->is_future()) {
-                    $output .= "<li class=\"future\"><div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div>";
+                    $output .= "<li class=\"future\"><div class=\"box-shadow-transition article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div>";
                 } else {
-                    $output .= "<li>{$article->get_link_html("<div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div>")}";
+                    $output .= "<li>{$article->get_link_html("<div class=\"box-shadow-transition article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div>")}";
                 }
                 $title = $article->get_title();
                 $style = ($class & strlen($title) > 40) ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
