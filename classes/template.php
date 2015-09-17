@@ -303,4 +303,29 @@ abstract class evangelical_magazine_template {
         }
     }
 
+    /**
+    * Helper function that ranks an array of articles by popularity and returns this top $limit articles.
+    * 
+    * @param evangelical_magazine_article[] $articles
+    * @param int $limit
+    * @return evangelical_magazine_article[]
+    */
+    protected function _get_top_articles ($articles, $limit = -1) {
+        if ($articles) {
+            $index = array();
+            foreach ($articles as $key => $article) {
+                 $view_count = get_post_meta($article->get_id(), evangelical_magazine_article::VIEW_COUNT_META_NAME, true);
+                 $index[$key] = round ($view_count/(time()-strtotime($article->get_post_date()))*84600 , 5);
+            }
+            arsort($index);
+            if ($limit != -1) {
+                $index = array_slice ($index, 0, $limit, true);
+            }
+            $top_articles = array();
+            foreach ($index as $key => $view_count) {
+                $top_articles[] = $articles[$key];
+            }
+            return $top_articles;
+        }
+    }
 }

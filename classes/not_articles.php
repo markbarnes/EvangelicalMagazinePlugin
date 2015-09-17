@@ -22,22 +22,7 @@ abstract class evangelical_magazine_not_articles extends evangelical_magazine_te
     protected function _get_top_articles_from_object ($limit = -1, $object, $exclude_article_ids = array()) {
         //We can't do this in one query, because WordPress won't return null values when you sort by meta_value
         $articles = $object->get_articles(-1, $exclude_article_ids);
-        if ($articles) {
-            $index = array();
-            foreach ($articles as $key => $article) {
-                 $view_count = get_post_meta($article->get_id(), evangelical_magazine_article::VIEW_COUNT_META_NAME, true);
-                 $index[$key] = round ($view_count/(time()-strtotime($article->get_post_date()))*84600 , 5);
-            }
-            arsort($index);
-            if ($limit != -1) {
-                $index = array_slice ($index, 0, $limit, true);
-            }
-            $top_articles = array();
-            foreach ($index as $key => $view_count) {
-                $top_articles[] = $articles[$key];
-            }
-            return $top_articles;
-        }
+        return self::_get_top_articles ($articles, $limit);
     }
 
     public function get_articles ($limit = -1, $exclude_article_ids = array()) {
