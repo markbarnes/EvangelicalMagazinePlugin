@@ -119,9 +119,9 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
     }
     
     /**
-    * Returns an array of all the issue objects
+    * Returns an array of all the issue objects, with the most recent first.
     * 
-    * @param string $order_by
+    * @param int $limit
     * @return evangelical_magazine_issue[]
     */
     public static function get_all_issues($limit = -1) {

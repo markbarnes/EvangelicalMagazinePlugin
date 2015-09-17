@@ -12,7 +12,7 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
     */
     public function get_description($link_name = true) {
         if ($link_name) {
-            return str_replace($this->get_name(), "<a href=\"{$this->get_link()}\">{$this->get_name()}</a>", $this->post_data->post_content);
+            return str_replace($this->get_name(), $this->get_name(true), $this->post_data->post_content);
         } else {
             return $this->post_data->post_content;
         }
@@ -24,7 +24,7 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
     * @return string
     */
     public function get_author_info_html() {
-        return "<div class=\"author-info\"><a href=\"{$this->get_link()}\"><img class=\"author-image\" src=\"{$this->get_image_url('thumbnail_75')}\"/></a><div class=\"author-description\">{$this->get_description()}</div></div>";
+        return "<div class=\"author-info\">".$this->get_link_html("<img class=\"author-image\" src=\"{$this->get_image_url('thumbnail_75')}\"/>")."<div class=\"author-description\">{$this->get_description()}</div></div>";
     }
 
     /**

@@ -51,7 +51,7 @@ abstract class evangelical_magazine_template {
     */
     public function get_name($link = false) {
         if ($link) {
-            return "<a class=\"{$this->get_friendly_class()}-link\" href=\"{$this->get_link()}\">{$this->post_data->post_title}</a>";
+            return $this->get_link_html($this->post_data->post_title);
         } else {
             return $this->post_data->post_title;
         }
@@ -64,6 +64,21 @@ abstract class evangelical_magazine_template {
     */
     public function get_link() {
         return get_permalink($this->post_data->ID);
+    }
+
+    /**
+    * Returns the permalink to the object as HTML
+    * 
+    * @param string $link_content
+    * @param string $class
+    * @param string $id
+    * @return string;
+    */
+    public function get_link_html($link_content, $class='', $id='') {
+        $class = trim ("{$this->get_friendly_class()}-link {$class}");
+        $class = "class=\"{$class}\"";
+        $id = $id ? " id=\"{$id}\"" : '';
+        return "<a href=\"{$this->get_link()}\"{$id}{$class}>{$link_content}</a>";
     }
 
     /**
@@ -122,7 +137,7 @@ abstract class evangelical_magazine_template {
             $class = (bool)$class ? " class=\"{$class}\"" : '';
             if ($src) {
                 $html = "<img src=\"{$src[0]}\" width=\"{$src[1]}\" height=\"{$src[2]}\"{$class}/>";
-                return $link ? "<a href=\"{$this->get_link()}\">{$html}</a>" : $html;
+                return $link ? $this->get_link_html(($html)) : $html;
             }
         }
     }
@@ -160,7 +175,7 @@ abstract class evangelical_magazine_template {
                 if ($article->is_future()) {
                     $output .= "<li class=\"future\"><div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div>";
                 } else {
-                    $output .= "<li><a href=\"{$article->get_link()}\"><div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div></a>";
+                    $output .= "<li>{$article->get_link_html("<div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div>")}";
                 }
                 $title = $article->get_title();
                 $style = ($class & strlen($title) > 40) ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';

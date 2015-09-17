@@ -47,7 +47,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     */
     public function get_title($link = false) {
         if ($link && !$this->is_future()) {
-            return "<a class=\"article-link\" href=\"{$this->get_link()}\">{$this->post_data->post_title}</a>";
+            return $this->get_link_html($this->post_data->post_title);
         } else {
             return $this->post_data->post_title;
         }
@@ -246,11 +246,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         if (is_array($this->authors)) {
             $output = array();
             foreach ($this->authors as $author) {
-                if ($link) {
-                    $output[] = "<a class=\"author-link\" href=\"{$author->get_link()}\">{$author->get_name()}</a>";
-                } else {
-                    $output[] = $author->get_name();
-                }
+                $output[] = $author->get_name($link);
             }
             if (count($output) > 1) {
                 $last = ' and '.array_pop ($output);
@@ -444,7 +440,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         $class .= $this->is_future() ? ' future' : '';
         $sub_title = $sub_title ? "<span class=\"sub-title\">{$sub_title}</span>" : '';
         if ($add_links && !$this->is_future()) {
-            return "<aside class=\"{$class}\">{$sub_title}<a href=\"{$this->get_link()}\"><div class=\"article-image\"{$style}></div></a><div class=\"article-title\">{$this->get_title(true)}</div></aside>";
+            return "<aside class=\"{$class}\">{$sub_title}".$this->get_link_html("<div class=\"article-image\"{$style}></div>")."<div class=\"article-title\">{$this->get_title(true)}</div></aside>";
         } else {
             return "<aside class=\"{$class}\"><div class=\"article-image\"{$style}>{$sub_title}</div><div class=\"article-title\">{$this->get_title()}</div></aside>";
         }
