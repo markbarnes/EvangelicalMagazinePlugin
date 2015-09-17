@@ -53,7 +53,7 @@ class evangelical_magazine_section extends evangelical_magazine_not_articles {
             $class=' first';
             foreach ($articles as $article) {
                 $url = $class == '' ? $article->get_image_url('width_150') : $article->get_image_url('width_400');
-                $output .= "<li>{$this->get_link_html("<div class=\"article-list-box-image{$class}\" style=\"background-image: url('{$url}')\"></div>")}";
+                $output .= "<li>{$this->get_link_html("<div class=\"article-list-box-image{$class} box-shadow-transition\" style=\"background-image: url('{$url}')\"></div>")}";
                 $title = $article->get_title();
                 $style = strlen($title) > 40 ? ' style="font-size:'.round(40/strlen($title)*1,2).'em"' : '';
                 $output .= "<span class=\"article-list-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"article-list-box-author\">by {$article->get_author_names(true)}</span></li>";
