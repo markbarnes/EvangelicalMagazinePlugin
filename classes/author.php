@@ -83,4 +83,17 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
             return $authors;
         }
     }
+    
+    public static function _compare_authors_alphabetically ($a, $b) {
+        return strcasecmp($a->get_name(), $b->get_name());
+    }
+    
+    /**
+    * Sorts an array of authors into alphabetical order (by first name)
+    * 
+    * @param mixed $authors
+    */
+    public static function sort_authors_alphabetically(&$authors) {
+        uasort($authors, array(__CLASS__, '_compare_authors_alphabetically'));
+    }
 }
