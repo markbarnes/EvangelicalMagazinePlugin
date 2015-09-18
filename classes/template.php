@@ -136,17 +136,16 @@ abstract class evangelical_magazine_template {
     * Returns an HTML <img> tag for the featured image
     * 
     * @param string $image_size
-    * @param string $class
+    * @param string $link_class
     * @param boolean $link
     * @return string
     */
-    public function get_image_html($image_size = 'thumbnail', $class = '', $link=false) {
+    public function get_image_html($image_size = 'thumbnail', $link=false, $link_class = '') {
         if (has_post_thumbnail($this->get_id())) {
             $src = wp_get_attachment_image_src (get_post_thumbnail_id($this->get_id()), $image_size);
-            $class = (bool)$class ? " class=\"{$class}\"" : '';
             if ($src) {
-                $html = "<img src=\"{$src[0]}\" width=\"{$src[1]}\" height=\"{$src[2]}\"{$class}/>";
-                return $link ? $this->get_link_html(($html)) : $html;
+                $html = "<img src=\"{$src[0]}\" width=\"{$src[1]}\" height=\"{$src[2]}\"/>";
+                return $link ? $this->get_link_html($html, $link_class) : $html;
             }
         }
     }
@@ -351,5 +350,12 @@ abstract class evangelical_magazine_template {
             }
             return $top_articles;
         }
+    }
+    
+    /**
+    * Returns true if the object is an author
+    */
+    public function is_author() {
+        return is_a($this, 'evangelical_magazine_author');
     }
 }
