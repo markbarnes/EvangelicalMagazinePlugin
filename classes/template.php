@@ -11,6 +11,14 @@
 */
 abstract class evangelical_magazine_template {
     
+    const AUTHOR_META_NAME = 'evangelical_magazine_authors';
+    const ISSUE_META_NAME = 'evangelical_magazine_issue';
+    const PAGE_NUM_META_NAME = 'evangelical_magazine_page_num';
+    const SERIES_META_NAME = 'evangelical_magazine_series';
+    const ORDER_META_NAME = 'evangelical_magazine_order';
+    const SECTION_META_NAME = 'evangelical_magazine_section';
+    const VIEW_COUNT_META_NAME = 'evangelical_magazine_view_count';
+
     /**
     * All the custom posttype data is stored in $post_data as a WP_Post object
     * 
@@ -319,7 +327,7 @@ abstract class evangelical_magazine_template {
     }
 
     /**
-    * Helper function that ranks an array of articles by popularity and returns this top $limit articles.
+    * Helper function that ranks an array of articles by popularity and returns the top $limit articles.
     * 
     * @param evangelical_magazine_article[] $articles
     * @param int $limit
