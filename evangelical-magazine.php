@@ -206,6 +206,24 @@ class evangelical_magazine {
         remove_menu_page ('edit.php');
         remove_menu_page ('edit-comments.php');
     }
+    
+    /**
+    * Returns the appropriate object when all we know is the ID
+    * 
+    * @param int $id
+    * @return mixed
+    */
+    public static function get_object_from_id($id) {
+        $post = get_post($id);
+        if ($post) {
+            if (substr ($post->post_type,0,3) == 'em_') {
+                $class_name = 'evangelical_magazine_'.substr($post->post_type, 3);
+                return new $class_name ($post);
+            } else {
+                return $post;
+            }
+        }
+    }
 }
 
 // Initialise
