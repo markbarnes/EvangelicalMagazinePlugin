@@ -18,6 +18,7 @@ abstract class evangelical_magazine_template {
     const ORDER_META_NAME = 'evangelical_magazine_order';
     const SECTION_META_NAME = 'evangelical_magazine_section';
     const VIEW_COUNT_META_NAME = 'evangelical_magazine_view_count';
+    const ISSUE_DATE_META_NAME = 'evangelical_magazine_issue_date';
 
     /**
     * All the custom posttype data is stored in $post_data as a WP_Post object
@@ -337,7 +338,7 @@ abstract class evangelical_magazine_template {
         if ($articles) {
             $index = array();
             foreach ($articles as $key => $article) {
-                 $view_count = get_post_meta($article->get_id(), evangelical_magazine_article::VIEW_COUNT_META_NAME, true);
+                 $view_count = get_post_meta($article->get_id(), self::VIEW_COUNT_META_NAME, true);
                  $index[$key] = round ($view_count/(time()-strtotime($article->get_post_date()))*84600 , 5);
             }
             arsort($index);

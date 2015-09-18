@@ -1,14 +1,6 @@
 <?php
 class evangelical_magazine_article extends evangelical_magazine_template {
     
-    const AUTHOR_META_NAME = 'evangelical_magazine_authors';
-    const ISSUE_META_NAME = 'evangelical_magazine_issue';
-    const PAGE_NUM_META_NAME = 'evangelical_magazine_page_num';
-    const SERIES_META_NAME = 'evangelical_magazine_series';
-    const ORDER_META_NAME = 'evangelical_magazine_order';
-    const SECTION_META_NAME = 'evangelical_magazine_section';
-    const VIEW_COUNT_META_NAME = 'evangelical_magazine_view_count';
-
     private $issue, $authors, $page_num, $order, $sections;
     
     /**
