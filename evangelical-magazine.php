@@ -101,6 +101,7 @@ class evangelical_magazine {
                         'description' => 'Information about each section is stored here',
                         'public' => true,
                         'show_in_menu' => true,
+                        'exclude_from_search' => true,
                         'menu_position' => 4,
                         'menu_icon' => 'dashicons-portfolio',
                         'supports' => array ('title', 'editor'),
