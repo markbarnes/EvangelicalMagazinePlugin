@@ -358,4 +358,11 @@ abstract class evangelical_magazine_template {
     public function is_author() {
         return is_a($this, 'evangelical_magazine_author');
     }
+
+    /**
+    * Returns true if the object is an article
+    */
+    public function is_article() {
+        return is_a($this, 'evangelical_magazine_article');
+    }
 }

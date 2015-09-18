@@ -220,8 +220,6 @@ class evangelical_magazine {
             if (substr ($post->post_type,0,3) == 'em_') {
                 $class_name = 'evangelical_magazine_'.substr($post->post_type, 3);
                 return new $class_name ($post);
-            } else {
-                return $post;
             }
         }
     }
