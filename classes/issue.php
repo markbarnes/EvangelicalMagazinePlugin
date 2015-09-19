@@ -127,4 +127,42 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
         $args = array ('post_type' => 'em_issue', 'meta_key' => self::ISSUE_DATE_META_NAME, 'orderby' => 'meta_value', 'order' => 'DESC', 'posts_per_page' => $limit);
         return self::_get_issues_from_query($args);
     }
+
+    /**
+    * Adds metaboxes to issues custom post type
+    * 
+    */
+    public static function issue_meta_boxes() {
+        add_meta_box ('em_issue_date', 'Date', array(get_called_class(), 'do_issue_date_meta_box'), 'em_issue', 'side', 'core');
+    }
+
+    /**
+    * Outputs the issue meta box
+    * 
+    * @param mixed $article
+    */
+    public static function do_issue_date_meta_box($post) {
+        wp_nonce_field ('em_issue_date_meta_box', 'em_issue_date_meta_box_nonce');
+        if (!evangelical_magazine::is_creating_post()) {
+            $issue = new evangelical_magazine_issue ($post);
+            $existing_issue_date = $issue->get_date();
+        } else {
+            $this_month = date('n');
+            $existing_issue_date = array('year' => date('Y'), 'month' => str_pad($this_month+(($this_month+1) % 2), 2, '0', STR_PAD_LEFT));
+        }
+        echo '<select name="em_issue_month">';
+        $possible_issues = evangelical_magazine_issue::get_possible_issue_dates();
+        foreach ($possible_issues as $index => $name) {
+            $selected = ($existing_issue_date['month'] == $index) ? ' selected="selected"' : '';
+            echo "<option value=\"{$index}\"{$selected}> {$name}</label></li>";
+        }
+        echo '</select>';
+        echo '<select name="em_issue_year">';
+        for ($year = date('Y')+1; $year >= evangelical_magazine_issue::EARLIEST_YEAR; $year--) {
+            $selected = ($existing_issue_date['year'] == $year) ? ' selected="selected"' : '';
+            echo "<option value=\"{$year}\"{$selected}> {$year}</label></li>";
+        }
+        echo '</select>';
+    }
+    
 }

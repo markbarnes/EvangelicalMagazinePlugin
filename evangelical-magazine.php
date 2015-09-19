@@ -124,7 +124,7 @@ class evangelical_magazine {
                         'supports' => array ('title', 'thumbnail', 'editor'),
                         'has_archive' => true,
                         'query_var' => 'issues',
-                        'register_meta_box_cb' => array ('evangelical_magazine_article', 'issue_meta_boxes'),
+                        'register_meta_box_cb' => array ('evangelical_magazine_issue', 'issue_meta_boxes'),
                         'rewrite' => array('slug' => 'issues', 'with_front' => false));
         register_post_type ('em_issue', $args);
         //Series
