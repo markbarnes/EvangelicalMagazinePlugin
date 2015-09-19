@@ -31,6 +31,9 @@ class evangelical_magazine {
         add_action ('init', array (__CLASS__, 'register_custom_post_types'));
         add_action ('save_post', array(__CLASS__, 'save_cpt_data'));
         add_action ('admin_menu', array(__CLASS__, 'remove_admin_menus'));
+        
+        //Add filter
+        add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
     }
 
     /**
@@ -223,6 +226,10 @@ class evangelical_magazine {
                 return new $class_name ($post);
             }
         }
+    }
+    
+    public static function pre_sanitize_title ($title, $raw_title = '', $context = 'display') {
+        return str_replace ('/', '-', $title);
     }
 }
 
