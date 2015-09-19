@@ -85,7 +85,7 @@ abstract class evangelical_magazine_template {
     */
     public function get_link_html($link_content, $class='', $id='') {
         $class = trim ("{$this->get_friendly_class()}-link {$class}");
-        $class = "class=\"{$class}\"";
+        $class = " class=\"{$class}\"";
         $id = $id ? " id=\"{$id}\"" : '';
         return "<a href=\"{$this->get_link()}\"{$id}{$class}>{$link_content}</a>";
     }
@@ -302,6 +302,7 @@ abstract class evangelical_magazine_template {
     * @return evangelical_magazine_article[]
     */
     protected function _get_top_articles ($articles, $limit = -1) {
+        //We can't do this in one query, because WordPress won't return null values when you sort by meta_value
         if ($articles) {
             $index = array();
             foreach ($articles as $key => $article) {

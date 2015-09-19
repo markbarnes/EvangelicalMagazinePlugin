@@ -20,7 +20,6 @@ abstract class evangelical_magazine_not_articles extends evangelical_magazine_te
     * @return evangelical_magazine_article[]
     */
     protected function _get_top_articles_from_object ($limit = -1, $object, $exclude_article_ids = array()) {
-        //We can't do this in one query, because WordPress won't return null values when you sort by meta_value
         $articles = $object->get_articles(-1, $exclude_article_ids);
         return self::_get_top_articles ($articles, $limit);
     }

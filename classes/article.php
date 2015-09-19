@@ -628,5 +628,4 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             return $articles;
         }
     }
-    
 }
