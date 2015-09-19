@@ -314,69 +314,81 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * 
     */
     public function save_meta_data() {
+        if (defined ('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+            return;
+        if (!current_user_can('edit_posts'))
+            return;
         // Authors
-        delete_post_meta ($this->get_id(), self::AUTHOR_META_NAME);
-        if (isset($_POST['em_authors'])) {
-            if (is_array($_POST['em_authors'])) {
-                foreach ($_POST['em_authors'] as $author) {
-                    add_post_meta ($this->get_id(), self::AUTHOR_META_NAME, $author);
+        if (isset ($_POST['em_author_meta_box_nonce']) && wp_verify_nonce ($_POST['em_author_meta_box_nonce'], 'em_author_meta_box')) {
+            delete_post_meta ($this->get_id(), self::AUTHOR_META_NAME);
+            if (isset($_POST['em_authors'])) {
+                if (is_array($_POST['em_authors'])) {
+                    foreach ($_POST['em_authors'] as $author) {
+                        add_post_meta ($this->get_id(), self::AUTHOR_META_NAME, $author);
+                    }
                 }
             }
+            $this->generate_authors_array();
         }
-        $this->generate_authors_array();
         // Sections
-        delete_post_meta ($this->get_id(), self::SECTION_META_NAME);
-        if (isset($_POST['em_sections'])) {
-            if (is_array($_POST['em_sections'])) {
-                foreach ($_POST['em_sections'] as $section) {
-                    add_post_meta ($this->get_id(), self::SECTION_META_NAME, $section);
+        if (isset ($_POST['em_section_meta_box_nonce']) && wp_verify_nonce ($_POST['em_section_meta_box_nonce'], 'em_section_meta_box')) {
+            delete_post_meta ($this->get_id(), self::SECTION_META_NAME);
+            if (isset($_POST['em_sections'])) {
+                if (is_array($_POST['em_sections'])) {
+                    foreach ($_POST['em_sections'] as $section) {
+                        add_post_meta ($this->get_id(), self::SECTION_META_NAME, $section);
+                    }
                 }
             }
+            $this->generate_sections_array();
         }
-        $this->generate_sections_array();
-        // Issue
-        $article_sort_order = '';
-        if (isset($_POST['em_issue'])) {
-            update_post_meta ($this->get_id(), self::ISSUE_META_NAME, $_POST['em_issue']);
-            $this->issue = new evangelical_magazine_issue($_POST['em_issue']);
-            $article_sort_order = $this->issue->get_date();
-            if ($article_sort_order) {
-                $article_sort_order = "{$article_sort_order['year']}-{$article_sort_order['month']}";
+        if (isset($_POST['em_issue_meta_box_nonce']) && wp_verify_nonce ($_POST['em_issue_meta_box_nonce'], 'em_issue_meta_box')) {
+            $article_sort_order = '';
+            // Issue
+            if (isset($_POST['em_issue'])) {
+                update_post_meta ($this->get_id(), self::ISSUE_META_NAME, $_POST['em_issue']);
+                $this->issue = new evangelical_magazine_issue($_POST['em_issue']);
+                $article_sort_order = $this->issue->get_date();
+                if ($article_sort_order) {
+                    $article_sort_order = "{$article_sort_order['year']}-{$article_sort_order['month']}";
+                }
+            } else {
+                delete_post_meta ($this->get_id(), self::ISSUE_META_NAME);
+                $this->issue = null;
             }
-        } else {
-            delete_post_meta ($this->get_id(), self::ISSUE_META_NAME);
-            $this->issue = null;
-        }
-        // Page number
-        if (isset($_POST['em_page_num'])) {
-            $this->page_num = (int)$_POST['em_page_num'];
-            update_post_meta ($this->get_id(), self::PAGE_NUM_META_NAME, $this->page_num);
-            $article_sort_order .= $this->page_num ? '-'.str_pad($this->page_num, 2, '0', STR_PAD_LEFT) : '';
-        } else {
-            delete_post_meta ($this->get_id(), self::PAGE_NUM_META_NAME);
-            $this->page_num = null;
-        }
-        // Sort order
-        if ($article_sort_order) {
-            update_post_meta ($this->get_id(), self::ARTICLE_SORT_ORDER_META_NAME, $article_sort_order);
-        } else {
-            delete_post_meta ($this->get_id(), self::ARTICLE_SORT_ORDER_META_NAME);
+            // Page number
+            if (isset($_POST['em_page_num'])) {
+                $this->page_num = (int)$_POST['em_page_num'];
+                update_post_meta ($this->get_id(), self::PAGE_NUM_META_NAME, $this->page_num);
+                $article_sort_order .= $this->page_num ? '-'.str_pad($this->page_num, 2, '0', STR_PAD_LEFT) : '';
+            } else {
+                delete_post_meta ($this->get_id(), self::PAGE_NUM_META_NAME);
+                $this->page_num = null;
+            }
+            // Sort order
+            if ($article_sort_order) {
+                update_post_meta ($this->get_id(), self::ARTICLE_SORT_ORDER_META_NAME, $article_sort_order);
+            } else {
+                delete_post_meta ($this->get_id(), self::ARTICLE_SORT_ORDER_META_NAME);
+            }
         }
         // Series
-        if (isset($_POST['em_series'])) {
-            update_post_meta ($this->get_id(), self::SERIES_META_NAME, $_POST['em_series']);
-            $this->series = new evangelical_magazine_series($_POST['em_series']);
-        } else {
-            delete_post_meta ($this->get_id(), self::SERIES_META_NAME);
-            $this->series = null;
-        }
-        // Series order
-        if (isset($_POST['em_order'])) {
-            $this->order = (int)$_POST['em_order'];
-            update_post_meta ($this->get_id(), self::ORDER_META_NAME, $this->order);
-        } else {
-            delete_post_meta ($this->get_id(), self::ORDER_META_NAME);
-            $this->series = null;
+        if (isset($_POST['em_series_meta_box_nonce']) && wp_verify_nonce ($_POST['em_series_meta_box_nonce'], 'em_series_meta_box')) {
+            if (isset($_POST['em_series'])) {
+                update_post_meta ($this->get_id(), self::SERIES_META_NAME, $_POST['em_series']);
+                $this->series = new evangelical_magazine_series($_POST['em_series']);
+            } else {
+                delete_post_meta ($this->get_id(), self::SERIES_META_NAME);
+                $this->series = null;
+            }
+            // Series order
+            if (isset($_POST['em_order'])) {
+                $this->order = (int)$_POST['em_order'];
+                update_post_meta ($this->get_id(), self::ORDER_META_NAME, $this->order);
+            } else {
+                delete_post_meta ($this->get_id(), self::ORDER_META_NAME);
+                $this->series = null;
+            }
         }
     }
     
