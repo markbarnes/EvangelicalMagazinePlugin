@@ -37,38 +37,6 @@ class evangelical_magazine_section extends evangelical_magazine_not_articles {
     }
     
     /**
-    * Returns the HTML of a list of articles in this section
-    * 
-    * @param int $limit
-    * @param int[] $exlude_article_ids
-    * @return string
-    */
-    public function article_list_box($limit, $exlude_article_ids = array()) {
-        $articles = $this->get_articles($limit, $exlude_article_ids);
-        if ($articles) {
-            $ids = array();
-            $output = "<div class=\"article-list-box\">";
-            $output .= "<h3>{$this->get_name(true)}</h3>";
-            $output .= "<ol>";
-            $class=' first';
-            foreach ($articles as $article) {
-                $url = $class == '' ? $article->get_image_url('width_150') : $article->get_image_url('width_400');
-                $output .= "<li>{$article->get_link_html("<div class=\"article-list-box-image{$class} box-shadow-transition\" style=\"background-image: url('{$url}')\"></div>")}";
-                $title = $article->get_title();
-                $style = strlen($title) > 35 ? ' style="font-size:'.round(35/strlen($title)*1,2).'em"' : '';
-                $output .= "<span class=\"article-list-box-title\"><span{$style}>{$article->get_title(true)}</span></span><br/><span class=\"article-list-box-author\">by {$article->get_author_names(true)}</span></li>";
-                $ids[] = $article->get_id();
-                $class='';
-            }
-            $output .= "</ol>";
-            $output .= '</div>';
-            return array ('output' => $output, 'ids' => $ids);
-        } else {
-            return array ('output' => null, 'ids' => array());
-        }
-    }
-
-    /**
     * Returns an array of all the section objects
     * 
     * @param string $order_by
