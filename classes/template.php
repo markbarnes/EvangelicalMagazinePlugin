@@ -282,6 +282,22 @@ abstract class evangelical_magazine_template {
     }
 
     /**
+    * Returns all the object_ids from an array of objects
+    * 
+    * @param array $objects
+    * @return array
+    */
+    public static function get_object_ids_from_array ($objects) {
+        if ($objects) {
+            $post_ids = array();
+            foreach ($objects as $object) {
+                $post_ids[] = $object->get_id();
+            }
+            return $post_ids;
+        }
+    }
+
+    /**
     * Helper function that returns the arguments needed to return future posts in addition to what is normally returned
     * 
     * @return array
