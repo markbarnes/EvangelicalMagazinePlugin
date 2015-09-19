@@ -75,13 +75,16 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
         $author_meta_key = self::AUTHOR_META_NAME;
         $limit = ($limit == -1) ? '' : " LIMIT 0, {$limit}";
         $author_ids = $wpdb->get_col ("SELECT meta_author.meta_value, AVG(meta_views.meta_value/DATEDIFF(NOW(), post_date)) AS average_views_per_day FROM {$wpdb->postmeta} AS meta_views, {$wpdb->postmeta} AS meta_author, {$wpdb->posts} WHERE ID=meta_views.post_id AND ID=meta_author.post_id AND meta_views.meta_key='{$view_meta_key}' AND meta_author.meta_key='{$author_meta_key}' AND post_status='publish' AND post_type = 'em_article' GROUP BY meta_author.meta_value ORDER BY average_views_per_day DESC{$limit}");
+        //Now we need to add authors that have been missed, because they have no views
+        $more_authors = evangelical_magazine_author::get_all_author_ids(array ('post__not_in' => (array)$author_ids));
+        $author_ids = $more_authors ? array_merge($author_ids, $more_authors) : $author_ids;
         if ($author_ids) {
             $authors = array();
             foreach ($author_ids as $id) {
                 $authors[] = new evangelical_magazine_author($id);
             }
-            return $authors;
         }
+        return $authors;
     }
     
     public static function _compare_authors_alphabetically ($a, $b) {
