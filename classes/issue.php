@@ -40,7 +40,6 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
     * 
     */
     public function save_meta_data() {
-        wp_nonce_field ('em_issue_date_meta_box', 'em_issue_date_meta_box_nonce');
         if (isset($_POST['em_issue_date_meta_box_nonce']) && wp_verify_nonce($_POST['em_issue_date_meta_box_nonce'], 'em_issue_date_meta_box')) {
             if (isset($_POST['em_issue_month']) && isset($_POST['em_issue_year'])) {
                 update_post_meta ($this->get_id(), self::ISSUE_DATE_META_NAME, "{$_POST['em_issue_year']}-{$_POST['em_issue_month']}");
