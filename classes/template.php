@@ -14,6 +14,7 @@ abstract class evangelical_magazine_template {
     const AUTHOR_META_NAME = 'evangelical_magazine_authors';
     const ISSUE_META_NAME = 'evangelical_magazine_issue';
     const PAGE_NUM_META_NAME = 'evangelical_magazine_page_num';
+    const ARTICLE_SORT_ORDER_META_NAME = 'evangelical_magazine_article_sort_order';
     const SERIES_META_NAME = 'evangelical_magazine_series';
     const ORDER_META_NAME = 'evangelical_magazine_order';
     const SECTION_META_NAME = 'evangelical_magazine_section';

@@ -48,7 +48,7 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
     }
     
     /**
-    * Helper function to returns the articles from this issue
+    * Helper function to return the articles from this issue
     * 
     * @param array $args
     * @return evangelical_magazine_article[]

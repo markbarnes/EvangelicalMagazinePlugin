@@ -36,7 +36,7 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
     */
     public function _get_articles ($args = array()) {
         $meta_query = array(array('key' => self::AUTHOR_META_NAME, 'value' => $this->get_id()));
-        $default_args = array ('post_type' => 'em_article', 'posts_per_page' => -1, 'meta_query' => $meta_query);
+        $default_args = array ('post_type' => 'em_article', 'posts_per_page' => -1, 'meta_query' => $meta_query, 'meta_key' => self::ARTICLE_SORT_ORDER_META_NAME, 'orderby' => 'meta_value');
         return self::_get_articles_from_query($args, $default_args);
     }
 

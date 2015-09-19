@@ -228,6 +228,17 @@ class evangelical_magazine {
         }
     }
     
+    /**
+    * Makes sure '/' characters are replaced with '-' characters when sanitising.
+    * 
+    * Useful for creating slugs for magazine issues (e.g. 'September/October')
+    * Filters sanitize_title.
+    * 
+    * @param string $title
+    * @param string $raw_title
+    * @param string $context
+    * @return string
+    */
     public static function pre_sanitize_title ($title, $raw_title = '', $context = 'display') {
         return str_replace ('/', '-', $title);
     }
