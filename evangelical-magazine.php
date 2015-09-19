@@ -12,6 +12,7 @@ Author URI: http://www.markbarnes.net/
 * This class contains all the main functions for the plugin, mostly as static methods.
 * We're using a class mostly to avoid name clashes.
 */
+
 class evangelical_magazine {
     
     /**
