@@ -162,7 +162,7 @@ class evangelical_magazine {
                         'menu_icon' => 'dashicons-media-text',
                         'supports' => array ('title', 'thumbnail', 'editor'),
                         'has_archive' => true,
-                        'query_var' => 'article',
+                        'query_var' => 'articles',
                         'register_meta_box_cb' => array ('evangelical_magazine_article', 'article_meta_boxes'),
                         'rewrite' => array('slug' => 'article', 'with_front' => false));
         register_post_type ('em_article', $args);

@@ -24,7 +24,7 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
     * @return string
     */
     public function get_author_info_html() {
-        return "<div class=\"author-info\">".$this->get_link_html("<img class=\"author-image\" src=\"{$this->get_image_url('thumbnail_75')}\"/>")."<div class=\"author-description\">{$this->get_description()}</div></div>";
+        return "<div class=\"author-info\">".$this->get_link_html("<img class=\"author-image\" src=\"{$this->get_image_url('square_thumbnail_tiny')}\"/>")."<div class=\"author-description\">{$this->get_description()}</div></div>";
     }
 
     /**
