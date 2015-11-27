@@ -134,6 +134,21 @@ abstract class evangelical_magazine_template {
     }
     
     /**
+    * Returns an array containing the URL, width and height of the featured image
+    * 
+    * @param string $image_size
+    * @return array
+    */
+    public function get_image_details($image_size = 'thumbnail') {
+        if (has_post_thumbnail($this->get_id())) {
+            $src = wp_get_attachment_image_src (get_post_thumbnail_id($this->get_id()), $image_size);
+            if ($src) {
+                return array ('url' => $src[0], 'width' => $src[1], 'height' => $src[2]);
+            }
+        }
+    }
+    
+    /**
     * Returns an HTML <img> tag for the featured image
     * 
     * @param string $image_size
@@ -158,6 +173,15 @@ abstract class evangelical_magazine_template {
     */
     public function get_content () {
         return $this->post_data->post_content;
+    }
+    
+    /**
+    * Returns the excerpt
+    * 
+    * @return string
+    */
+    public function get_excerpt () {
+        return get_the_excerpt ($this->get_id());
     }
     
     /**
