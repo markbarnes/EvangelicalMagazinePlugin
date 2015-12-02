@@ -29,6 +29,7 @@ class evangelical_magazine {
         // Add main actions
         add_action ('evangelicalmagazine_activate', array(__CLASS__, 'flush_rewrite_rules'));
         add_action ('init', array (__CLASS__, 'register_custom_post_types'));
+        add_action ('widgets_init', array ('evangelical_magazine_widgets', 'register_widgets'));
         add_action ('save_post', array(__CLASS__, 'save_cpt_data'));
         add_action ('admin_menu', array(__CLASS__, 'remove_admin_menus'));
         
