@@ -88,6 +88,17 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     }
     
     /**
+    * Returns the permalink of the issue
+    * 
+    * @return string
+    */
+    public function get_issue_link() {
+        if ($this->has_issue()) {
+            return $this->issue->get_link();
+        }
+    }
+    
+    /**
     * Returns the article's page number
     * 
     * @return integer
