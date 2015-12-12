@@ -92,7 +92,30 @@ class evangelical_magazine {
     * @return array - the label array
     */
     static function generate_post_label ($plural, $singular) {
-        return array('name' => $plural, 'singular_name' => $singular, 'add_new' => 'Add New', 'add_new_item' => "Add New {$singular}", 'edit_item' => "Edit {$singular}", 'new_item' => "New {$singular}", 'view_item' => "View {$singular}", 'search_items' => "Search {$plural}", 'not_found' => "No {$plural} Found", 'not_found_in_trash' => "No {$plural} Found in Trash", 'parent_item_colon' => "Parent {$singular}:", 'menu_name' => $plural);
+        $singular_l = strtolower($singular);
+        $plural_l = strtolower($plural);
+        return array(   'name' => $plural,
+                        'singular_name' => $singular,
+                        'add_new' => 'Add New',
+                        'add_new_item' => "Add New {$singular}",
+                        'edit_item' => "Edit {$singular}",
+                        'new_item' => "New {$singular}",
+                        'view_item' => "View {$singular}",
+                        'search_items' => "Search {$plural}",
+                        'not_found' => "No {$plural} Found",
+                        'not_found_in_trash' => "No {$plural} Found in Trash",
+                        'parent_item_colon' => "Parent {$singular}:",
+                        'menu_name' => $plural,
+                        'featured_image' => "{$singular} image",
+                        'set_featured_image' => "Set {$singular_l} image",
+                        'remove_featured_image' => "Remove {$singular_l} image",
+                        'use_featured_image' => "Use {$singular_l} image",
+                        'archives' => "{$singular} Archive",
+                        'insert_into_item' => "Insert into {$singular_l}",
+                        'uploaded_to_this_item' => "Uploaded to this {$singular_l}",
+                        'filter_items_list' => "Filter {$plural_l} list",
+                        'items_list_navigation' => "{$plural} list navigation",
+                        'items_list' => "{$plural} list");
     }
 
     /**
