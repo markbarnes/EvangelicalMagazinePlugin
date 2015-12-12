@@ -6,12 +6,8 @@ class evangelical_magazine_widgets {
         register_widget('evangelical_magazine_most_popular');
         register_widget('evangelical_magazine_current_issue');
         register_widget('evangelical_magazine_facebook_page_plugin');
-        add_action ('genesis_before', array (__CLASS__, 'output_facebook_javascript_sdk'));
-    }
-    
-    public static function output_facebook_javascript_sdk() {
-        if (is_active_widget(false, false, 'evangelical_magazine_facebook_page_plugin')) {
-            echo '<div id="fb-root"></div><script>(function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.5&appId=1248516525165787"; fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>'."\r\n";
+        if (class_exists('evangelical_magazine_theme')) {
+            add_action ('genesis_before', array ('evangelical_magazine_theme', 'output_facebook_javascript_sdk'));
         }
     }
 }
