@@ -465,7 +465,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     public function get_small_box_html($add_links = true, $sub_title = '', $class = '') {
         if (has_post_thumbnail($this->get_id())) {
             $src = $this->get_image_url($image_size = 'article_small');
-            $style = "style=\"background-image: url('{$src}'); width:210px; height:140px; background-position: center center; background-size: cover\"";
+            $style = "style=\"background-image: url('{$src}'); background-position: center center; background-size: cover\"";
         } else {
             $style = '';
         }
