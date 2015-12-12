@@ -1,12 +1,19 @@
 <?php
 class evangelical_magazine_widgets {
 
-    static function register_widgets() {
+    public static function register_widgets() {
         register_widget('evangelical_magazine_subscribe');
         register_widget('evangelical_magazine_most_popular');
         register_widget('evangelical_magazine_current_issue');
-    }    
-
+        register_widget('evangelical_magazine_facebook_page_plugin');
+        add_action ('genesis_before', array (__CLASS__, 'output_facebook_javascript_sdk'));
+    }
+    
+    public static function output_facebook_javascript_sdk() {
+        if (is_active_widget(false, false, 'evangelical_magazine_facebook_page_plugin')) {
+            echo '<div id="fb-root"></div><script>(function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.5&appId=1248516525165787"; fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>'."\r\n";
+        }
+    }
 }
 
 class evangelical_magazine_subscribe extends WP_Widget {
@@ -92,5 +99,19 @@ class evangelical_magazine_current_issue extends WP_Widget {
                 echo $args['after_widget'];
             }
         }
+    }
+}
+
+class evangelical_magazine_facebook_page_plugin extends WP_Widget {
+    
+    function __construct() {
+        parent::__construct('evangelical_magazine_facebook_page_plugin', 'Facebook Page Plugin', array ('description' => 'Displays a mini Facebook page to encourage likes.'));
+    }
+    
+    public function widget ($args, $instance) {
+        echo $args['before_widget'];
+        echo "{$args['before_title']}Like us on Facebook{$args['after_title']}";
+        echo '<div class="fb-page" data-href="https://www.facebook.com/evangelicalmagazine/" data-width="360" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true" hide_cta="true"><div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/evangelicalmagazine/"><a href="https://www.facebook.com/evangelicalmagazine/">Evangelical Magazine</a></blockquote></div></div>';
+        echo $args['after_widget'];
     }
 }
