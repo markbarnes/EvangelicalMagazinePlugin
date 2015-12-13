@@ -107,7 +107,7 @@ class evangelical_magazine_facebook_page_plugin extends WP_Widget {
     public function widget ($args, $instance) {
         echo $args['before_widget'];
         echo "{$args['before_title']}Like us on Facebook{$args['after_title']}";
-        echo '<div class="fb-page" data-href="https://www.facebook.com/evangelicalmagazine/" data-width="360" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true" hide_cta="true"><div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/evangelicalmagazine/"><a href="https://www.facebook.com/evangelicalmagazine/">Evangelical Magazine</a></blockquote></div></div>';
+        echo '<div class="fb-page" data-href="https://www.facebook.com/evangelicalmagazine/" data-width="520" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true" hide_cta="true"><div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/evangelicalmagazine/"><a href="https://www.facebook.com/evangelicalmagazine/">Evangelical Magazine</a></blockquote></div></div>';
         echo $args['after_widget'];
     }
 }
