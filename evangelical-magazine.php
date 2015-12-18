@@ -31,6 +31,7 @@ class evangelical_magazine {
         add_action ('init', array (__CLASS__, 'register_custom_post_types'));
         add_action ('widgets_init', array ('evangelical_magazine_widgets', 'register_widgets'));
         add_action ('save_post', array(__CLASS__, 'save_cpt_data'));
+        add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
         add_action ('admin_menu', array(__CLASS__, 'remove_admin_menus'));
         
         //Add filter
@@ -190,6 +191,8 @@ class evangelical_magazine {
                         'register_meta_box_cb' => array ('evangelical_magazine_article', 'article_meta_boxes'),
                         'rewrite' => array('slug' => 'article', 'with_front' => false));
         register_post_type ('em_article', $args);
+        add_filter ('manage_edit-em_article_columns', array ('evangelical_magazine_article', 'filter_columns'));
+        add_action ('manage_em_article_posts_custom_column', array ('evangelical_magazine_article', 'output_columns'), 10, 2);
     }
     
     /**
@@ -265,6 +268,10 @@ class evangelical_magazine {
     */
     public static function pre_sanitize_title ($title, $raw_title = '', $context = 'display') {
         return str_replace ('/', '-', $title);
+    }
+    
+    public static function add_styles_to_admin_head () {
+        echo '<style type="text/css">.column-fb_likes, .column-fb_shares, .column-fb_comments, .column-fb_total {width: 10%}</style>';
     }
 }
 

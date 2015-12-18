@@ -632,4 +632,23 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             return $articles;
         }
     }
+    
+    public static function filter_columns ($columns) {
+        $columns ['fb_likes'] = 'Likes';
+        $columns ['fb_shares'] = 'Shares';
+        $columns ['fb_comments'] = 'Comments';
+        $columns ['fb_total'] = 'Total';
+        return $columns;
+    }
+    
+    public static function output_columns ($column, $post_id) {
+        global $post;
+        $article = new evangelical_magazine_article($post);
+        if ($article->is_published()) {
+            $fb_stats = $article->get_facebook_stats();
+            if (is_array ($fb_stats) && in_array ($column, array ('fb_likes', 'fb_shares', 'fb_comments', 'fb_total'))) {
+                echo $fb_stats[substr($column, 3)];
+            }
+        }
+    }
 }
