@@ -5,8 +5,10 @@ class evangelical_magazine_widgets {
         register_widget('evangelical_magazine_subscribe');
         register_widget('evangelical_magazine_most_popular');
         register_widget('evangelical_magazine_current_issue');
+        register_widget('evangelical_magazine_beacon_ad');
         register_widget('evangelical_magazine_facebook_page_plugin');
         if (class_exists('evangelical_magazine_theme')) {
+            add_action ('genesis_before', array ('evangelical_magazine_theme', 'output_beacon_ads_main_code'));
             add_action ('genesis_before', array ('evangelical_magazine_theme', 'output_facebook_javascript_sdk'));
         }
     }
@@ -42,7 +44,7 @@ class evangelical_magazine_subscribe extends WP_Widget {
                 echo "{$args['before_title']}Get the latest articles by email{$args['after_title']}";
                 echo "<div class=\"widget-contents\">";
                 echo "<p class=\"description\">Get the latest articles for free, every Thursday evening.</p>";
-                gravity_form (1, false);
+                gravity_form (1, false, true, false, null, true);
                 echo "</div>";
                 echo $args['after_widget'];
             }
@@ -108,6 +110,20 @@ class evangelical_magazine_facebook_page_plugin extends WP_Widget {
         echo $args['before_widget'];
         echo "{$args['before_title']}Like us on Facebook{$args['after_title']}";
         echo '<div class="fb-page" data-href="https://www.facebook.com/evangelicalmagazine/" data-width="520" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true" hide_cta="true"><div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/evangelicalmagazine/"><a href="https://www.facebook.com/evangelicalmagazine/">Evangelical Magazine</a></blockquote></div></div>';
+        echo $args['after_widget'];
+    }
+}
+
+class evangelical_magazine_beacon_ad extends WP_Widget {
+    
+    function __construct() {
+        parent::__construct('evangelical_magazine_beacon_ad', 'Beacon Ads Plugin (Not finished)', array ('description' => 'Inserts an ad from Beacon Ads.'));
+    }
+    
+    public function widget ($args, $instance) {
+        echo $args['before_widget'];
+        //echo "{$args['before_title']}Like us on Facebook{$args['after_title']}";
+        echo '<div id="bsap_1304381" class="bsarocks bsap_da154a6c34ffdee37c6b8e74ed808dfe"></div>';
         echo $args['after_widget'];
     }
 }
