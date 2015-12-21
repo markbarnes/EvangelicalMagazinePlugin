@@ -508,7 +508,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             } else {
                 $existing_object_ids = array();
             }
-            $output = "<ul id=\"em_{$name}checklist\" data-wp-lists=\"list:em_{$name}\" class=\"categorychecklist form-no-clear\">";
+            $output = "<ul id=\"em_{$name}checklist\" style=\"max-height: 275px; overflow-y: auto\" data-wp-lists=\"list:em_{$name}\" class=\"categorychecklist form-no-clear\">";
             foreach ($objects as $object) {
                 $checked = in_array($object->get_id(), $existing_object_ids) ? ' checked="checked"' : '';
                 $output .= "<li><label class=\"selectit\"><input type=\"checkbox\" name=\"em_{$name}s[]\" value=\"{$object->get_id()}\"{$checked}> {$object->get_name()}</label></li>";
