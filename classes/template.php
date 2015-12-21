@@ -20,6 +20,10 @@ abstract class evangelical_magazine_template {
     const SECTION_META_NAME = 'evangelical_magazine_section';
     const VIEW_COUNT_META_NAME = 'evangelical_magazine_view_count';
     const ISSUE_DATE_META_NAME = 'evangelical_magazine_issue_date';
+    const FB_LIKES_META_NAME = 'evangelical_magazine_fb_likes';
+    const FB_COMMENTS_META_NAME = 'evangelical_magazine_fb_comments';
+    const FB_SHARES_META_NAME = 'evangelical_magazine_fb_shares';
+    const FB_TOTAL_META_NAME = 'evangelical_magazine_fb_total';
 
     /**
     * All the custom posttype data is stored in $post_data as a WP_Post object
@@ -388,19 +392,24 @@ abstract class evangelical_magazine_template {
     }
     
     public function get_facebook_stats() {
-        $transient_name = "em_fb_stats_{$this->get_id()}";
+        $transient_name = "em_fb_valid_{$this->get_id()}";
         $stats = get_transient($transient_name);
         if (!$stats) {
             $json = wp_remote_request('https://api.facebook.com/method/links.getStats?urls='.urlencode($this->get_link()).'&format=json');
             $stats = json_decode(wp_remote_retrieve_body($json), true);
             if ($stats !== NULL && isset($stats[0])) {
-                $stats = array ('likes' => $stats[0]['like_count'], 'comments' => $stats[0]['comment_count'], 'shares' => $stats[0]['share_count'], 'total' => $stats[0]['total_count']);
+                add_post_meta($this->get_id(), self::FB_LIKES_META_NAME, $stats[0]['like_count'], true);
+                add_post_meta($this->get_id(), self::FB_COMMENTS_META_NAME, $stats[0]['comment_count'], true);
+                add_post_meta($this->get_id(), self::FB_SHARES_META_NAME, $stats[0]['share_count'], true);
+                add_post_meta($this->get_id(), self::FB_TOTAL_META_NAME, $stats[0]['total_count'], true);
                 $secs_since_published = time() - strtotime($this->get_post_date());
-                set_transient ($transient_name, $stats, $secs_since_published > 604800 ? 604800 : $secs_since_published);
-                return $stats;
+                set_transient ($transient_name, true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
             }
-        } else {
-            return $stats;
         }
+        return array (  'likes' => get_post_meta($this->get_id(), self::FB_LIKES_META_NAME, true),
+                        'comments' => get_post_meta($this->get_id(), self::FB_COMMENTS_META_NAME, true),
+                        'shares' => get_post_meta($this->get_id(), self::FB_SHARES_META_NAME, true),
+                        'total' => get_post_meta($this->get_id(), self::FB_TOTAL_META_NAME, true));
+
     }
 }
