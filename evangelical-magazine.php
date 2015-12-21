@@ -193,6 +193,8 @@ class evangelical_magazine {
         register_post_type ('em_article', $args);
         add_filter ('manage_edit-em_article_columns', array ('evangelical_magazine_article', 'filter_columns'));
         add_action ('manage_em_article_posts_custom_column', array ('evangelical_magazine_article', 'output_columns'), 10, 2);
+        add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_article', 'make_columns_sortable'));
+        add_action ('pre_get_posts', array ('evangelical_magazine_article', 'sort_by_columns'));
     }
     
     /**

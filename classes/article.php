@@ -651,4 +651,29 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             }
         }
     }
+    
+    public static function make_columns_sortable ($columns) {
+        $columns ['fb_likes'] = 'fb_likes';
+        $columns ['fb_shares'] = 'fb_shares';
+        $columns ['fb_comments'] = 'fb_comments';
+        $columns ['fb_total'] = 'fb_total';
+        return $columns;
+    }
+    
+    public static function sort_by_columns ($query) {
+        if  (is_admin()) {
+            $screen = get_current_screen();
+            if ($screen->id == 'edit-em_article') {
+                $columns = array ( 'fb_likes' => self::FB_LIKES_META_NAME,
+                                   'fb_shares' => self::FB_SHARES_META_NAME,
+                                   'fb_comments' => self::FB_COMMENTS_META_NAME,
+                                   'fb_total' => self::FB_TOTAL_META_NAME);
+                $orderby = $query->get('orderby');
+                if ($orderby && isset($columns[$orderby])) {
+                    $query->set ('meta_key', $columns[$orderby]);
+                    $query->set ('orderby','meta_value_num');
+                }
+            }
+        }
+    }
 }
