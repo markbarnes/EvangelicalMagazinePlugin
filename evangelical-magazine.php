@@ -29,9 +29,9 @@ class evangelical_magazine {
         // Add main actions
         add_action ('evangelicalmagazine_activate', array(__CLASS__, 'flush_rewrite_rules'));
         add_action ('init', array (__CLASS__, 'register_custom_post_types'));
+        add_action ('admin_init', array (__CLASS__, 'setup_custom_post_type_columns'));
         add_action ('widgets_init', array ('evangelical_magazine_widgets', 'register_widgets'));
         add_action ('save_post', array(__CLASS__, 'save_cpt_data'));
-        add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
         add_action ('admin_menu', array(__CLASS__, 'remove_admin_menus'));
         
         //Add filter
@@ -191,10 +191,17 @@ class evangelical_magazine {
                         'register_meta_box_cb' => array ('evangelical_magazine_article', 'article_meta_boxes'),
                         'rewrite' => array('slug' => 'article', 'with_front' => false));
         register_post_type ('em_article', $args);
+    }
+    
+    /**
+    * Sets up the actions and filters required to add custom columns to the Edit Articles page
+    */
+    public static function setup_custom_post_type_columns() {
         add_filter ('manage_edit-em_article_columns', array ('evangelical_magazine_article', 'filter_columns'));
         add_action ('manage_em_article_posts_custom_column', array ('evangelical_magazine_article', 'output_columns'), 10, 2);
         add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_article', 'make_columns_sortable'));
         add_action ('pre_get_posts', array ('evangelical_magazine_article', 'sort_by_columns'));
+        add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
     }
     
     /**
@@ -272,7 +279,11 @@ class evangelical_magazine {
         return str_replace ('/', '-', $title);
     }
     
-    public static function add_styles_to_admin_head () {
+    /**
+    * Adds styling to the admin head.
+    * 
+    */
+    public static function dd_styles_to_admin_head () {
         echo '<style type="text/css">.column-fb_likes, .column-fb_shares, .column-fb_comments, .column-fb_total {width: 10%}</style>';
     }
 }
