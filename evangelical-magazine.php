@@ -33,8 +33,10 @@ class evangelical_magazine {
         add_action ('widgets_init', array ('evangelical_magazine_widgets', 'register_widgets'));
         add_action ('save_post', array(__CLASS__, 'save_cpt_data'));
         add_action ('admin_menu', array(__CLASS__, 'remove_admin_menus'));
-        add_action('rss2_item', array(__CLASS__, 'add_featured_image_to_rss'));
-        add_action('atom_entry', array(__CLASS__, 'add_featured_image_to_rss'));
+        add_action ('rss2_ns', array(__CLASS__, 'add_mediarss_namespace'));
+        add_action ('atom_ns', array(__CLASS__, 'add_mediarss_namespace'));
+        add_action ('rss2_item', array(__CLASS__, 'add_featured_image_to_rss'));
+        add_action ('atom_entry', array(__CLASS__, 'add_featured_image_to_rss'));
         
         //Add filters
         add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
@@ -299,6 +301,10 @@ class evangelical_magazine {
     */
     public static function add_styles_to_admin_head () {
         echo '<style type="text/css">.column-fb_likes, .column-fb_shares, .column-fb_comments, .column-fb_total {width: 10%}</style>';
+    }
+    
+    public static function add_mediarss_namespace() {
+        echo "xmlns:media=\"http://search.yahoo.com/mrss/\"\r\n";
     }
     
     public static function add_featured_image_to_rss () {
