@@ -33,9 +33,12 @@ class evangelical_magazine {
         add_action ('widgets_init', array ('evangelical_magazine_widgets', 'register_widgets'));
         add_action ('save_post', array(__CLASS__, 'save_cpt_data'));
         add_action ('admin_menu', array(__CLASS__, 'remove_admin_menus'));
+        add_action('rss2_item', array(__CLASS__, 'add_featured_image_to_rss'));
+        add_action('atom_entry', array(__CLASS__, 'add_featured_image_to_rss'));
         
-        //Add filter
+        //Add filters
         add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
+        add_filter ('the_author', array (__CLASS__, 'filter_author_name'));
     }
 
     /**
@@ -256,12 +259,23 @@ class evangelical_magazine {
     */
     public static function get_object_from_id($id) {
         $post = get_post($id);
-        if ($post) {
+        return self::get_object_from_post($post);
+    }
+    
+    /**
+    * Converts a WP_Post object to the correct magazine object
+    * 
+    * @param WP_Post $post
+    * @return mixed
+    */
+    public static function get_object_from_post($post) {
+        if (is_a($post, 'WP_Post')) {
             if (substr ($post->post_type,0,3) == 'em_') {
                 $class_name = 'evangelical_magazine_'.substr($post->post_type, 3);
                 return new $class_name ($post);
             }
         }
+        return false;
     }
     
     /**
@@ -283,8 +297,31 @@ class evangelical_magazine {
     * Adds styling to the admin head.
     * 
     */
-    public static function dd_styles_to_admin_head () {
+    public static function add_styles_to_admin_head () {
         echo '<style type="text/css">.column-fb_likes, .column-fb_shares, .column-fb_comments, .column-fb_total {width: 10%}</style>';
+    }
+    
+    public static function add_featured_image_to_rss () {
+        global $post;
+        if ($object = self::get_object_from_post($post)) {
+            $image = $object->get_image_details ('article_large');
+            if ($image) {
+                echo "<media:content url=\"{$image['url']}\" type=\"{$image['mimetype']}\" height=\"{$image['height']}\" width=\"{$image['width']}\" />\r\n";
+            }
+        }
+    }
+    
+    public static function filter_author_name ($display_name) {
+        global $post;
+        if ($object = self::get_object_from_post($post)) {
+            if ($object->is_article()) {
+                return $object->get_author_names();
+            } else {
+                return 'editor';
+            }
+        } else {
+            return $display_name;
+        }
     }
 }
 
