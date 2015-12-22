@@ -157,8 +157,17 @@ abstract class evangelical_magazine_template {
             $thumbnail_id = get_post_thumbnail_id($this->get_id());
             $src = wp_get_attachment_image_src ($thumbnail_id, $image_size);
             $mime_type = get_post_mime_type($thumbnail_id);
+            $metadata = wp_get_attachment_metadata($thumbnail_id);
+            if (isset($metadata['sizes'][$image_size]['file'])) {
+                $filename = $metadata['sizes'][$image_size]['file'];
+                $uploads = wp_upload_dir();
+                //$filename = $uploads['basedir'] . "/{$filename}";
+                $filesize = @filesize(dirname("{$uploads['basedir']}/{$metadata['file']}").'/'.$filename);
+            } else {
+                $filesize = false;
+            }
             if ($src) {
-                return array ('url' => $src[0], 'width' => $src[1], 'height' => $src[2], 'mimetype' => $mime_type);
+                return array ('url' => $src[0], 'width' => $src[1], 'height' => $src[2], 'mimetype' => $mime_type, 'filesize' => $filesize);
             }
         }
     }

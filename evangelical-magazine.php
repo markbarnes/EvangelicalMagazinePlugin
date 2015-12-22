@@ -41,6 +41,8 @@ class evangelical_magazine {
         //Add filters
         add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
         add_filter ('the_author', array (__CLASS__, 'filter_author_name'));
+        
+        add_image_size ('article_rss', 560, 373, true);
     }
 
     /**
@@ -310,9 +312,10 @@ class evangelical_magazine {
     public static function add_featured_image_to_rss () {
         global $post;
         if ($object = self::get_object_from_post($post)) {
-            $image = $object->get_image_details ('article_large');
+            $image = $object->get_image_details ('article_rss');
             if ($image) {
                 echo "<media:content url=\"{$image['url']}\" type=\"{$image['mimetype']}\" height=\"{$image['height']}\" width=\"{$image['width']}\" />\r\n";
+                echo "<enclosure url=\"{$image['url']}\" type=\"{$image['mimetype']}\" length=\"{$image['filesize']}/>\r\n";
             }
         }
     }
