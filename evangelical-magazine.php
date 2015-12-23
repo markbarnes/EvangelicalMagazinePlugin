@@ -41,6 +41,7 @@ class evangelical_magazine {
         //Add filters
         add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
         add_filter ('the_author', array (__CLASS__, 'filter_author_name'));
+        add_filter ('post_row_actions', array (__CLASS__, 'filter_post_row_actions'), 10, 2);
         
         add_image_size ('article_rss', 560, 373, true);
     }
@@ -209,6 +210,11 @@ class evangelical_magazine {
         add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_article', 'make_columns_sortable'));
         add_action ('pre_get_posts', array ('evangelical_magazine_article', 'sort_by_columns'));
         add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
+        if (isset($_GET['recalc_fb']) && is_admin()) {
+            $post_id = (int)$_GET['recalc_fb'];
+            $transient_name = "em_fb_valid_{$post_id}";
+            delete_transient($transient_name);
+        }
     }
     
     /**
@@ -315,7 +321,7 @@ class evangelical_magazine {
             $image = $object->get_image_details ('article_rss');
             if ($image) {
                 echo "<media:content url=\"{$image['url']}\" type=\"{$image['mimetype']}\" height=\"{$image['height']}\" width=\"{$image['width']}\" />\r\n";
-                echo "<enclosure url=\"{$image['url']}\" type=\"{$image['mimetype']}\" length=\"{$image['filesize']}/>\r\n";
+                echo "\t\t<enclosure url=\"{$image['url']}\" type=\"{$image['mimetype']}\" length=\"{$image['filesize']}\" />\r\n";
             }
         }
     }
@@ -331,6 +337,22 @@ class evangelical_magazine {
         } else {
             return $display_name;
         }
+    }
+    
+    public static function filter_post_row_actions ($actions, $post) {
+        global $current_screen;
+        if ($post->post_type == 'em_article') {
+            $possible_variables = array ('paged', 'orderby', 'order', 'author', 'all_posts', 'post_status');
+            $arguments = array('recalc_fb' => $post->ID);
+            foreach ($possible_variables as $p) {
+                if (isset($_GET[$p])) {
+                    $arguments[$p] = $_GET[$p];
+                }
+            }
+            $url = esc_url(add_query_arg ($arguments, admin_url ($current_screen->parent_file)));
+            $actions ['recalc_fb'] = "<a href=\"{$url}\">Recalc FB</a>";
+        }
+        return $actions;
     }
 }
 
