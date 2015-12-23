@@ -1,4 +1,12 @@
 <?php
+/**
+* The main class for handling the article custom post type
+* 
+* @package evangelical-magazine-plugin
+* @author Mark Barnes
+* @access public
+*/
+
 class evangelical_magazine_article extends evangelical_magazine_template {
     
     private $issue, $authors, $page_num, $order, $sections;
@@ -633,6 +641,13 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         }
     }
     
+    /**
+    * Adds columns to the Articles admin page
+    * 
+    * Filters manage_edit-em_article_columns
+    * 
+    * @param mixed $columns
+    */
     public static function filter_columns ($columns) {
         $columns ['fb_likes'] = 'Likes';
         $columns ['fb_shares'] = 'Shares';
@@ -641,6 +656,14 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         return $columns;
     }
     
+    /**
+    * Outputs the additional columns on the Articles admin page
+    * 
+    * Filters manage_em_article_posts_custom_column
+    * 
+    * @param string $column
+    * @param int $post_id
+    */
     public static function output_columns ($column, $post_id) {
         global $post;
         $article = new evangelical_magazine_article($post);
@@ -652,6 +675,14 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         }
     }
     
+    /**
+    * Sets the custom columns to be sortable
+    * 
+    * Filters manage_edit-em_article_sortable_columns
+    * 
+    * @param array $columns
+    * @return array
+    */
     public static function make_columns_sortable ($columns) {
         $columns ['fb_likes'] = 'fb_likes';
         $columns ['fb_shares'] = 'fb_shares';
@@ -660,6 +691,13 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         return $columns;
     }
     
+    /**
+    * Modifies the query to sort by columns, if requested
+    * 
+    * Runs on the pre_get_posts action 
+    * 
+    * @param WP_Query $query
+    */
     public static function sort_by_columns ($query) {
         if  (is_admin()) {
             $screen = get_current_screen();

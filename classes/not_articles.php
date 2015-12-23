@@ -5,7 +5,7 @@
 * 
 * Contains common functions such as get_id()
 * 
-* @package evangelical-magazine-theme
+* @package evangelical-magazine-plugin
 * @author Mark Barnes
 * @access public
 */
@@ -24,6 +24,13 @@ abstract class evangelical_magazine_not_articles extends evangelical_magazine_te
         return self::_get_top_articles ($articles, $limit);
     }
 
+    /**
+    * Returns an array of articles
+    * 
+    * @param int $limit
+    * @param int[] $exclude_article_ids
+    * @return evangelical_magazine_article[]
+    */
     public function get_articles ($limit = -1, $exclude_article_ids = array()) {
         return $this->_get_articles(array ('posts_per_page' => $limit, 'post__not_in' => (array)$exclude_article_ids));
     }

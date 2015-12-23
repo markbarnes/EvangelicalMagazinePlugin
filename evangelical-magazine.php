@@ -311,10 +311,20 @@ class evangelical_magazine {
         echo '<style type="text/css">.column-fb_likes, .column-fb_shares, .column-fb_comments, .column-fb_total {width: 10%}</style>';
     }
     
+    /**
+    * Outputs the mediaRSS namespace to the RSS feeds
+    * 
+    * Called on the rss2_ns and atom_ns actions
+    */
     public static function add_mediarss_namespace() {
         echo "xmlns:media=\"http://search.yahoo.com/mrss/\"\r\n";
     }
     
+    /**
+    * Adds the featured image to the RSS feeds
+    * 
+    * Adds both a media:content and enclosure
+    */
     public static function add_featured_image_to_rss () {
         global $post;
         if ($object = self::get_object_from_post($post)) {
@@ -326,6 +336,15 @@ class evangelical_magazine {
         }
     }
     
+    /**
+    * Filters the authors names
+    * 
+    * Replaces the post author with the actual author(s) of the article.
+    * Filters the_author
+    * 
+    * @param string $display_name
+    * @return string
+    */
     public static function filter_author_name ($display_name) {
         global $post;
         if ($object = self::get_object_from_post($post)) {
@@ -339,6 +358,15 @@ class evangelical_magazine {
         }
     }
     
+    /**
+    * Adds the 'recalc_fb' row action to articles
+    * 
+    * Filters post_row_actions
+    * 
+    * @param array $actions
+    * @param WP_Post $post
+    * @return array
+    */
     public static function filter_post_row_actions ($actions, $post) {
         global $current_screen;
         if ($post->post_type == 'em_article') {

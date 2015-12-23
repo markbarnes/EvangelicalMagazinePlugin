@@ -5,7 +5,7 @@
 * 
 * Contains common functions such as get_id()
 * 
-* @package evangelical-magazine-theme
+* @package evangelical-magazine-plugin
 * @author Mark Barnes
 * @access public
 */
@@ -53,6 +53,11 @@ abstract class evangelical_magazine_template {
         return $this->post_data->ID;
     }
     
+    /**
+    * Returns a friendly class name of the current object
+    * 
+    * @return string
+    */
     protected function get_friendly_class() {
         return str_replace('evangelical_magazine_', '', get_called_class());
     }
@@ -281,7 +286,7 @@ abstract class evangelical_magazine_template {
         return self::_get_objects_from_query($args, $default_args, 'series');
     }
 
-   /**
+    /**
     * Helper function to help subclasses return all the issues from a WP_Query
     * 
     * Wrapper for _get_objects()
@@ -295,7 +300,7 @@ abstract class evangelical_magazine_template {
         return self::_get_objects_from_query($args, $default_args, 'issue');
     }
 
-   /**
+    /**
     * Helper function to help subclasses return all the authors from a WP_Query
     * 
     * Wrapper for _get_objects()
@@ -400,6 +405,12 @@ abstract class evangelical_magazine_template {
         return is_a($this, 'evangelical_magazine_article');
     }
     
+    /**
+    * Gets the Facebook stats for this object
+    * 
+    * return array
+    * 
+    */
     public function get_facebook_stats() {
         if (!(defined('WP_DEBUG') && WP_DEBUG == true)) {
             $transient_name = "em_fb_valid_{$this->get_id()}";

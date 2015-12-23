@@ -3,7 +3,7 @@
 /**
 * The main class for handling the series custom post type
 * 
-* @package evangelical-magazine-theme
+* @package evangelical-magazine-plugin
 * @author Mark Barnes
 * @access public
 */

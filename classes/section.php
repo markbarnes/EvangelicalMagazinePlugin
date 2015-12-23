@@ -1,4 +1,11 @@
 <?php
+/**
+* The main class for handling the section custom post type
+* 
+* @package evangelical-magazine-plugin
+* @author Mark Barnes
+* @access public
+*/
 class evangelical_magazine_section extends evangelical_magazine_not_articles {
     
     /**

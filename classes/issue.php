@@ -1,4 +1,11 @@
 <?php
+/**
+* The main class for handling the issue custom post type
+* 
+* @package evangelical-magazine-plugin
+* @author Mark Barnes
+* @access public
+*/
 class evangelical_magazine_issue extends evangelical_magazine_not_articles {
     
     const EARLIEST_YEAR = 2010;
@@ -166,5 +173,4 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
         }
         echo '</select>';
     }
-    
 }

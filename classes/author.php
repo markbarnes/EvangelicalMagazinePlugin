@@ -1,7 +1,12 @@
 <?php
 /**
-* Accepts either a WP_Post object, or a post_id
+* The main class for handling the author custom post type
+* 
+* @package evangelical-magazine-plugin
+* @author Mark Barnes
+* @access public
 */
+
 class evangelical_magazine_author extends evangelical_magazine_not_articles {
     
     /**
@@ -90,6 +95,15 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
         return $authors;
     }
     
+    /**
+    * Helper function to sort authors alphabetically
+    * 
+    * Designed to be called by one of PHP's array sort functions, such as uasort();
+    * 
+    * @param evangelical_magazine_author $a
+    * @param evangelical_magazine_author $b
+    * @return int
+    */
     public static function _compare_authors_alphabetically ($a, $b) {
         return strcasecmp($a->get_name(), $b->get_name());
     }
