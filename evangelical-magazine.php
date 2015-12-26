@@ -24,10 +24,10 @@ class evangelical_magazine {
         spl_autoload_register(array(__CLASS__, 'autoload_classes'));
         
         // Register activation hook
-        register_activation_hook (__FILE__, array(__CLASS__, 'do_on_activation'));
+        register_activation_hook (__FILE__, array(__CLASS__, 'on_activation'));
 
         // Add main actions
-        add_action ('evangelicalmagazine_activate', array(__CLASS__, 'flush_rewrite_rules'));
+        add_action ('evangelical_magazine_activate', array(__CLASS__, 'flush_rewrite_rules'));
         add_action ('init', array (__CLASS__, 'register_custom_post_types'));
         add_action ('admin_init', array (__CLASS__, 'setup_custom_post_type_columns'));
         add_action ('widgets_init', array ('evangelical_magazine_widgets', 'register_widgets'));
@@ -41,7 +41,6 @@ class evangelical_magazine {
         //Add filters
         add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
         add_filter ('the_author', array (__CLASS__, 'filter_author_name'));
-        add_filter ('post_row_actions', array (__CLASS__, 'filter_post_row_actions'), 10, 2);
         
         add_image_size ('article_rss', 560, 373, true);
     }
@@ -52,6 +51,7 @@ class evangelical_magazine {
     */
     public static function on_activation() {
         do_action ('evangelical_magazine_activate');
+        add_role ('subs-admin', 'Subscriptions administrator', array ('gravityforms_view_entries' => true, 'gravityforms_edit_entries' => true, 'gravityforms_delete_entries' => true, 'gravityforms_export_entries' => true, 'gravityforms_view_entry_notes' => true, 'gravityforms_edit_entry_notes' => true, 'gravityforms_preview_forms' => true));
     }
 
     /**
@@ -88,7 +88,7 @@ class evangelical_magazine {
     /**
     * Flushes the rewrite rules
     */
-    function flush_rewrite_rules () {
+    public static function flush_rewrite_rules () {
         global $wp_rewrite;
         $wp_rewrite->flush_rules();
     }
@@ -210,6 +210,7 @@ class evangelical_magazine {
         add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_article', 'make_columns_sortable'));
         add_action ('pre_get_posts', array ('evangelical_magazine_article', 'sort_by_columns'));
         add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
+        add_filter ('post_row_actions', array (__CLASS__, 'filter_post_row_actions'), 10, 2);
         if (isset($_GET['recalc_fb']) && is_admin()) {
             $post_id = (int)$_GET['recalc_fb'];
             $transient_name = "em_fb_valid_{$post_id}";
