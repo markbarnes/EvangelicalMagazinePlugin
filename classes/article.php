@@ -195,6 +195,18 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     }
     
     /**
+    * Returns the name the first section
+    * 
+    * @return string
+    */
+    public function get_section_name() {
+        if ($this->has_sections()) {
+            $sections = $this->get_sections();
+            return key($sections);
+        }
+    }
+    
+    /**
     * Helper function to generate author and section data
     * 
     * @param int[] $ids
