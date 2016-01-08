@@ -66,13 +66,21 @@ abstract class evangelical_magazine_template {
     * Returns the name of the object
     * 
     * @param boolean $link - include a HTML link
+    * @param boolean $schema - add schema.org microdata
     * @return string
     */
-    public function get_name($link = false) {
-        if ($link) {
-            return $this->get_link_html($this->post_data->post_title);
+    public function get_name($link = false, $schema = false) {
+        $name = $this->post_data->post_title;
+        if ($schema) {
+            $name = $this->html_tag('span', $name, array ('itemprop' => 'name'));
+            $attributes = array ('itemprop' => 'url');
         } else {
-            return $this->post_data->post_title;
+            $attributes = array();
+        }
+        if ($link) {
+            return $this->get_link_html($name, $attributes);
+        } else {
+            return $name;
         }
     }
         
@@ -93,11 +101,10 @@ abstract class evangelical_magazine_template {
     * @param string $id
     * @return string;
     */
-    public function get_link_html($link_content, $class='', $id='') {
-        $class = trim ("{$this->get_friendly_class()}-link {$class}");
-        $class = " class=\"{$class}\"";
-        $id = $id ? " id=\"{$id}\"" : '';
-        return "<a href=\"{$this->get_link()}\"{$id}{$class}>{$link_content}</a>";
+    public function get_link_html($link_content, $attributes = array()) {
+        $attributes = wp_parse_args($attributes, array('class' => ''));
+        $attributes['class'] = trim("{$this->get_friendly_class()}-link {$attributes['class']}");
+        return "<a href=\"{$this->get_link()}\" {$this->attr_html($attributes)}>{$link_content}</a>";
     }
 
     /**
@@ -134,6 +141,15 @@ abstract class evangelical_magazine_template {
     */
     public function get_post_date() {
         return $this->post_data->post_date;
+    }
+    
+    /**
+    * Returns the post date as a Unix timestamp
+    * 
+    * @return string
+    */
+    public function get_post_datetime() {
+        return strtotime($this->post_data->post_date);
     }
     
     /**
@@ -433,5 +449,39 @@ abstract class evangelical_magazine_template {
                         'shares' => get_post_meta($this->get_id(), self::FB_SHARES_META_NAME, true),
                         'total' => get_post_meta($this->get_id(), self::FB_TOTAL_META_NAME, true));
 
+    }
+    
+    /**
+    * Converts an array of attributes into a string, ready for HTML output
+    * 
+    * e.g. array ('key1' => 'value1', 'key2' => 'value2')
+    * will become 'key1="value1" key2="value2"'
+    * 
+    * @param array $attributes
+    * @return string
+    */
+    protected function attr_html ($attributes) {
+        $output = '';
+        foreach ($attributes as $key => $value) {
+            if ($value) {
+                if ($value === true) {
+                    $output .= esc_html($key).' ';
+                } else {
+                    $output .= sprintf('%s="%s" ', esc_html($key), esc_attr($value));
+                }
+            }
+        }
+        return trim($output);
+    }
+    
+    /**
+    * Returns HTML
+    * 
+    * @param string $tag - The HTML tag
+    * @param string $contents - The text contained in the tag
+    * @param array $attributes - Various attributes [class, id, etc.] for the tag
+    */
+    protected function html_tag ($tag, $contents, $attributes = array()) {
+        return "<{$tag} {$this->attr_html($attributes)}>{$contents}</{$tag}>";
     }
 }
