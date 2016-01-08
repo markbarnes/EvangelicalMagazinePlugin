@@ -8,8 +8,26 @@
 */
 
 class evangelical_magazine_article extends evangelical_magazine_template {
+    /**
+    * @var evangelical_magazine_issue
+    */
+    private $issue;
     
-    private $issue, $authors, $page_num, $order, $sections;
+    /**
+    * @var evangelical_magazine_author[]
+    */
+    private $authors;
+    
+    
+    /**
+    * @var evangelical_magazine_section[]
+    */
+    private $sections;
+
+    /**
+    * @var int
+    */
+    private $page_num, $order;
     
     /**
     * Instantiate the class by passing the WP_Post object or a post_id
@@ -51,16 +69,6 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         } else {
             return $this->post_data->post_title;
         }
-    }
-    
-    /**
-    * Wrapper for get_title()
-    * 
-    * @param boolean $link
-    * @return string
-    */
-    public function get_name ($link = false) {
-        return $this->get_title ($link);
     }
     
     /**
@@ -262,14 +270,24 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     /**
     * Returns a list of author names
     * 
-    * @param bool $link
+    * @param bool $link - Make the names into links
+    * @param bool $schema - Add schema.org markup
     * @return string
     */
-    public function get_author_names($link = false) {
+    public function get_author_names($link = false, $schema = false) {
         if (is_array($this->authors)) {
             $output = array();
             foreach ($this->authors as $author) {
-                $output[] = $author->get_name($link);
+                if ($schema) {
+                    $attributes = array ('itemprop' => 'author', 'itemtype' => 'http://schema.org/Person', 'itemscope' => true);
+                    $this_author = '<span '.$this->attr_html($attributes).'>';
+                    $attributes = array ('itemprop' => 'name');
+                    $this_author .= $author->get_name($link, $schema);
+                    $this_author .= '</span>';
+                } else {
+                    $this_author = $author->get_name($link);
+                }
+                $output[] = $this_author;
             }
             if (count($output) > 1) {
                 $last = ' and '.array_pop ($output);
@@ -308,6 +326,17 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     public function get_issue_date() {
         if ($this->has_issue()) {
             return $this->issue->get_date();
+        }
+    }
+    
+    /**
+    * Returns the date of the issue as a Unix timestamp
+    * 
+    */
+    public function get_issue_datetime() {
+        if ($this->has_issue()) {
+            $date = $this->issue->get_date();
+            return strtotime("{$date['year']}-{$date['month']}-01");
         }
     }
     
