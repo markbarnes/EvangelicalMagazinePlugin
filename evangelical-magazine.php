@@ -388,8 +388,27 @@ class evangelical_magazine {
     public static function filter_feed_for_mailchimp ($content) {
         global $post;
         if (isset($_GET['output']) && $_GET['output']=='excerpt') {
-            $link = get_permalink($post->ID);
-            return wp_trim_words($content, 200, "&hellip; <a href=\"{$link}\">Read article</a>");
+            $link = esc_url (get_permalink());
+            $content = strip_shortcodes ($content);
+            $content = apply_filters ('the_content', $content);
+            $content = str_replace(']]>', ']]&gt;', $content);
+            $content = strip_tags ($content, '<em>,<b>,<i>,<strong>,<br>,<p>,<ul>,<ol>,<li>,<h1>,<h2>,<h3>,<h4>,<h5>');
+            $max_words = 175;
+            $tokens = array();
+            preg_match_all('/(<[^>]+>|[^<>\s]+)\s*/u', $content, $tokens);
+            $output = '';
+            $count = 0;
+            foreach ($tokens[0] as $token) {
+                if ($count >= $max_words && preg_match('/[\,\;\?\.\!]\s*$/uS', $token)) { 
+                    $output .= trim($token);
+                    break;
+                }
+                $count++;
+                $output .= $token;
+            }
+            $output .= "&hellip; <a href=\"{$link}\">(continue reading)</a>";
+            $content = trim(force_balance_tags($output));
+            return $content;
         } else {
             return $content;
         }
