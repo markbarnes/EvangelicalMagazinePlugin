@@ -41,6 +41,7 @@ class evangelical_magazine {
         //Add filters
         add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
         add_filter ('the_author', array (__CLASS__, 'filter_author_name'));
+        add_filter ('the_content_feed', array (__CLASS__, 'filter_feed_for_mailchimp'));
         
         add_image_size ('article_rss', 560, 373, true);
     }
@@ -382,6 +383,16 @@ class evangelical_magazine {
             $actions ['recalc_fb'] = "<a href=\"{$url}\">Recalc FB</a>";
         }
         return $actions;
+    }
+    
+    public static function filter_feed_for_mailchimp ($content) {
+        global $post;
+        if (isset($_GET['output']) && $_GET['output']=='excerpt') {
+            $link = get_permalink($post->ID);
+            return wp_trim_words($content, 200, "&hellip; <a href=\"{$link}\">Read article</a>");
+        } else {
+            return $content;
+        }
     }
 }
 
