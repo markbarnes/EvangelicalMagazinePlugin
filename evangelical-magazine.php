@@ -37,7 +37,6 @@ class evangelical_magazine {
         add_action ('atom_ns', array(__CLASS__, 'add_mediarss_namespace'));
         add_action ('rss2_item', array(__CLASS__, 'add_featured_image_to_rss'));
         add_action ('atom_entry', array(__CLASS__, 'add_featured_image_to_rss'));
-        add_action ('pre_get_posts', array (__CLASS__, 'modify_instant_articles_query'), 11, 1);
         
         //Add filters
         add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
@@ -45,6 +44,8 @@ class evangelical_magazine {
         add_filter ('the_content_feed', array (__CLASS__, 'filter_feed_for_mailchimp'));
         
         add_image_size ('article_rss', 560, 373, true);
+        
+        $ia = new evangelical_magazine_facebook_instant_articles();
     }
 
     /**
@@ -412,19 +413,6 @@ class evangelical_magazine {
             return $content;
         } else {
             return $content;
-        }
-    }
-    
-    /**
-    * Modifies the WordPress query when the instant articles feed is being requested
-    * 
-    * Effectively modifies instant_articles_query in the official Automattic Instant Articles plugin
-    * 
-    * @param WP_Query $query  The WP_Query object. Passed by reference.
-    */
-    public static function modify_instant_articles_query ($query) {
-        if (defined('INSTANT_ARTICLES_SLUG') && $query->is_main_query() && $query->is_feed(INSTANT_ARTICLES_SLUG)) {
-            $query->set ('post_type', 'em_article');
         }
     }
 }
