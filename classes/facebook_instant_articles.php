@@ -17,6 +17,7 @@ class evangelical_magazine_facebook_instant_articles {
     public function __construct() {
         add_action ('pre_get_posts', array (__CLASS__, 'modify_query'), 11, 1);
         add_filter ('instant_articles_authors', array (__CLASS__, 'filter_author'));
+        add_filter ('instant_articles_content', array (__CLASS__, 'remove_onpage_hyperlinks'));
     }
 
     /**
@@ -30,14 +31,39 @@ class evangelical_magazine_facebook_instant_articles {
         }
     }
     
+    /**
+    * Filters the author name for instant articles
+    * 
+    * @param object $author
+    * @return object
+    */
     public static function filter_author ($author) {
         global $post;
         /** @var evangelical_magazine_article */
-        $article = evangelical_magazine::get_object_from_post($post);
-        if ($article && isset($author[0])) {
-            $author[0]->display_name = $article->get_author_names();
+        $object = evangelical_magazine::get_object_from_post($post);
+        if ($object && $object->is_article() && isset($author[0])) {
+            $author[0]->display_name = $object->get_author_names();
         }
         return $author;
     }
 
+    /**
+    * Filters the content for instant articles to remove onpage hyperlinks
+    * 
+    * (.e.g. hyperlinks that begin with a #)
+    * 
+    * @param string $content
+    * @return string
+    */
+    public static function remove_onpage_hyperlinks ($content) {
+        preg_match_all ('/<a href=\\"([^\\"]*)\\">(.*)<\\/a>/iU', $content, $matches);
+        foreach ($matches[0] as $link) {
+            preg_match_all ('/(?<=href=\").+(?=\")/', $link, $matches2);
+            $href = isset ($matches2[0][0]) ? $matches2[0][0] : false;
+            if (0 === strpos ($href, '#')) {
+                $content = str_replace ($link, strip_tags($link), $content);
+            }
+        }
+        return $content;
+    }
 }
