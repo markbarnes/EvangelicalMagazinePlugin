@@ -56,13 +56,9 @@ class evangelical_magazine_facebook_instant_articles {
     * @return string
     */
     public static function remove_onpage_hyperlinks ($content) {
-        preg_match_all ('/<a href=\\"([^\\"]*)\\">(.*)<\\/a>/iU', $content, $matches);
-        foreach ($matches[0] as $link) {
-            preg_match_all ('/(?<=href=\").+(?=\")/', $link, $matches2);
-            $href = isset ($matches2[0][0]) ? $matches2[0][0] : false;
-            if (0 === strpos ($href, '#')) {
-                $content = str_replace ($link, strip_tags($link), $content);
-            }
+        preg_match_all( '!<a[^>]*? href=[\'"]#[^<]+</a>!i', $content, $matches );
+        foreach ( $matches[0] as $link ) {
+                $content = str_replace( $link, strip_tags($link), $content );
         }
         return $content;
     }
