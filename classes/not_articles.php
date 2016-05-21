@@ -3,7 +3,7 @@
 /**
 * A helper class used by most of the other custom post type classes
 * 
-* Contains common functions such as get_id()
+* Contains a few common functions such as get_articles()
 * 
 * @package evangelical-magazine-plugin
 * @author Mark Barnes

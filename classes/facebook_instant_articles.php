@@ -8,7 +8,6 @@
 * @author Mark Barnes
 * @access public
 */
-
 class evangelical_magazine_facebook_instant_articles {
 
     /**

@@ -6,7 +6,6 @@
 * @author Mark Barnes
 * @access public
 */
-
 class evangelical_magazine_article extends evangelical_magazine_template {
     /**
     * @var evangelical_magazine_issue

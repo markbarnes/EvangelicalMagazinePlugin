@@ -198,7 +198,6 @@ class evangelical_magazine_beacon_ad extends WP_Widget {
     */
     public function widget ($args, $instance) {
         echo $args['before_widget'];
-        //echo "{$args['before_title']}Like us on Facebook{$args['after_title']}";
         echo '<div id="bsap_1304381" class="bsarocks bsap_da154a6c34ffdee37c6b8e74ed808dfe"></div>';
         echo $args['after_widget'];
     }

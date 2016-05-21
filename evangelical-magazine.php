@@ -12,7 +12,6 @@ Author URI: http://www.markbarnes.net/
 * This class contains all the main functions for the plugin, mostly as static methods.
 * We're using a class mostly to avoid name clashes.
 */
-
 class evangelical_magazine {
     
     /**
@@ -387,6 +386,14 @@ class evangelical_magazine {
         return $actions;
     }
     
+    /**
+    * Enables an "?output=excerpt" parameter on the main feed, so it's possible to have both a full RSS feed and a excerpted one.
+    * 
+    * The resulting feed is fed to MailChimp.
+    * 
+    * @param string $content
+    * @return string
+    */
     public static function filter_feed_for_mailchimp ($content) {
         global $post;
         if (isset($_GET['output']) && $_GET['output']=='excerpt') {
