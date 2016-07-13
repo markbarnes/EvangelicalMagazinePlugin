@@ -14,22 +14,11 @@ class evangelical_magazine_facebook_instant_articles {
     * Adds all the actions and filters required for Facebook Instant Articles
     */
     public function __construct() {
-        add_action ('pre_get_posts', array (__CLASS__, 'modify_query'), 11, 1);
+        add_filter ('instant_articles_post_types', create_function('', 'return array ("em_article");'));
         add_filter ('instant_articles_authors', array (__CLASS__, 'filter_author'));
         add_filter ('instant_articles_content', array (__CLASS__, 'remove_onpage_hyperlinks'));
     }
 
-    /**
-    * Modifies the WordPress query when the instant articles feed is being requested
-    * 
-    * @param WP_Query $query  The WP_Query object. Passed by reference.
-    */
-    public static function modify_query ($query) {
-        if (defined('INSTANT_ARTICLES_SLUG') && $query->is_main_query() && $query->is_feed(INSTANT_ARTICLES_SLUG)) {
-            $query->set ('post_type', 'em_article');
-        }
-    }
-    
     /**
     * Filters the author name for instant articles
     * 
