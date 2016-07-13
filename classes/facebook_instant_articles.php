@@ -15,7 +15,7 @@ class evangelical_magazine_facebook_instant_articles {
     */
     public function __construct() {
         add_filter ('instant_articles_post_types', create_function('', 'return array ("em_article");'));
-        add_filter ('instant_articles_authors', array (__CLASS__, 'filter_author'));
+        add_filter ('instant_articles_authors', array (__CLASS__, 'filter_author'), 10, 2);
     }
 
     /**
@@ -24,13 +24,12 @@ class evangelical_magazine_facebook_instant_articles {
     * @param object $author
     * @return object
     */
-    public static function filter_author ($author) {
-        global $post;
+    public static function filter_author ($authors, $post_id) {
         /** @var evangelical_magazine_article */
-        $object = evangelical_magazine::get_object_from_post($post);
-        if ($object && $object->is_article() && isset($author[0])) {
-            $author[0]->display_name = $object->get_author_names();
+        $object = evangelical_magazine::get_object_from_id($post_id);
+        if ($object && $object->is_article() && isset($authors[0])) {
+            $authors[0]->display_name = $object->get_author_names();
         }
-        return $author;
+        return $authors;
     }
 }
