@@ -18,9 +18,9 @@ class evangelical_magazine_widgets {
         register_widget('evangelical_magazine_current_issue');
         register_widget('evangelical_magazine_beacon_ad');
         register_widget('evangelical_magazine_facebook_page_plugin');
-        if (class_exists('evangelical_magazine_theme')) {
-            add_action ('genesis_before', array ('evangelical_magazine_theme', 'output_beacon_ads_main_code'));
-            add_action ('genesis_before', array ('evangelical_magazine_theme', 'output_facebook_javascript_sdk'));
+        if (class_exists('evangelical_mag_theme')) {
+            add_action ('genesis_before', array ('evangelical_mag_theme', 'output_beacon_ads_main_code'));
+            add_action ('genesis_before', array ('evangelical_mag_theme', 'output_facebook_javascript_sdk'));
         }
     }
 }
