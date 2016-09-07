@@ -736,6 +736,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     */
     public static function make_columns_sortable ($columns) {
         $columns ['fb_engagement'] = 'fb_engagement';
+        $columns ['issue_details'] = 'issue_details';
         return $columns;
     }
     
@@ -750,11 +751,13 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         if  (is_admin()) {
             $screen = get_current_screen();
             if ($screen->id == 'edit-em_article') {
-                $columns = array ( 'fb_engagement' => self::FB_ENGAGEMENT_META_NAME);
                 $orderby = $query->get('orderby');
-                if ($orderby && isset($columns[$orderby])) {
-                    $query->set ('meta_key', $columns[$orderby]);
+                if ($orderby && $orderby == 'fb_engagement') {
+                    $query->set ('meta_key', self::FB_ENGAGEMENT_META_NAME);
                     $query->set ('orderby','meta_value_num');
+                } elseif ($orderby && $orderby == 'issue_details') {
+                    $query->set ('meta_key', self::ARTICLE_SORT_ORDER_META_NAME);
+                    $query->set ('orderby','meta_value');
                 }
             }
         }
