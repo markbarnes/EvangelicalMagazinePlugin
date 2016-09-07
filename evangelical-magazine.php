@@ -311,7 +311,7 @@ class evangelical_magazine {
     * 
     */
     public static function add_styles_to_admin_head () {
-        echo '<style type="text/css">.column-fb_engagement {width: 10%; text-align:center}</style>';
+        echo '<style type="text/css">.column-title {width: 30%}</style>';
     }
     
     /**

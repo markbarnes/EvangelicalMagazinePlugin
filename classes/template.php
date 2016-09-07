@@ -72,8 +72,11 @@ abstract class evangelical_magazine_template {
     * @param boolean $schema - add schema.org microdata
     * @return string
     */
-    public function get_name($link = false, $schema = false) {
+    public function get_name($link = false, $schema = false, $edit_link = false) {
         $name = $this->post_data->post_title;
+        if ($edit_link) {
+            return $this->get_edit_link_html ($name);
+        }
         if ($schema) {
             $name = $this->html_tag('span', $name, array ('itemprop' => 'name'));
             $attributes = array ('itemprop' => 'url');
@@ -108,6 +111,21 @@ abstract class evangelical_magazine_template {
         $attributes = wp_parse_args($attributes, array('class' => ''));
         $attributes['class'] = trim("{$this->get_friendly_class()}-link {$attributes['class']}");
         return "<a href=\"{$this->get_link()}\" {$this->attr_html($attributes)}>{$link_content}</a>";
+    }
+
+    /**
+    * Returns the link to edit the object as HTML
+    * 
+    * @param string $link_content
+    * @param string $class
+    * @param string $id
+    * @return string;
+    */
+    public function get_edit_link_html($link_content, $attributes = array()) {
+        $link = get_edit_post_link ($this->get_id());
+        $attributes = wp_parse_args($attributes, array('class' => ''));
+        $attributes['class'] = trim("{$this->get_friendly_class()}-link {$attributes['class']}");
+        return "<a href=\"{$link}\" {$this->attr_html($attributes)}>{$link_content}</a>";
     }
 
     /**

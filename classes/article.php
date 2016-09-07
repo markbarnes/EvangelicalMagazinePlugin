@@ -96,9 +96,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * @param bool $link
     * @return string
     */
-    public function get_issue_name($link = false) {
+    public function get_issue_name($link = false, $schema = false, $edit_link = false) {
         if ($this->has_issue()) {
-            return $this->issue->get_name($link);
+            return $this->issue->get_name($link, $schema, $edit_link);
         }
     }
     
@@ -158,9 +158,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * @param bool $link
     * @return string
     */
-    public function get_series_name() {
+    public function get_series_name($link = false, $schema = false, $edit_link = false) {
         if ($this->has_series()) {
-            return $this->series->get_name();
+            return $this->series->get_name($link, $schema, $edit_link);
         }
     }
     
@@ -206,30 +206,10 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * 
     * @return string
     */
-    public function get_section_name() {
+    public function get_section_name($link = false, $schema = false, $edit_link = false) {
         if ($this->has_sections()) {
             $sections = $this->get_sections();
-            return key($sections);
-        }
-    }
-    
-    /**
-    * Helper function to generate author and section data
-    * 
-    * @param int[] $ids
-    * @param mixed $object_class
-    */
-    private function _generate_objects_array($ids, $object_class) {
-        if ($ids) {
-            $objects = array();
-            $object_class = "evangelical_magazine_{$object_class}";
-            foreach ($ids as $id) {
-                $object = new $object_class ($id);
-                $objects[$object->get_name()] = $object;
-            }
-            return $objects;
-        } else {
-            return null;
+            return $sections[0]->get_name($link, $schema, $edit_link);
         }
     }
     
@@ -237,7 +217,12 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * Populates $this->sections
     */
     private function generate_sections_array() {
-        $this->sections = $this->_generate_objects_array ($this->get_section_ids(), 'section');
+        $section_ids = $this->get_section_ids();
+        if ($section_ids) {
+            foreach ($section_ids as $section_id) {
+                $this->sections[] = new evangelical_magazine_section($section_id);
+            }
+        }
     }
     
     /**
@@ -256,14 +241,19 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     */
     public function get_author_ids() {
         $authors = get_post_meta ($this->get_id(), self::AUTHOR_META_NAME);
-        return (array)$authors;
+        return array_unique((array)$authors);
     }
     
     /**
     * Populates $this->authors
     */
     private function generate_authors_array() {
-        $this->authors = $this->_generate_objects_array ($this->get_author_ids(), 'author');
+        $author_ids = $this->get_author_ids();
+        if ($author_ids) {
+            foreach ($author_ids as $author_id) {
+                $this->authors[] = new evangelical_magazine_author($author_id);
+            }
+        }
     }
     
     /**
@@ -689,8 +679,13 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * @param mixed $columns
     */
     public static function filter_columns ($columns) {
-        $columns ['fb_engagement'] = 'Facebook Engagement';
-        return $columns;
+        $columns ['article_author'] = 'Author';
+        $columns ['issue_details'] = 'Issue';
+        $columns ['section'] = 'Section';
+        $columns ['series'] = 'Series';
+        $columns ['fb_engagement'] = 'FB Engagement';
+        $column_order = array ('cb', 'title', 'article_author', 'issue_details', 'section', 'series', 'fb_engagement', 'date');
+        return array_merge(array_flip($column_order), $columns);
     }
     
     /**
@@ -704,11 +699,30 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     public static function output_columns ($column, $post_id) {
         global $post;
         $article = new evangelical_magazine_article($post);
-        if ($article->is_published()) {
+        if ($article->is_published() && $column == 'fb_engagement') {
             $fb_stats = $article->get_facebook_stats();
-            if (is_array ($fb_stats) && in_array ($column, array ('fb_engagement'))) {
-                echo $fb_stats[substr($column, 3)];
+            if (is_array ($fb_stats)) {
+                echo $fb_stats['engagement'];
             }
+        }
+        elseif ($column == 'article_author') {
+            $authors = $article->get_authors();
+            if ($authors) {
+                $author_names = array();
+                foreach ($authors as $author) {
+                    $author_names[] = $author->get_name (false, false, true);
+                }
+                echo implode('<br/>', $author_names);
+            }
+        }
+        elseif ($column == 'issue_details') {
+            echo $article->get_issue_name(false, false, true).',&nbsp;pg&nbsp;'.$article->get_page_num();
+        }
+        elseif ($column == 'section') {
+            echo $article->get_section_name(false, false, true);
+        }
+        elseif ($column == 'series') {
+            echo $article->get_series_name(false, false, true);
         }
     }
     
