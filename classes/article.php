@@ -689,10 +689,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * @param mixed $columns
     */
     public static function filter_columns ($columns) {
-        $columns ['fb_likes'] = 'Likes';
-        $columns ['fb_shares'] = 'Shares';
-        $columns ['fb_comments'] = 'Comments';
-        $columns ['fb_total'] = 'Total';
+        $columns ['fb_engagement'] = 'Facebook Engagement';
         return $columns;
     }
     
@@ -709,7 +706,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         $article = new evangelical_magazine_article($post);
         if ($article->is_published()) {
             $fb_stats = $article->get_facebook_stats();
-            if (is_array ($fb_stats) && in_array ($column, array ('fb_likes', 'fb_shares', 'fb_comments', 'fb_total'))) {
+            if (is_array ($fb_stats) && in_array ($column, array ('fb_engagement'))) {
                 echo $fb_stats[substr($column, 3)];
             }
         }
@@ -724,10 +721,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * @return array
     */
     public static function make_columns_sortable ($columns) {
-        $columns ['fb_likes'] = 'fb_likes';
-        $columns ['fb_shares'] = 'fb_shares';
-        $columns ['fb_comments'] = 'fb_comments';
-        $columns ['fb_total'] = 'fb_total';
+        $columns ['fb_engagement'] = 'fb_engagement';
         return $columns;
     }
     
@@ -742,10 +736,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         if  (is_admin()) {
             $screen = get_current_screen();
             if ($screen->id == 'edit-em_article') {
-                $columns = array ( 'fb_likes' => self::FB_LIKES_META_NAME,
-                                   'fb_shares' => self::FB_SHARES_META_NAME,
-                                   'fb_comments' => self::FB_COMMENTS_META_NAME,
-                                   'fb_total' => self::FB_TOTAL_META_NAME);
+                $columns = array ( 'fb_engagement' => self::FB_ENGAGEMENT_META_NAME);
                 $orderby = $query->get('orderby');
                 if ($orderby && isset($columns[$orderby])) {
                     $query->set ('meta_key', $columns[$orderby]);

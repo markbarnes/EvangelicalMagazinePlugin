@@ -20,10 +20,13 @@ abstract class evangelical_magazine_template {
     const SECTION_META_NAME = 'evangelical_magazine_section';
     const VIEW_COUNT_META_NAME = 'evangelical_magazine_view_count';
     const ISSUE_DATE_META_NAME = 'evangelical_magazine_issue_date';
-    const FB_LIKES_META_NAME = 'evangelical_magazine_fb_likes';
-    const FB_COMMENTS_META_NAME = 'evangelical_magazine_fb_comments';
-    const FB_SHARES_META_NAME = 'evangelical_magazine_fb_shares';
-    const FB_TOTAL_META_NAME = 'evangelical_magazine_fb_total';
+    const FB_ENGAGEMENT_META_NAME = 'evangelical_magazine_fb_engagement';
+    // Separate likes and shares seems broken in Facebook API 2.7. See http://stackoverflow.com/questions/31768568/missing-result-field-in-get-requests-of-the-facebook-graph-api
+    //const FB_LIKES_META_NAME = 'evangelical_magazine_fb_likes';
+    //const FB_SHARES_META_NAME = 'evangelical_magazine_fb_shares';
+    //const FB_LIKESANDSHARES_META_NAME = 'evangelical_magazine_fb_likes';
+    //const FB_COMMENTS_META_NAME = 'evangelical_magazine_fb_comments';
+    //const FB_TOTAL_META_NAME = 'evangelical_magazine_fb_total';
 
     /**
     * All the custom posttype data is stored in $post_data as a WP_Post object
@@ -428,27 +431,19 @@ abstract class evangelical_magazine_template {
     * 
     */
     public function get_facebook_stats() {
-        if (!(defined('WP_DEBUG') && WP_DEBUG == true)) {
-            $transient_name = "em_fb_valid_{$this->get_id()}";
-            $stats = get_transient($transient_name);
-            if (!$stats) {
-                $json = wp_remote_request('https://api.facebook.com/method/links.getStats?urls='.urlencode($this->get_link()).'&format=json');
-                $stats = json_decode(wp_remote_retrieve_body($json), true);
-                if ($stats !== NULL && isset($stats[0])) {
-                    update_post_meta($this->get_id(), self::FB_LIKES_META_NAME, $stats[0]['like_count']);
-                    update_post_meta($this->get_id(), self::FB_COMMENTS_META_NAME, $stats[0]['comment_count']);
-                    update_post_meta($this->get_id(), self::FB_SHARES_META_NAME, $stats[0]['share_count']);
-                    update_post_meta($this->get_id(), self::FB_TOTAL_META_NAME, $stats[0]['total_count']);
-                    $secs_since_published = time() - strtotime($this->get_post_date());
-                    set_transient ($transient_name, true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
-                }
+        $transient_name = "em_fb_valid_{$this->get_id()}";
+        $stats = get_transient($transient_name);
+        if (!$stats) {
+            $url = $this->get_link();
+            $json = wp_remote_request('https://graph.facebook.com/v2.7/?id='.urlencode($url).'&fields=og_object{engagement{count}},share&access_token='.evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret());
+            $stats = json_decode(wp_remote_retrieve_body($json), true);
+            if ($stats !== NULL && isset($stats['share'])) {
+                update_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, $stats['share']['share_count']);
+                $secs_since_published = time() - strtotime($this->get_post_date());
+                set_transient ($transient_name, true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
             }
         }
-        return array (  'likes' => get_post_meta($this->get_id(), self::FB_LIKES_META_NAME, true),
-                        'comments' => get_post_meta($this->get_id(), self::FB_COMMENTS_META_NAME, true),
-                        'shares' => get_post_meta($this->get_id(), self::FB_SHARES_META_NAME, true),
-                        'total' => get_post_meta($this->get_id(), self::FB_TOTAL_META_NAME, true));
-
+        return array (  'engagement' => get_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, true));
     }
     
     /**
