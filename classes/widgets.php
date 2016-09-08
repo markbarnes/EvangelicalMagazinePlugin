@@ -104,13 +104,20 @@ class evangelical_magazine_most_popular extends WP_Widget {
         $articles = evangelical_magazine_article::get_top_articles(5, $exclude);
         if ($articles) {
             echo $args['before_widget'];
-            echo "{$args['before_title']}Other popular articles{$args['after_title']}";
+            $title = ($post->post_type == 'em_article') ? 'Other popular articles' : 'Popular articles';
+            echo "{$args['before_title']}{$title}{$args['after_title']}";
             echo "<ul>";
             $size = 'article_very_large';
             foreach ($articles as $article) {
                 echo "<li class=\"popular_article\">";
                 echo "<a href=\"{$article->get_link()}\"><div class=\"popular-article-cover image-fit\" style=\"background-image:url('{$article->get_image_url($size)}')\"></div></a>";
-                echo "<div class=\"article-info\">{$article->get_name(true)} by {$article->get_author_names(true)}</div></li>";
+                echo "<div class=\"article-info\">{$article->get_name(true)} by {$article->get_author_names(true)}</div>";
+                $facebook_stats = $article->get_facebook_stats();
+                if (isset($facebook_stats['engagement']) && $facebook_stats['engagement']) {
+                    $person_people = $facebook_stats['engagement'] > 1 ? 'people' : 'person';
+                    $stats = number_format($facebook_stats['engagement']);
+                    echo "<div class=\"facebook_stats\">{$stats} {$person_people} like this</div></li>";
+                }
                 $size = 'thumbnail';
             }
             echo "</ul>";
