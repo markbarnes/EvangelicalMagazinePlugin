@@ -661,7 +661,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         $meta_key = self::VIEW_COUNT_META_NAME;
         $limit = ($limit == -1) ? '' : " LIMIT 0, {$limit}";
         $not_in = ($exclude_article_ids) ? " AND post_id NOT IN(".implode(', ', $exclude_article_ids).')' : '';
-        $article_ids = $wpdb->get_col ("SELECT post_id, (meta_value/DATEDIFF(NOW(), post_date)) AS views_per_day FROM {$wpdb->postmeta}, {$wpdb->posts} WHERE ID=post_id AND meta_key='{$meta_key}' AND post_status='publish' AND post_type = 'em_article'{$not_in} ORDER BY views_per_day DESC{$limit}", 0);
+        $article_ids = $wpdb->get_col ("SELECT post_id, (meta_value/DATEDIFF(NOW(), post_date)) AS views_per_day FROM {$wpdb->postmeta}, {$wpdb->posts} WHERE ID=post_id AND meta_key='{$meta_key}' AND post_status='publish' AND post_type = 'em_article'{$not_in} GROUP BY post_id ORDER BY views_per_day DESC{$limit}", 0);
         if ($article_ids) {
             $articles = array();
             foreach ($article_ids as $id) {
