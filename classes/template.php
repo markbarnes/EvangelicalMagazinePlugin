@@ -270,6 +270,12 @@ abstract class evangelical_magazine_template {
     */
     protected static function _get_objects_from_query ($args, $default_args, $class) {
         $class = "evangelical_magazine_{$class}";
+        if (isset($args['posts_per_page']) && $args['posts_per_page'] != -1) {
+            $args['nopaging'] = false;
+        }
+        if (!isset($default_args['nopaging'])) {
+            $default_args['nopaging'] = true;
+        }
         $args = wp_parse_args($args, $default_args);
         $query = new WP_Query($args);
         if ($query->posts) {
