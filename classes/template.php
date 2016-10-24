@@ -475,7 +475,7 @@ abstract class evangelical_magazine_template {
     */
     public function get_facebook_stats() {
         if (!$this->has_valid_facebook_stats()) {
-            $url = $this->get_link();
+            $url = apply_filters ('evangelical_magazine_url_for_facebook', $this->get_link());
             $json = wp_remote_request('https://graph.facebook.com/v2.8/?id='.urlencode($url).'&fields=og_object{engagement{count}},share&access_token='.evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret());
             $stats = json_decode(wp_remote_retrieve_body($json), true);
             if ($stats !== NULL && isset($stats['share'])) {

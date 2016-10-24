@@ -435,7 +435,7 @@ class evangelical_magazine {
         }
         foreach ($objects as $key => $object) {
             if (!$object->has_valid_facebook_stats()) {
-                $url = str_replace('http://localhost/evangelicalmagazine', 'https://www.evangelicalmagazine.com',$object->get_link());
+                $url = apply_filters ('evangelical_magazine_url_for_facebook', $object->get_link());
                 $requests[] = array ('method' => 'GET', 'relative_url' => '?id='.urlencode($url).'&fields=og_object{engagement{count}},share');
                 $lookup [$url] = $key;
             }
