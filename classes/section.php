@@ -22,14 +22,14 @@ class evangelical_magazine_section extends evangelical_magazine_not_articles {
     }
 
     /**
-    * Returns an array of article IDs for all articles in a section
+    * Returns an array of article IDs for all articles in a section, ordered by date
     * 
     * @param array $args
     * @return integer[]
     */
     public function get_article_ids($args = array()) {
         $meta_query = array(array('key' => self::SECTION_META_NAME, 'value' => $this->get_id()));
-        $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'posts_per_page' => -1, 'meta_key' => self::ARTICLE_SORT_ORDER_META_NAME, 'orderby' => 'meta_value');
+        $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'posts_per_page' => -1, 'orderby' => 'date');
         return self::_get_object_ids_from_query($args, $default_args);
     }
     
