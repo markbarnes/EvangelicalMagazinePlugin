@@ -38,12 +38,23 @@ abstract class evangelical_magazine_not_articles extends evangelical_magazine_te
     /**
     * Returns the number of articles in an object
     * 
+    * @param bool $include_text - whether or not the string ' article(s)' should be appended to the return value
+    * @param book $include_likes - whether or not Facebook likes should be appended. Requires $include_text to be true.
     * @return integer
     */
-    public function get_article_count() {
+    public function get_article_count($include_text = false, $include_likes = false) {
         $article_ids = $this->get_article_ids();
         if ($article_ids) {
-            return count ($article_ids);
+            $num_articles = count ($article_ids);
+            if ($include_text) {
+                $return_value = $num_articles.($num_articles == 1 ? ' article' : ' articles');
+                if ($include_likes) {
+                    $return_value .= "{$this->get_facebook_stats()}";
+                }
+            } else {
+                $return_value = $num_articles;
+            }
+            return $return_value;
         }
     }
 }
