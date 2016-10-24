@@ -711,7 +711,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         global $post;
         $article = new evangelical_magazine_article($post);
         if ($article->is_published() && $column == 'fb_engagement') {
-            echo $article->get_facebook_stats();
+            echo number_format($article->get_facebook_stats());
         }
         elseif ($column == 'article_author') {
             $authors = $article->get_authors();
@@ -759,7 +759,6 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         if  (is_admin()) {
             $screen = get_current_screen();
             if ($screen->id == 'edit-em_article') {
-                evangelical_magazine::update_facebook_stats_if_required(evangelical_magazine_article::get_all_articles());
                 $orderby = $query->get('orderby');
                 if ($orderby && $orderby == 'fb_engagement') {
                     $query->set ('meta_key', self::FB_ENGAGEMENT_META_NAME);
@@ -770,5 +769,13 @@ class evangelical_magazine_article extends evangelical_magazine_template {
                 }
             }
         }
+    }
+    
+    /**
+    * Update Facebook stats for all articles, as required
+    */
+    public static function update_all_facebook_stats_for_articles() {
+        $articles = self::get_all_articles();
+        evangelical_magazine::update_facebook_stats_if_required($articles);
     }
 }
