@@ -449,14 +449,32 @@ abstract class evangelical_magazine_template {
     }
     
     /**
+    * Returns the name of the transient which indicates whether or not the Facebook engagement stat is cached
+    * 
+    * @return string
+    */
+    public function get_facebook_transient_name() {
+        return "em_fb_valid_{$this->get_id()}";
+    }
+    
+    /**
+    * Checks whether Facebook stats for this object have already been cached
+    * 
+    * @return bool
+    */
+    public function has_valid_facebook_stats() {
+        $transient_name = $this->get_facebook_transient_name();
+        $stats = get_transient($transient_name);
+        return (bool)$stats;
+    }
+    
+    /**
     * Gets the Facebook stats for this object
     * 
-    * return int
+    * @return int
     */
     public function get_facebook_stats() {
-        $transient_name = "em_fb_valid_{$this->get_id()}";
-        $stats = get_transient($transient_name);
-        if (!$stats) {
+        if (!$this->has_valid_facebook_stats()) {
             $url = $this->get_link();
             $json = wp_remote_request('https://graph.facebook.com/v2.8/?id='.urlencode($url).'&fields=og_object{engagement{count}},share&access_token='.evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret());
             $stats = json_decode(wp_remote_retrieve_body($json), true);
@@ -475,7 +493,7 @@ abstract class evangelical_magazine_template {
     public function update_facebook_stats($engagement_count) {
         update_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, $engagement_count);
         $secs_since_published = time() - strtotime($this->get_post_date());
-        set_transient ($transient_name, true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
+        set_transient ($this->get_facebook_transient_name(), true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
     }
     
     /**
