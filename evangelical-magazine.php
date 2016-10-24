@@ -429,30 +429,37 @@ class evangelical_magazine {
     * @param array $ids - an array of post ids or valid evangelical_magazine_* objects
     */
     public static function update_facebook_stats_if_required ($ids) {
-        $requests = $objects = array();
-        foreach ((array)$ids as $id) {
-            if (gettype ($id) == 'object') {
-                $objects[] = $id;
-            } else {
-                $objects[] = SELF::get_object_from_id($id);
+        $chunks = array_chunk ($ids, 50);
+        foreach ($chunks as $chunk) {
+            $requests = $objects = array();
+            foreach ($chunk as $id) {
+                if (gettype ($id) == 'object') {
+                    $objects[] = $id;
+                } else {
+                    $objects[] = SELF::get_object_from_id($id);
+                }
             }
-        }
-        foreach ($objects as $key => $object) {
-            if (!$object->has_valid_facebook_stats()) {
-                $url = apply_filters ('evangelical_magazine_url_for_facebook', $object->get_link());
-                $requests[] = array ('method' => 'GET', 'relative_url' => '?id='.urlencode($url).'&fields=og_object{engagement{count}},share');
-                $lookup [$url] = $key;
+            foreach ($objects as $key => $object) {
+                if (!$object->has_valid_facebook_stats()) {
+                    $url = apply_filters ('evangelical_magazine_url_for_facebook', $object->get_link());
+                    $requests[] = array ('method' => 'GET', 'relative_url' => '?id='.urlencode($url).'&fields=share');
+                    $lookup [$url] = $key;
+                }
             }
-        }
-        if ($requests) {
-            $args['access_token'] = evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret();
-            $args['batch'] = json_encode($requests);
-            $stats = wp_remote_post('https://graph.facebook.com/v2.8/', array ('body' => $args));
-            $response = json_decode($stats['body']);
-            foreach ((array)$response as $r) {
-                $stats = json_decode($r->body);
-                if ($stats !== NULL && isset($stats->share)) {
-                    $objects[$lookup[$stats->id]]->update_facebook_stats ($stats->share->share_count);
+            if ($requests) {
+                $args['access_token'] = evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret();
+                $args['batch'] = json_encode($requests);
+                $stats = wp_remote_post('https://graph.facebook.com/v2.8/', array ('body' => $args));
+                $response = json_decode($stats['body']);
+                if (!isset($response->error)) {
+                    foreach ((array)$response as $r) {
+                        $stats = json_decode($r->body);
+                        if ($stats !== NULL && isset($stats->share)) {
+                            $objects[$lookup[$stats->id]]->update_facebook_stats ($stats->share->share_count);
+                        } else {
+                            $objects[$lookup[$stats->id]]->update_facebook_stats (0);
+                        }
+                    }
                 }
             }
         }
