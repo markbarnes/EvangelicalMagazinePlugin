@@ -600,7 +600,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             }
             echo '</select><br/>';
             echo "<label>Page: <input type=\"text\" name=\"em_page_num\" size=\"2\" maxlength=\"2\" autocomplete=\"off\" value=\"{$existing_page_num}\"/></label>";
-            echo '<h4><a href="#em_issue_add" class="hide-if-no-js">+ Add New Issue</a></h4>';
+            echo '<h4><a id="em_issue_add" href="#" class="hide-if-no-js">+ Add new issue</a></h4>';
         }
     }
     
@@ -630,7 +630,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             }
             echo '</select><br/>';
             echo "<label>Order: <input type=\"text\" name=\"em_order\" size=\"2\" maxlength=\"2\" autocomplete=\"off\" value=\"{$existing_order}\"/></label>";
-            echo '<h4><a href="#em_series_add" class="hide-if-no-js">+ Add New Series</a></h4>';
+            echo '<h4><a href="#em_series_add" class="hide-if-no-js">+ Add new series</a></h4>';
         }
     }
     
@@ -700,10 +700,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         global $post;
         $article = new evangelical_magazine_article($post);
         if ($article->is_published() && $column == 'fb_engagement') {
-            $fb_stats = $article->get_facebook_stats();
-            if (is_array ($fb_stats)) {
-                echo $fb_stats['engagement'];
-            }
+            echo $article->get_facebook_stats();
         }
         elseif ($column == 'article_author') {
             $authors = $article->get_authors();

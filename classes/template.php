@@ -451,8 +451,7 @@ abstract class evangelical_magazine_template {
     /**
     * Gets the Facebook stats for this object
     * 
-    * return array
-    * 
+    * return int
     */
     public function get_facebook_stats() {
         $transient_name = "em_fb_valid_{$this->get_id()}";
@@ -462,12 +461,21 @@ abstract class evangelical_magazine_template {
             $json = wp_remote_request('https://graph.facebook.com/v2.8/?id='.urlencode($url).'&fields=og_object{engagement{count}},share&access_token='.evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret());
             $stats = json_decode(wp_remote_retrieve_body($json), true);
             if ($stats !== NULL && isset($stats['share'])) {
-                update_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, $stats['share']['share_count']);
-                $secs_since_published = time() - strtotime($this->get_post_date());
-                set_transient ($transient_name, true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
+                $this->update_facebook_stats ($stats['share']['share_count']);
             }
         }
-        return array (  'engagement' => get_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, true));
+        return get_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, true);
+    }
+    
+    /**
+    * Updates the Facebook engagement metadata for this object
+    * 
+    * @param int $engagement_count
+    */
+    public function update_facebook_stats($engagement_count) {
+        update_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, $engagement_count);
+        $secs_since_published = time() - strtotime($this->get_post_date());
+        set_transient ($transient_name, true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
     }
     
     /**
