@@ -459,7 +459,7 @@ abstract class evangelical_magazine_template {
         $stats = get_transient($transient_name);
         if (!$stats) {
             $url = $this->get_link();
-            $json = wp_remote_request('https://graph.facebook.com/v2.7/?id='.urlencode($url).'&fields=og_object{engagement{count}},share&access_token='.evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret());
+            $json = wp_remote_request('https://graph.facebook.com/v2.8/?id='.urlencode($url).'&fields=og_object{engagement{count}},share&access_token='.evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret());
             $stats = json_decode(wp_remote_retrieve_body($json), true);
             if ($stats !== NULL && isset($stats['share'])) {
                 update_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, $stats['share']['share_count']);
