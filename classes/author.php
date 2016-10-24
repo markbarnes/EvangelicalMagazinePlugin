@@ -45,6 +45,18 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
     }
 
     /**
+    * Returns an array of article IDs for all articles from an author, ordered by date
+    * 
+    * @param array $args
+    * @return integer[]
+    */
+    public function get_article_ids($args = array()) {
+        $meta_query = array(array('key' => self::AUTHOR_META_NAME, 'value' => $this->get_id()));
+        $default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'posts_per_page' => -1, 'orderby' => 'date');
+        return self::_get_object_ids_from_query($args, $default_args);
+    }
+    
+    /**
     * Returns an array of all the author objects
     * 
     * @param array $args
