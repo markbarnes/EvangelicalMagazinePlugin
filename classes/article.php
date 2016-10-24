@@ -57,6 +57,17 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     }
     
     /**
+    * Returns an array of all the article objects
+    * 
+    * @param array $args
+    * @return evangelical_magazine_article[]
+    */
+    public static function get_all_articles($args = array()) {
+        $default_args = array ('post_type' => 'em_article', 'orderby' => 'date', 'order' => 'ASC', 'posts_per_page' => -1);
+        return self::_get_articles_from_query($args, $default_args);
+    }
+
+    /**
     * Returns the title of the article
     * 
     * @param boolean $link - include a HTML link
