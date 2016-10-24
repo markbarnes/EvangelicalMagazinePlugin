@@ -49,7 +49,17 @@ abstract class evangelical_magazine_not_articles extends evangelical_magazine_te
             if ($include_text) {
                 $return_value = $num_articles.($num_articles == 1 ? ' article' : ' articles');
                 if ($include_likes) {
-                    $return_value .= "{$this->get_facebook_stats()}";
+                    $likes = 0;
+                    foreach ($article_ids as $article_id) {
+                        /**
+                        * @var evangelical_magazine_article
+                        */
+                        $article = evangelical_magazine::get_object_from_id($article_id);
+                        $likes += $article->get_facebook_stats();
+                    }
+                    if ($likes) {
+                        $return_value .= ', '.number_format($likes).($likes == 1 ? ' like' : ' likes');
+                    }
                 }
             } else {
                 $return_value = $num_articles;
