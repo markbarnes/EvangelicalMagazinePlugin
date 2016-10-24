@@ -759,6 +759,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
         if  (is_admin()) {
             $screen = get_current_screen();
             if ($screen->id == 'edit-em_article') {
+                evangelical_magazine::update_facebook_stats_if_required(evangelical_magazine_article::get_all_articles());
                 $orderby = $query->get('orderby');
                 if ($orderby && $orderby == 'fb_engagement') {
                     $query->set ('meta_key', self::FB_ENGAGEMENT_META_NAME);
