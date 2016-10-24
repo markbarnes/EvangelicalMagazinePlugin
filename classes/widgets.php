@@ -114,9 +114,9 @@ class evangelical_magazine_most_popular extends WP_Widget {
                 echo "<a href=\"{$article->get_link()}\"><div class=\"popular-article-cover image-fit\" style=\"background-image:url('{$article->get_image_url($size)}')\"></div></a>";
                 echo "<div class=\"article-info\">{$article->get_name(true)} by {$article->get_author_names(true)}</div>";
                 $facebook_stats = $article->get_facebook_stats();
-                if (isset($facebook_stats['engagement']) && $facebook_stats['engagement']) {
-                    $person_people = $facebook_stats['engagement'] > 1 ? 'people' : 'person';
-                    $stats = number_format($facebook_stats['engagement']);
+                if ($facebook_stats) {
+                    $person_people = $facebook_stats > 1 ? 'people' : 'person';
+                    $stats = number_format($facebook_stats);
                     echo "<div class=\"facebook_stats\">{$stats} {$person_people} like this</div></li>";
                 }
                 $size = 'thumbnail';
