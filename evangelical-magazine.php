@@ -426,12 +426,16 @@ class evangelical_magazine {
     /**
     * Updates the Facebook stats for multiple objects in one request
     * 
-    * @param array $ids - an array of post ids
+    * @param array $ids - an array of post ids or valid evangelical_magazine_* objects
     */
     public static function update_facebook_stats_if_required ($ids) {
         $requests = $objects = array();
         foreach ((array)$ids as $id) {
-            $objects[] = SELF::get_object_from_id($id);
+            if (gettype ($id) == 'object') {
+                $objects[] = $id;
+            } else {
+                $objects[] = SELF::get_object_from_id($id);
+            }
         }
         foreach ($objects as $key => $object) {
             if (!$object->has_valid_facebook_stats()) {
