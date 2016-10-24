@@ -22,7 +22,7 @@ class evangelical_magazine_section extends evangelical_magazine_not_articles {
     }
 
     /**
-    * Returns an array of article IDs for all articles a section
+    * Returns an array of article IDs for all articles in a section
     * 
     * @param array $args
     * @return integer[]
