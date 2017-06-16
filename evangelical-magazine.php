@@ -451,14 +451,16 @@ class evangelical_magazine {
                 $args['access_token'] = evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret();
                 $args['batch'] = json_encode($requests);
                 $stats = wp_remote_post('https://graph.facebook.com/v2.8/', array ('body' => $args));
-                $response = json_decode($stats['body']);
-                if (!isset($response->error)) {
-                    foreach ((array)$response as $r) {
-                        $stats = json_decode($r->body);
-                        if ($stats !== NULL && isset($stats->share)) {
-                            $objects[$lookup[$stats->id]]->update_facebook_stats ($stats->share->share_count);
-                        } else {
-                            $objects[$lookup[$stats->id]]->update_facebook_stats (0);
+                if (!is_a($stats, 'WP_Error')) {
+                    $response = json_decode($stats['body']);
+                    if (!isset($response->error)) {
+                        foreach ((array)$response as $r) {
+                            $stats = json_decode($r->body);
+                            if ($stats !== NULL && isset($stats->share)) {
+                                $objects[$lookup[$stats->id]]->update_facebook_stats ($stats->share->share_count);
+                            } else {
+                                $objects[$lookup[$stats->id]]->update_facebook_stats (0);
+                            }
                         }
                     }
                 }
