@@ -272,9 +272,10 @@ class evangelical_magazine_article extends evangelical_magazine_template {
     * 
     * @param bool $link - Make the names into links
     * @param bool $schema - Add schema.org markup
+    * @param string $prefix - Text to prepend to the output (ignored if there are no authors)
     * @return string
     */
-    public function get_author_names($link = false, $schema = false) {
+    public function get_author_names($link = false, $schema = false, $prefix = '') {
         if (is_array($this->authors)) {
             $output = array();
             foreach ($this->authors as $author) {
@@ -286,6 +287,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
                     $this_author .= '</span>';
                 } else {
                     $this_author = $author->get_name($link);
+                }
+                if ($prefix) {
+                    $this_author = $prefix.$this_author;
                 }
                 $output[] = $this_author;
             }
