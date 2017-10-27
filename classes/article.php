@@ -288,9 +288,6 @@ class evangelical_magazine_article extends evangelical_magazine_template {
                 } else {
                     $this_author = $author->get_name($link);
                 }
-                if ($prefix) {
-                    $this_author = $prefix.$this_author;
-                }
                 $output[] = $this_author;
             }
             if (count($output) > 1) {
@@ -298,7 +295,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
             } else {
                 $last = '';
             }
-            return implode (', ', $output).$last;
+            return $prefix.implode (', ', $output).$last;
         }
     }
 
