@@ -410,6 +410,8 @@ abstract class evangelical_magazine_template {
     /**
     * Helper function that ranks an array of articles by popularity and returns the top $limit articles.
     * 
+    * Popularity is calculated according to the number of views per day
+    * 
     * @param evangelical_magazine_article[] $articles
     * @param int $limit
     * @return evangelical_magazine_article[]
