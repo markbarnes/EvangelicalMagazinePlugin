@@ -173,20 +173,4 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 		}
 		echo '</select>';
 	}
-
-	/**
-	* Returns an HTML <img> tag for the featured image
-	*
-	* @param string $image_size
-	* @param string $link_class
-	* @param boolean $link
-	* @param string $alt_attribute
-	* @return string
-	*/
-	public function get_image_html($image_size = 'thumbnail', $link=false, $link_class = '', $alt_attribute = '') {
-		if ($alt_attribute == '') {
-			$alt_attribute = $this->get_name();
-		}
-		return parent::get_image_html($image_size, $link, $link_class, $alt_attribute);
-	}
 }

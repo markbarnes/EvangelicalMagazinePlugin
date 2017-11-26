@@ -228,7 +228,7 @@ abstract class evangelical_magazine_template {
 			$image_id = get_post_thumbnail_id($this->get_id());
 			$src = wp_get_attachment_image_src ($image_id, $image_size);
 			if ($alt_attribute == '') {
-				$alt_attribute = get_the_title ($image_id);
+				$alt_attribute = $this->get_name();
 			}
 			$alt_attribute = htmlspecialchars($alt_attribute, ENT_HTML5);
 			if ($src) {

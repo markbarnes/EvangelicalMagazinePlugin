@@ -523,9 +523,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 		$class .= $this->is_future() ? ' future' : '';
 		$sub_title = $sub_title ? "<span class=\"sub-title\">{$sub_title}</span>" : '';
 		if ($add_links && !$this->is_future()) {
-			return "<aside class=\"{$class}\">{$sub_title}".$this->get_link_html("<div class=\"article-image\"{$style}></div>")."<div class=\"article-title\">{$this->get_title(true)}</div></aside>";
+			return "<aside class=\"{$class}\">{$sub_title}".$this->get_link_html("<div class=\"article-image\" {$style}></div>")."<div class=\"article-title\">{$this->get_title(true)}</div></aside>";
 		} else {
-			return "<aside class=\"{$class}\"><div class=\"article-image\"{$style}>{$sub_title}</div><div class=\"article-title\">{$this->get_title()}</div></aside>";
+			return "<aside class=\"{$class}\"><div class=\"article-image\" {$style}>{$sub_title}</div><div class=\"article-title\">{$this->get_title()}</div></aside>";
 		}
 	}
 
