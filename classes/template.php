@@ -220,13 +220,19 @@ abstract class evangelical_magazine_template {
 	* @param string $image_size
 	* @param string $link_class
 	* @param boolean $link
+	* @param string $alt_attribute
 	* @return string
 	*/
-	public function get_image_html($image_size = 'thumbnail', $link=false, $link_class = '') {
+	public function get_image_html($image_size = 'thumbnail', $link=false, $link_class = '', $alt_attribute = '') {
 		if (has_post_thumbnail($this->get_id())) {
-			$src = wp_get_attachment_image_src (get_post_thumbnail_id($this->get_id()), $image_size);
+			$image_id = get_post_thumbnail_id($this->get_id());
+			$src = wp_get_attachment_image_src ($image_id, $image_size);
+			if ($alt_attribute == '') {
+				$alt_attribute = get_the_title ($image_id);
+			}
+			$alt_attribute = htmlspecialchars($alt_attribute, ENT_HTML5);
 			if ($src) {
-				$html = "<img src=\"{$src[0]}\" width=\"{$src[1]}\" height=\"{$src[2]}\"/>";
+				$html = "<img src=\"{$src[0]}\" width=\"{$src[1]}\" height=\"{$src[2]}\" alt=\"{$alt_attribute}\"/>";
 				return $link ? $this->get_link_html($html, $link_class) : $html;
 			}
 		}
