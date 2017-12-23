@@ -647,6 +647,17 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	}
 
 	/**
+	* Returns the most recently published articles
+	*
+	* @param array $args
+	* @return evangelical_magazine_article
+	*/
+	public static function get_recent_articles($number_of_articles = 10) {
+		$default_args = array ('post_type' => 'em_article', 'orderby' => 'date', 'order' => 'DESC', 'posts_per_page' => $number_of_articles, 'paged' => 1, 'post_status' => 'publish');
+		return self::_get_articles_from_query($default_args);
+	}
+
+	/**
 	* Returns the next article to be published
 	*
 	* @param array $args
