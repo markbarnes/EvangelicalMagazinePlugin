@@ -519,7 +519,6 @@ abstract class evangelical_magazine_template {
 	* @return bool
 	*/
 	public function has_valid_google_analytics_stats() {
-		return false;
 		$transient_name = $this->get_google_analytics_transient_name();
 		$stats = get_transient($transient_name);
 		return (bool)$stats;
