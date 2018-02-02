@@ -434,7 +434,7 @@ class evangelical_magazine {
 	*
 	* @param array $ids - an array of post ids or valid evangelical_magazine_* objects
 	*/
-	public static function update_facebook_stats_if_required ($ids) {
+	public function update_facebook_stats_if_required ($ids) {
 		$chunks = array_chunk ($ids, 50);
 		foreach ($chunks as $chunk) {
 			$requests = $objects = array();
@@ -470,6 +470,48 @@ class evangelical_magazine {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	* Updates the Google Analytics stats for multiple objects in one request
+	*
+	* @param array $ids - an array of post ids or valid evangelical_magazine_* objects
+	*/
+	public function update_google_analytics_stats_if_required ($ids) {
+		$urls = $objects = $index = array();
+		foreach ($ids as $id) {
+			if (gettype ($id) == 'object') {
+				$objects[$id->get_id()] = $id;
+			} else {
+				/**
+				* @var evangelical_magazine_article[]
+				*/
+				$objects[$id] = SELF::get_object_from_id($id);
+			}
+		}
+		foreach ($objects as $key => $object) {
+			if (!$object->has_valid_google_analytics_stats()) {
+				$url = apply_filters ('evangelical_magazine_url_for_google_analytics', $object->get_link());
+				$all_urls[] = $url;
+				$index[wp_parse_url($url, PHP_URL_PATH)] = $object->get_id();
+			}
+		}
+		if ($all_urls) {
+			$chunks = array_chunk ($all_urls, 10);
+			foreach ($chunks as $chunked_urls) {
+				$stats = $this->analytics->get_page_views($chunked_urls);
+				foreach ($stats as $path => $count) {
+					$objects[$index[$path]]->update_google_analytics_stats ($count);
+				}
+			}
+		}
+	}
+
+	public function update_all_stats_if_required ($ids) {
+		$this->update_facebook_stats_if_required($ids);
+		if ($this->use_google_analytics) {
+			$this->update_google_analytics_stats_if_required($ids);
 		}
 	}
 }

@@ -99,12 +99,13 @@ class evangelical_magazine_most_popular extends WP_Widget {
 	* @param array $instance
 	*/
 	public function widget ($args, $instance) {
-		global $post;
+		global $post, $evangelical_magazine;
 		$exclude = (isset($post->ID)) ? array($post->ID) : array();
 		$num_articles = ($post->post_type == 'em_article') ? 10 : 5;
 		$articles = evangelical_magazine_article::get_top_articles($num_articles, $exclude);
-		evangelical_magazine::update_facebook_stats_if_required($articles);
 		if ($articles) {
+			$evangelical_magazine->update_all_stats_if_required($articles);
+			$articles = evangelical_magazine_article::get_top_articles($num_articles, $exclude);
 			echo $args['before_widget'];
 			$title = ($post->post_type == 'em_article') ? 'Other popular articles' : 'Popular articles';
 			echo "{$args['before_title']}{$title}{$args['after_title']}";

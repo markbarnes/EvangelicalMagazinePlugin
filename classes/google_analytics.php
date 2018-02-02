@@ -9,25 +9,13 @@
 class evangelical_magazine_google_analytics {
 
 	/**
-	* @var Google_Client
+	* @var Google_Client $client
+	* @var int $profile_id		The unique Analytics view (profile) ID
+	* @var int $access_token	The temporary secret access token required to make the request
 	*/
-	private $client;
+	private $client, $profile_id, $access_token;
 
-	/**
-	* The unique Analytics view (profile) ID
-	*
-	* @var int
-	*/
-	private $profile_id;
-
-	/**
-	* put your comment there...
-	*
-	* @var mixed
-	*/
 	private $http;
-
-	private $access_token;
 
 	public function __construct() {
 		$this->client = new Google_Client();
@@ -66,16 +54,32 @@ class evangelical_magazine_google_analytics {
 		return $this->profile_id;
 	}
 
-	public function get_page_views($url) {
+	public function get_page_views($urls) {
+		if (!is_array($urls)) {
+			$urls = (array)$urls;
+			$return_single_value = true;
+		} else {
+			$return_single_value = false;
+		}
 		$access_token = $this->get_access_token();
 		$profile_id = $this->get_profile_id();
-		$page_path = urlencode(wp_parse_url($url, PHP_URL_PATH));
-		$url = "https://www.googleapis.com/analytics/v3/data/ga?ids=ga%3A{$profile_id}&start-date=2016-01-01&end-date=yesterday&metrics=ga%3Apageviews&dimensions=ga%3ApagePath&filters=ga%3ApagePath%3D%3D{$page_path}&access_token=".$access_token;
-		$response = json_decode($this->http->get($url)->getBody()->read(8192));
-		if ($response && isset($response->rows[0][1])) {
-			return $response->rows[0][1];
-		} else {
-			return 0;
+		$filters = array();
+		foreach ($urls as $url) {
+			$filters[] = urlencode('ga:pagePath=='.wp_parse_url($url, PHP_URL_PATH));
+		}
+		$filter = implode ($filters, ',');
+		$url = "https://www.googleapis.com/analytics/v3/data/ga?ids=ga%3A{$profile_id}&start-date=2016-01-01&end-date=yesterday&metrics=ga%3Apageviews&dimensions=ga%3ApagePath&filters={$filter}&access_token=".$access_token;
+		$response = json_decode($this->http->get($url)->getBody()->getContents());
+		if (isset($response->rows)) {
+			if ($return_single_value) {
+				return $response->rows[0][1];
+			} else {
+				$values = array();
+				foreach ($response->rows as $row) {
+					$values[$row[0]] = $row[1];
+				}
+				return $values;
+			}
 		}
 	}
 }
