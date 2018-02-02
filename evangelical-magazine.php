@@ -45,6 +45,11 @@ class evangelical_magazine {
 		add_image_size ('article_rss', 560, 373, true);
 
 		$ia = new evangelical_magazine_facebook_instant_articles();
+		$this->use_google_analytics = file_exists($this->plugin_dir_path('google-api-credentials.json')) && file_exists($this->plugin_dir_path('libraries/google-api-php-client/vendor/autoload.php'));
+		if ($this->use_google_analytics) {
+			require_once $this->plugin_dir_path('libraries/google-api-php-client/vendor/autoload.php');
+			$this->analytics = new evangelical_magazine_google_analytics();
+		}
 	}
 
 	/**
@@ -83,7 +88,7 @@ class evangelical_magazine {
 	* @param string $relative_path - a file or folder within the plugin
 	* @return string
 	*/
-	function plugin_dir_path ($relative_path = '') {
+	public static function plugin_dir_path ($relative_path = '') {
 		return plugin_dir_path(__FILE__).$relative_path;
 	}
 

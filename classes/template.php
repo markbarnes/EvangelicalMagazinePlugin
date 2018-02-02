@@ -21,12 +21,7 @@ abstract class evangelical_magazine_template {
 	const VIEW_COUNT_META_NAME = 'evangelical_magazine_view_count';
 	const ISSUE_DATE_META_NAME = 'evangelical_magazine_issue_date';
 	const FB_ENGAGEMENT_META_NAME = 'evangelical_magazine_fb_engagement';
-	// Separate likes and shares seems broken in Facebook API 2.7. See http://stackoverflow.com/questions/31768568/missing-result-field-in-get-requests-of-the-facebook-graph-api
-	//const FB_LIKES_META_NAME = 'evangelical_magazine_fb_likes';
-	//const FB_SHARES_META_NAME = 'evangelical_magazine_fb_shares';
-	//const FB_LIKESANDSHARES_META_NAME = 'evangelical_magazine_fb_likes';
-	//const FB_COMMENTS_META_NAME = 'evangelical_magazine_fb_comments';
-	//const FB_TOTAL_META_NAME = 'evangelical_magazine_fb_total';
+	const GOOGLE_ANALYTICS_META_NAME = 'evangelical_magazine_google_analytics';
 
 	/**
 	* All the custom posttype data is stored in $post_data as a WP_Post object
@@ -426,8 +421,13 @@ abstract class evangelical_magazine_template {
 		//We can't do this in one query, because WordPress won't return null values when you sort by meta_value
 		if ($articles) {
 			$index = array();
+			if (self::use_google_analytics()) {
+				$view_meta_key = self::GOOGLE_ANALYTICS_META_NAME;
+			} else {
+				$view_meta_key = self::VIEW_COUNT_META_NAME;
+			}
 			foreach ($articles as $key => $article) {
-				$view_count = get_post_meta($article->get_id(), self::VIEW_COUNT_META_NAME, true);
+				$view_count = get_post_meta($article->get_id(), $view_meta_key, true);
 				$index[$key] = round ($view_count/(time()-strtotime($article->get_post_date()))*84600 , 5);
 			}
 			arsort($index);
@@ -502,6 +502,57 @@ abstract class evangelical_magazine_template {
 		update_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, $engagement_count);
 		$secs_since_published = time() - strtotime($this->get_post_date());
 		set_transient ($this->get_facebook_transient_name(), true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
+	}
+
+	/**
+	* Returns the name of the transient which indicates whether or not the Google Analytics engagement stat is cached
+	*
+	* @return string
+	*/
+	public function get_google_analytics_transient_name() {
+		return "em_ga_valid_{$this->get_id()}";
+	}
+
+	/**
+	* Checks whether Google Analytics stats for this object have already been cached
+	*
+	* @return bool
+	*/
+	public function has_valid_google_analytics_stats() {
+		$transient_name = $this->get_google_analytics_transient_name();
+		$stats = get_transient($transient_name);
+		return (bool)$stats;
+	}
+
+	/**
+	* Gets the Google Analytics stats for this object
+	*
+	* @return int
+	*/
+	public function get_google_analytics_stats() {
+		global $evangelical_magazine;
+		if (!$this->has_valid_google_analytics_stats()) {
+			$url = apply_filters ('evangelical_magazine_url_for_google_analytics', $this->get_link());
+			$stats = $evangelical_magazine->analytics->get_page_views($url);
+			$this->update_google_analytics_stats ($stats);
+		}
+		return get_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, true);
+	}
+
+	/**
+	* Updates the Google Analytics metadata for this object
+	*
+	* @param int $page_views
+	*/
+	public function update_google_analytics_stats($page_views) {
+		update_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, $page_views);
+		$secs_since_published = time() - strtotime($this->get_post_date());
+		set_transient ($this->get_google_analytics_transient_name(), true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
+	}
+
+	public static function use_google_analytics() {
+		global $evangelical_magazine;
+		return $evangelical_magazine->use_google_analytics;
 	}
 
 	/**

@@ -88,7 +88,11 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
 	public static function get_top_authors ($limit = -1) {
 		global $wpdb;
 		// For performance reasons, we can't do this through WP_Query
-		$view_meta_key = self::VIEW_COUNT_META_NAME;
+		if (self::use_google_analytics()) {
+			$view_meta_key = self::GOOGLE_ANALYTICS_META_NAME;
+		} else {
+			$view_meta_key = self::VIEW_COUNT_META_NAME;
+		}
 		$author_meta_key = self::AUTHOR_META_NAME;
 		$limit_sql = ($limit == -1) ? '' : " LIMIT 0, {$limit}";
 		$author_ids = $wpdb->get_col ("SELECT meta_author.meta_value, AVG(meta_views.meta_value/DATEDIFF(NOW(), post_date)) AS average_views_per_day FROM {$wpdb->postmeta} AS meta_views, {$wpdb->postmeta} AS meta_author, {$wpdb->posts} WHERE ID=meta_views.post_id AND ID=meta_author.post_id AND meta_views.meta_key='{$view_meta_key}' AND meta_author.meta_key='{$author_meta_key}' AND post_status='publish' AND post_type = 'em_article' GROUP BY meta_author.meta_value ORDER BY average_views_per_day DESC{$limit_sql}");

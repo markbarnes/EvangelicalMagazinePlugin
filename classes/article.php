@@ -492,7 +492,11 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	*
 	*/
 	public function get_view_count() {
-		return get_post_meta($this->get_id(), self::VIEW_COUNT_META_NAME, true);
+		if (self::use_google_analytics()) {
+			return get_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, true);
+		} else {
+			return get_post_meta($this->get_id(), self::VIEW_COUNT_META_NAME, true);
+		}
 	}
 
 	/**
@@ -681,7 +685,11 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	public static function get_top_articles ($limit = -1, $exclude_article_ids = array()) {
 		global $wpdb;
 		// For performance reasons, we can't do this through WP_Query
-		$meta_key = self::VIEW_COUNT_META_NAME;
+		if (self::use_google_analytics()) {
+			$meta_key = self::GOOGLE_ANALYTICS_META_NAME;
+		} else {
+			$meta_key = self::VIEW_COUNT_META_NAME;
+		}
 		$limit = ($limit == -1) ? '' : " LIMIT 0, {$limit}";
 		$not_in = ($exclude_article_ids) ? " AND post_id NOT IN(".implode(', ', $exclude_article_ids).')' : '';
 		$article_ids = $wpdb->get_col ("SELECT post_id, (meta_value/DATEDIFF(NOW(), post_date)) AS views_per_day FROM {$wpdb->postmeta}, {$wpdb->posts} WHERE ID=post_id AND meta_key='{$meta_key}' AND post_status='publish' AND post_type = 'em_article'{$not_in} GROUP BY post_id ORDER BY views_per_day DESC{$limit}", 0);
@@ -702,12 +710,18 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	* @param mixed $columns
 	*/
 	public static function filter_columns ($columns) {
+		global $evangelical_magazine;
 		$columns ['article_author'] = 'Author';
 		$columns ['issue_details'] = 'Issue';
 		$columns ['section'] = 'Section';
 		$columns ['series'] = 'Series';
 		$columns ['fb_engagement'] = 'FB Engagement';
-		$column_order = array ('cb', 'title', 'article_author', 'issue_details', 'section', 'series', 'fb_engagement', 'date');
+		if (self::use_google_analytics()) {
+			$columns ['views'] = 'Views';
+			$column_order = array ('cb', 'title', 'article_author', 'issue_details', 'section', 'series', 'views', 'fb_engagement', 'date');
+		} else {
+			$column_order = array ('cb', 'title', 'article_author', 'issue_details', 'section', 'series', 'fb_engagement', 'date');
+		}
 		return array_merge(array_flip($column_order), $columns);
 	}
 
@@ -724,6 +738,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 		$article = new evangelical_magazine_article($post);
 		if ($article->is_published() && $column == 'fb_engagement') {
 			echo number_format($article->get_facebook_stats());
+		}
+		elseif ($article->is_published() && $column == 'views') {
+			echo number_format($article->get_google_analytics_stats());
 		}
 		elseif ($column == 'article_author') {
 			$authors = $article->get_authors();
@@ -755,8 +772,12 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	* @return array
 	*/
 	public static function make_columns_sortable ($columns) {
+		global $evangelical_magazine;
 		$columns ['fb_engagement'] = 'fb_engagement';
 		$columns ['issue_details'] = 'issue_details';
+		if (self::use_google_analytics()) {
+			$columns ['views'] = 'views';
+		}
 		return $columns;
 	}
 
@@ -774,6 +795,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 				$orderby = $query->get('orderby');
 				if ($orderby && $orderby == 'fb_engagement') {
 					$query->set ('meta_key', self::FB_ENGAGEMENT_META_NAME);
+					$query->set ('orderby','meta_value_num');
+				} elseif ($orderby && $orderby == 'views') {
+					$query->set ('meta_key', self::GOOGLE_ANALYTICS_META_NAME);
 					$query->set ('orderby','meta_value_num');
 				} elseif ($orderby && $orderby == 'issue_details') {
 					$query->set ('meta_key', self::ARTICLE_SORT_ORDER_META_NAME);

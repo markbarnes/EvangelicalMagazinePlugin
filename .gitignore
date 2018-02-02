@@ -1,1 +1,4 @@
 /classes/fb_access_tokens.php
+/google-api-credentials.json
+/libraries/google-api-php-client/src
+/libraries/google-api-php-client/vendor
