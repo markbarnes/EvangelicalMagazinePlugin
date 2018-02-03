@@ -24,16 +24,15 @@ abstract class evangelical_magazine_template {
 	const GOOGLE_ANALYTICS_META_NAME = 'evangelical_magazine_google_analytics';
 
 	/**
-	* All the custom posttype data is stored in $post_data as a WP_Post object
-	*
-	* @var WP_Post
+	* @var WP_Post $post_data - All the custom posttype data is stored in $post_data as a WP_Post object
 	*/
 	protected $post_data;
 
 	/**
 	* Instantiate the class by passing the WP_Post object or a post_id
 	*
-	* @param integer|WP_Post $post
+	* @param integer|WP_Post $post - post_id or post object
+	* @return void
 	*/
 	public function __construct($post) {
 		if (!is_a ($post, 'WP_Post')) {
@@ -63,8 +62,9 @@ abstract class evangelical_magazine_template {
 	/**
 	* Returns the name of the object
 	*
-	* @param boolean $link - include a HTML link
-	* @param boolean $schema - add schema.org microdata
+	* @param bool $link - whether to add a HTML link to the object around the name
+	* @param bool $schema - whether to add schema.org microdata
+	* @param bool $edit_link - whether to add a HTML link to edit the object around the name (overrides other options)
 	* @return string
 	*/
 	public function get_name($link = false, $schema = false, $edit_link = false) {
@@ -97,9 +97,8 @@ abstract class evangelical_magazine_template {
 	/**
 	* Returns the permalink to the object as HTML
 	*
-	* @param string $link_content
-	* @param string $class
-	* @param string $id
+	* @param string $link_content - the text to be linked
+	* @param array $attributes - an array of attributes to by added to the link element
 	* @return string;
 	*/
 	public function get_link_html($link_content, $attributes = array()) {
@@ -111,9 +110,8 @@ abstract class evangelical_magazine_template {
 	/**
 	* Returns the link to edit the object as HTML
 	*
-	* @param string $link_content
-	* @param string $class
-	* @param string $id
+	* @param string $link_content - the text to be linked
+	* @param array $attributes - an array of attributes to by added to the link element
 	* @return string;
 	*/
 	public function get_edit_link_html($link_content, $attributes = array()) {
@@ -171,7 +169,7 @@ abstract class evangelical_magazine_template {
 	/**
 	* Returns the URL of the featured image
 	*
-	* @param string $image_size
+	* @param string $image_size - the size of the image to be returned
 	* @return string
 	*/
 	public function get_image_url($image_size = 'thumbnail') {
@@ -186,8 +184,8 @@ abstract class evangelical_magazine_template {
 	/**
 	* Returns an array containing the URL, width and height of the featured image
 	*
-	* @param string $image_size
-	* @return array
+	* @param string $image_size - the size of the image to be returned
+	* @return array - with keys 'url', 'width', 'height', 'mimetype' and 'filesize'
 	*/
 	public function get_image_details($image_size = 'thumbnail') {
 		if (has_post_thumbnail($this->get_id())) {
@@ -212,10 +210,10 @@ abstract class evangelical_magazine_template {
 	/**
 	* Returns an HTML <img> tag for the featured image
 	*
-	* @param string $image_size
-	* @param string $link_class
-	* @param boolean $link
-	* @param string $alt_attribute
+	* @param string $image_size - the size of the image to be returned
+	* @param boolean $link - whether or not the image should be hyperlinked
+	* @param string $link_class - a CSS class to be added to the link
+	* @param string $alt_attribute - the alt attribute for the image
 	* @return string
 	*/
 	public function get_image_html($image_size = 'thumbnail', $link=false, $link_class = '', $alt_attribute = '') {
@@ -263,11 +261,11 @@ abstract class evangelical_magazine_template {
 	/**
 	* Helper function to help subclasses return all the objects from a WP_Query
 	*
-	* @param array $args
-	* @param array $default_args
+	* @param array $args - WP_Query arguments
+	* @param array $default_args - WP_Query arguments
 	* @param string $class - the class to return (without the 'evangelical_magazine_')
 	* @uses WP_Query
-	* @return array
+	* @return null|array
 	*/
 	protected static function _get_objects_from_query ($args, $default_args, $class) {
 		$class = "evangelical_magazine_{$class}";
@@ -293,10 +291,9 @@ abstract class evangelical_magazine_template {
 	*
 	* Wrapper for _get_objects()
 	*
-	* @param array $args
-	* @param array $default_args
-	* @uses evangelical_magazine_template::_get_objects()
-	* @return evangelical_magazine_article[]
+	* @param array $args - WP_Query arguments
+	* @param array $default_args - WP_Query arguments
+	* @return null|evangelical_magazine_article[]
 	*/
 	protected static function _get_articles_from_query ($args, $default_args = '') {
 		return self::_get_objects_from_query($args, $default_args, 'article');
@@ -307,10 +304,9 @@ abstract class evangelical_magazine_template {
 	*
 	* Wrapper for _get_objects()
 	*
-	* @param array $args
-	* @param array $default_args
-	* @uses evangelical_magazine_template::_get_objects()
-	* @return evangelical_magazine_section[]
+	* @param array $args - WP_Query arguments
+	* @param array $default_args - WP_Query arguments
+	* @return null|evangelical_magazine_section[]
 	*/
 	protected static function _get_sections_from_query ($args, $default_args = '') {
 		return self::_get_objects_from_query($args, $default_args, 'section');
@@ -321,10 +317,9 @@ abstract class evangelical_magazine_template {
 	*
 	* Wrapper for _get_objects()
 	*
-	* @param array $args
-	* @param array $default_args
-	* @uses evangelical_magazine_template::_get_objects()
-	* @return evangelical_magazine_series[]
+	* @param array $args - WP_Query arguments
+	* @param array $default_args - WP_Query arguments
+	* @return null|evangelical_magazine_series[]
 	*/
 	protected static function _get_series_from_query ($args, $default_args = '') {
 		return self::_get_objects_from_query($args, $default_args, 'series');
@@ -335,10 +330,9 @@ abstract class evangelical_magazine_template {
 	*
 	* Wrapper for _get_objects()
 	*
-	* @param array $args
-	* @param array $default_args
-	* @uses evangelical_magazine_template::_get_objects()
-	* @return evangelical_magazine_issue[]
+	* @param array $args - WP_Query arguments
+	* @param array $default_args - WP_Query arguments
+	* @return null|evangelical_magazine_issue[]
 	*/
 	protected static function _get_issues_from_query ($args, $default_args = '') {
 		return self::_get_objects_from_query($args, $default_args, 'issue');
@@ -352,7 +346,7 @@ abstract class evangelical_magazine_template {
 	* @param array $args
 	* @param array $default_args
 	* @uses evangelical_magazine_template::_get_objects()
-	* @return evangelical_magazine_author[]
+	* @return null|evangelical_magazine_author[]
 	*/
 	protected static function _get_authors_from_query ($args, $default_args = '') {
 		return self::_get_objects_from_query($args, $default_args, 'author');
@@ -361,11 +355,9 @@ abstract class evangelical_magazine_template {
 	/**
 	* Helper function to help subclasses return all the object_ids from a WP_Query
 	*
-	* @param array $args
-	* @param array $default_args
-	* @param string $class - the class to return (without the 'evangelical_magazine_')
-	* @uses WP_Query
-	* @return array
+	* @param array $args - WP_Query arguments
+	* @param array $default_args - WP_Query arguments
+	* @return null|int[]
 	*/
 	public static function _get_object_ids_from_query ($args, $default_args) {
 		$args = wp_parse_args($args, $default_args);
@@ -382,8 +374,8 @@ abstract class evangelical_magazine_template {
 	/**
 	* Returns all the object_ids from an array of objects
 	*
-	* @param array $objects
-	* @return array
+	* @param array $objects - any evangelical_magazine_* objects
+	* @return null|int[]
 	*/
 	public static function get_object_ids_from_array ($objects) {
 		if ($objects) {
@@ -398,7 +390,7 @@ abstract class evangelical_magazine_template {
 	/**
 	* Helper function that returns the arguments needed to return future posts in addition to what is normally returned
 	*
-	* @return array
+	* @return array - with the key 'post_status'
 	*/
 	public static function _future_posts_args () {
 		if (is_user_logged_in()) {
@@ -413,8 +405,8 @@ abstract class evangelical_magazine_template {
 	*
 	* Popularity is calculated according to the number of views per day
 	*
-	* @param evangelical_magazine_article[] $articles
-	* @param int $limit
+	* @param evangelical_magazine_article[] $articles - an array of articles
+	* @param int $limit - the maximum number of articles to return
 	* @return evangelical_magazine_article[]
 	*/
 	protected function _get_top_articles ($articles, $limit = -1) {
@@ -444,6 +436,8 @@ abstract class evangelical_magazine_template {
 
 	/**
 	* Returns true if the object is an author
+	*
+	* @return bool
 	*/
 	public function is_author() {
 		return is_a($this, 'evangelical_magazine_author');
@@ -451,6 +445,8 @@ abstract class evangelical_magazine_template {
 
 	/**
 	* Returns true if the object is an article
+	*
+	* @return bool
 	*/
 	public function is_article() {
 		return is_a($this, 'evangelical_magazine_article');
@@ -497,6 +493,7 @@ abstract class evangelical_magazine_template {
 	* Updates the Facebook engagement metadata for this object
 	*
 	* @param int $engagement_count
+	* @return void
 	*/
 	public function update_facebook_stats($engagement_count) {
 		update_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, $engagement_count);
@@ -543,6 +540,7 @@ abstract class evangelical_magazine_template {
 	* Updates the Google Analytics metadata for this object
 	*
 	* @param int $page_views
+	* @return void
 	*/
 	public function update_google_analytics_stats($page_views) {
 		update_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, $page_views);
@@ -550,6 +548,11 @@ abstract class evangelical_magazine_template {
 		set_transient ($this->get_google_analytics_transient_name(), true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
 	}
 
+	/**
+	* Returns true if Google Analytics is configured and in use
+	*
+	* @return bool;
+	*/
 	public static function use_google_analytics() {
 		global $evangelical_magazine;
 		return $evangelical_magazine->use_google_analytics;
@@ -579,11 +582,11 @@ abstract class evangelical_magazine_template {
 	}
 
 	/**
-	* Returns HTML
+	* Returns a HTML tag
 	*
-	* @param string $tag - The HTML tag
+	* @param string $tag - The name of the HTML tag
 	* @param string $contents - The text contained in the tag
-	* @param array $attributes - Various attributes [class, id, etc.] for the tag
+	* @param array $attributes - Various attributes and values [class, id, etc.] for the tag. The name of the attribute should be used as the key.
 	*/
 	protected function html_tag ($tag, $contents, $attributes = array()) {
 		return "<{$tag} {$this->attr_html($attributes)}>{$contents}</{$tag}>";

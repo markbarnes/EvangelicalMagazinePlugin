@@ -11,6 +11,7 @@ class evangelical_magazine_widgets {
 	/**
 	* Register the various widgets, and add necessary actions
 	*
+	* @return void
 	*/
 	public static function register_widgets() {
 		register_widget('evangelical_magazine_subscribe');
@@ -32,6 +33,8 @@ class evangelical_magazine_subscribe extends WP_Widget {
 
 	/**
 	* Instantiate the widget
+	*
+	* @return void
 	*/
 	function __construct() {
 		parent::__construct('evangelical_magazine_subscribe', 'Subscribe', array ('description' => 'Rotates between an advert to subscribe to the print edition, and a form to receive the email edition.'));
@@ -52,8 +55,9 @@ class evangelical_magazine_subscribe extends WP_Widget {
 	/**
 	* Outputs the widget
 	*
-	* @param array $args
+	* @param array $args - WP_Widget arguments
 	* @param array $instance
+	* @return void
 	*/
 	public function widget ($args, $instance) {
 		if (rand(1,2) == 1) {
@@ -87,6 +91,8 @@ class evangelical_magazine_most_popular extends WP_Widget {
 
 	/**
 	* Instantiate the widget
+	*
+	* @return void
 	*/
 	function __construct() {
 		parent::__construct('evangelical_magazine_most_popular', 'Most Popular Articles', array ('description' => 'Outputs a list of the most popular articles.'));
@@ -95,8 +101,9 @@ class evangelical_magazine_most_popular extends WP_Widget {
 	/**
 	* Outputs the widget
 	*
-	* @param array $args
+	* @param array $args - WP_Widget arguments
 	* @param array $instance
+	* @return void
 	*/
 	public function widget ($args, $instance) {
 		global $post, $evangelical_magazine;
@@ -136,6 +143,8 @@ class evangelical_magazine_current_issue extends WP_Widget {
 
 	/**
 	* Instantiate the widget
+	*
+	* @return void
 	*/
 	function __construct() {
 		parent::__construct('evangelical_magazine_current_issue', 'Current issue', array ('description' => 'Provides a link to the current issue of the magazine.'));
@@ -144,8 +153,9 @@ class evangelical_magazine_current_issue extends WP_Widget {
 	/**
 	* Outputs the widget
 	*
-	* @param array $args
+	* @param array $args - WP_Widget arguments
 	* @param array $instance
+	* @return void
 	*/
 	public function widget ($args, $instance) {
 		$issues = evangelical_magazine_issue::get_all_issues(1);
@@ -169,6 +179,8 @@ class evangelical_magazine_facebook_page_plugin extends WP_Widget {
 
 	/**
 	* Instantiate the widget
+	*
+	* @return void
 	*/
 	function __construct() {
 		parent::__construct('evangelical_magazine_facebook_page_plugin', 'Facebook Page Plugin', array ('description' => 'Displays a mini Facebook page to encourage likes.'));
@@ -177,8 +189,9 @@ class evangelical_magazine_facebook_page_plugin extends WP_Widget {
 	/**
 	* Outputs the widget
 	*
-	* @param array $args
+	* @param array $args - WP_Widget arguments
 	* @param array $instance
+	* @return void
 	*/
 	public function widget ($args, $instance) {
 		echo $args['before_widget'];
@@ -195,6 +208,8 @@ class evangelical_magazine_beacon_ad extends WP_Widget {
 
 	/**
 	* Instantiate the widget
+	*
+	* @return void
 	*/
 	function __construct() {
 		parent::__construct('evangelical_magazine_beacon_ad', 'Beacon Ads Plugin (Not finished)', array ('description' => 'Inserts an ad from Beacon Ads.'));
@@ -203,8 +218,9 @@ class evangelical_magazine_beacon_ad extends WP_Widget {
 	/**
 	* Outputs the widget
 	*
-	* @param array $args
+	* @param array $args - WP_Widget arguments
 	* @param array $instance
+	* @return void
 	*/
 	public function widget ($args, $instance) {
 		echo $args['before_widget'];

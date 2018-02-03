@@ -8,14 +8,20 @@
 */
 class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 
+	/** @var int - the earliest year for which it is possible for an issue to exist */
 	const EARLIEST_YEAR = 2010;
 
+	/**
+	* @var int $year - the year of this issue
+	* @var int $month - the month of this issue
+	*/
 	private $year, $month;
 
 	/**
 	* Instantiate the class by passing the WP_Post object or a post_id
 	*
 	* @param integer|WP_Post $post
+	* @return void
 	*/
 	public function __construct($post) {
 		if (!is_a ($post, 'WP_Post')) {
@@ -34,7 +40,7 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 	/**
 	* Returns an array contain the date of this issue
 	*
-	* @return array
+	* @return array - an array with the keys 'year' and 'month'
 	*/
 	public function get_date() {
 		return array ('year' => $this->year, 'month' => $this->month);
@@ -43,8 +49,7 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 	/**
 	* Saves the metadata when a post is edited
 	*
-	* Called on the 'save_post_action
-	*
+	* @return void
 	*/
 	public function save_meta_data() {
 		if (isset($_POST['em_issue_date_meta_box_nonce']) && wp_verify_nonce($_POST['em_issue_date_meta_box_nonce'], 'em_issue_date_meta_box')) {
@@ -59,8 +64,8 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 	/**
 	* Helper function to return the articles from this issue
 	*
-	* @param array $args
-	* @return evangelical_magazine_article[]
+	* @param array $args - WP_Query arguments
+	* @return null|evangelical_magazine_article[]
 	*/
 	public function _get_articles ($args = array()) {
 		$meta_query = array(array('key' => self::ISSUE_META_NAME, 'value' => $this->get_id()));
@@ -71,8 +76,8 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 	/**
 	* Returns an array of article IDs for all articles in the issue
 	*
-	* @param array $args
-	* @return integer[]
+	* @param array $args - WP_Query arguments
+	* @return null|integer[]
 	*/
 	public function get_article_ids($args = array()) {
 		$meta_query = array(array('key' => self::ISSUE_META_NAME, 'value' => $this->get_id()));
@@ -83,7 +88,7 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 	/**
 	* Returns an array of author IDs for all authors in the issue
 	*
-	* @return integer[]
+	* @return null|integer[]
 	*/
 	public function get_author_ids() {
 		$articles = $this->get_articles();
@@ -97,10 +102,10 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 	}
 
 	/**
-	* Gets the post popular articles in the issue
+	* Gets the most popular articles in the issue
 	*
 	* @param integer $limit - the maximum number of articles to return
-	* @return evangelical_magazine_article[]
+	* @return null|evangelical_magazine_article[]
 	*/
 	public function get_top_articles ($limit = -1) {
 		return $this->_get_top_articles_from_object ($limit, $this);
@@ -109,6 +114,7 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 	/**
 	* Gets the articles with future post_dates in this issue
 	*
+	* @param array $args - WP_Query arguments
 	* @return evangelical_magazine_article[]
 	*/
 	public function get_future_articles($args = array()) {
@@ -129,8 +135,8 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 	/**
 	* Returns an array of all the issue objects, with the most recent first.
 	*
-	* @param int $limit
-	* @return evangelical_magazine_issue[]
+	* @param int $limit - the maximum number of issues to return
+	* @return null|evangelical_magazine_issue[]
 	*/
 	public static function get_all_issues($limit = -1) {
 		$args = array ('post_type' => 'em_issue', 'meta_key' => self::ISSUE_DATE_META_NAME, 'orderby' => 'meta_value', 'order' => 'DESC', 'posts_per_page' => $limit);
@@ -140,6 +146,7 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 	/**
 	* Adds metaboxes to issues custom post type
 	*
+	* @return void
 	*/
 	public static function issue_meta_boxes() {
 		add_meta_box ('em_issue_date', 'Date', array(get_called_class(), 'do_issue_date_meta_box'), 'em_issue', 'side', 'core');
@@ -147,8 +154,10 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles {
 
 	/**
 	* Outputs the issue meta box
+	* Called by add_meta_box
 	*
-	* @param mixed $article
+	* @param WP_Post $post - the current post
+	* @return void
 	*/
 	public static function do_issue_date_meta_box($post) {
 		wp_nonce_field ('em_issue_date_meta_box', 'em_issue_date_meta_box_nonce');

@@ -10,13 +10,17 @@ class evangelical_magazine_google_analytics {
 
 	/**
 	* @var Google_Client $client
-	* @var int $profile_id		The unique Analytics view (profile) ID
-	* @var int $access_token	The temporary secret access token required to make the request
+	* @var int $profile_id - the unique Analytics view (profile) ID
+	* @var int $access_token - the temporary secret access token required to make the request
+	* @var GuzzleHttp\ClientInterface $http - the http client object used for interacting with the Google API
 	*/
-	private $client, $profile_id, $access_token;
+	private $client, $profile_id, $access_token, $http;
 
-	private $http;
-
+	/**
+	* Instantiate the class by setting up the http client object
+	*
+	* @return void
+	*/
 	public function __construct() {
 		$this->client = new Google_Client();
 		$this->client->useApplicationDefaultCredentials();
@@ -26,6 +30,12 @@ class evangelical_magazine_google_analytics {
 		$this->http = $this->client->authorize();
 	}
 
+	/**
+	* Returns the Google Analytics access token
+	*
+	* @param boolean $force_renewal - if true, will override the cached value
+	* @return string
+	*/
 	private function get_access_token($force_renewal = false) {
 		if (!$force_renewal) {
 			$this->access_token = get_transient('em_google_access_token');
@@ -39,12 +49,17 @@ class evangelical_magazine_google_analytics {
 		return $this->access_token;
 	}
 
+	/**
+	* Returns the Google Analytics profile id
+	*
+	* @return string
+	*/
 	private function get_profile_id() {
 		if (!$this->profile_id) {
 			$this->profile_id = get_transient ('em_google_profile_id');
 			if (!$this->profile_id) {
 				$url = 'https://www.googleapis.com/analytics/v3/management/accountSummaries';
-				$response = json_decode($this->http->get($url)->getBody()->read(8192));
+				$response = json_decode($this->http->get($url)->getBody()->getContents());
 				if ($response && isset($response->items) && isset($response->items[0]->webProperties[0]->profiles[0]->id)) {
 					$this->profile_id = $response->items[0]->webProperties[0]->profiles[0]->id;
 					set_transient ('em_google_profile_id', $this->profile_id, 60*60*24*7); // 1 week
@@ -54,6 +69,12 @@ class evangelical_magazine_google_analytics {
 		return $this->profile_id;
 	}
 
+	/**
+	* Gets the number of Google Analytics page views for a single url or array of urls
+	*
+	* @param string|string[] $urls - a single url or array of urls
+	* @return int|array - returns an integer if $urls was a string, and an arrays if $urls was an array. The array key is set to the path, and the value to the number of views.
+	*/
 	public function get_page_views($urls) {
 		if (!is_array($urls)) {
 			$urls = (array)$urls;

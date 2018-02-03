@@ -8,30 +8,19 @@
 */
 class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
-	* @var evangelical_magazine_issue
+	* @var evangelical_magazine_issue $issue - the issue this article is in
+	* @var evangelical_magazine_author[] $authors - an array of authors of this article
+	* @var evangelical_magazine_section[] $sections - an array of sections this article is in
+	* @var int $page_num - the page number of this article
+	* @var int $order_in_series - the order of this article within a series
 	*/
-	private $issue;
-
-	/**
-	* @var evangelical_magazine_author[]
-	*/
-	private $authors;
-
-
-	/**
-	* @var evangelical_magazine_section[]
-	*/
-	private $sections;
-
-	/**
-	* @var int
-	*/
-	private $page_num, $order;
+	private $issue, $authors, $sections, $page_num, $order_in_series;
 
 	/**
 	* Instantiate the class by passing the WP_Post object or a post_id
 	*
-	* @param integer|WP_Post $post
+	* @param integer|WP_Post $post - the post_id of WP_Post object
+	* @return void
 	*/
 	public function __construct ($post) {
 		if (!is_a ($post, 'WP_Post')) {
@@ -51,7 +40,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 		} else {
 			$this->series = null;
 		}
-		$this->order = get_post_meta($this->get_id(), self::ORDER_META_NAME, true);
+		$this->order_in_series = get_post_meta($this->get_id(), self::ORDER_META_NAME, true);
 		$this->generate_sections_array();
 		$this->generate_authors_array();
 	}
@@ -70,7 +59,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns the title of the article
 	*
-	* @param boolean $link - include a HTML link
+	* @param boolean $link - whether to add a HTML link to the article around the title text
 	* @return string
 	*/
 	public function get_title($link = false) {
@@ -104,7 +93,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns the name of the issue
 	*
-	* @param bool $link
+	* @param bool $link - whether to add a HTML link to the issue around the issue name
+	* @param bool $schema - whether to add schema.org microdata
+	* @param bool $edit_link - whether to add a HTML link to edit the issue around the issue name
 	* @return string
 	*/
 	public function get_issue_name($link = false, $schema = false, $edit_link = false) {
@@ -166,7 +157,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns the name of the series
 	*
-	* @param bool $link
+	* @param bool $link - whether to add a HTML link to the series around the series name
+	* @param bool $schema - whether to add schema.org microdata
+	* @param bool $edit_link - whether to add a HTML link to edit the series around the series text
 	* @return string
 	*/
 	public function get_series_name($link = false, $schema = false, $edit_link = false) {
@@ -181,7 +174,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	* @return int
 	*/
 	public function get_series_order() {
-		return $this->order;
+		return $this->order_in_series;
 	}
 
 	/**
@@ -226,6 +219,8 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 
 	/**
 	* Populates $this->sections
+	*
+	* @return void
 	*/
 	private function generate_sections_array() {
 		$section_ids = $this->get_section_ids();
@@ -257,6 +252,8 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 
 	/**
 	* Populates $this->authors
+	*
+	* @return void
 	*/
 	private function generate_authors_array() {
 		$author_ids = $this->get_author_ids();
@@ -270,25 +267,16 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns a list of author names
 	*
-	* @param bool $link - Make the names into links
-	* @param bool $schema - Add schema.org markup
-	* @param string $prefix - Text to prepend to the output (ignored if there are no authors)
+	* @param bool $link - whether to add a HTML link to the author around the author's name
+	* @param bool $schema - whether to add schema.org microdata
+	* @param string $prefix - text to prepend to the output (ignored if there are no authors)
 	* @return string
 	*/
 	public function get_author_names($link = false, $schema = false, $prefix = '') {
 		if (is_array($this->authors)) {
 			$output = array();
 			foreach ($this->authors as $author) {
-				if ($schema) {
-					$attributes = array ('itemprop' => 'author', 'itemtype' => 'http://schema.org/Person', 'itemscope' => true);
-					$this_author = '<span '.$this->attr_html($attributes).'>';
-					$attributes = array ('itemprop' => 'name');
-					$this_author .= $author->get_name($link, $schema);
-					$this_author .= '</span>';
-				} else {
-					$this_author = $author->get_name($link);
-				}
-				$output[] = $this_author;
+				$output[] = $author->get_name ($link, $schema);
 			}
 			if (count($output) > 1) {
 				$last = ' and '.array_pop ($output);
@@ -303,7 +291,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns the URL of the featured image
 	*
-	* @param string $image_size
+	* @param string $image_size - the size of the image to be returned
 	* @return string
 	*/
 	public function get_image_url($image_size = 'thumbnail') {
@@ -322,7 +310,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns the date of the issue
 	*
-	* @return array
+	* @return array - an array with the keys 'year' and 'month'
 	*/
 	public function get_issue_date() {
 		if ($this->has_issue()) {
@@ -333,6 +321,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns the date of the issue as a Unix timestamp
 	*
+	* @return int
 	*/
 	public function get_issue_datetime() {
 		if ($this->has_issue()) {
@@ -373,6 +362,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	*
 	* Called during the 'save_post' action
 	*
+	* @return void
 	*/
 	public function save_meta_data() {
 		if (defined ('DOING_AUTOSAVE') && DOING_AUTOSAVE)
@@ -444,8 +434,8 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 			}
 			// Series order
 			if (isset($_POST['em_order'])) {
-				$this->order = (int)$_POST['em_order'];
-				update_post_meta ($this->get_id(), self::ORDER_META_NAME, $this->order);
+				$this->order_in_series = (int)$_POST['em_order'];
+				update_post_meta ($this->get_id(), self::ORDER_META_NAME, $this->order_in_series);
 			} else {
 				delete_post_meta ($this->get_id(), self::ORDER_META_NAME);
 				$this->series = null;
@@ -456,8 +446,8 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns all articles by the same author(s) as this article
 	*
-	* @param int $limit
-	* @param int[] $exclude_this_article - an array of post ids
+	* @param int $limit - the maximum number of articles to return
+	* @param bool $exclude_this_article - true if the present article should be excluded
 	* @return evangelical_magazine_article[]
 	*/
 	public function get_articles_by_same_authors($limit = 5, $exclude_this_article = true) {
@@ -475,8 +465,8 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns all articles in the same series as this article
 	*
-	* @param int $limit
-	* @param int[] $exclude_this_article
+	* @param int $limit - the maximum number of articles to return
+	* @param bool $exclude_this_article - true if the present article should be excluded
 	* @return evangelical_magazine_article[]
 	*/
 	public function get_articles_in_same_series($limit = 99, $exclude_this_article = false) {
@@ -486,10 +476,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	}
 
 	/**
-	* Gets the number of views
+	* Gets the number times this article has been viewed
 	*
 	* @return integer
-	*
 	*/
 	public function get_view_count() {
 		if (self::use_google_analytics()) {
@@ -502,6 +491,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Increases the view count by one
 	*
+	* @return void
 	*/
 	public function record_view_count()  {
 		$view_count = $this->get_view_count();
@@ -511,9 +501,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns the HTML which produces the small article box
 	*
-	* @param bool $add_links
-	* @param string $sub_title
-	* @param string $class
+	* @param bool $add_links - whether links should be added to the article name and image
+	* @param string $sub_title - any subtitle to be added
+	* @param string $class - any CSS classes to be added
 	* @return string
 	*/
 	public function get_small_box_html($add_links = true, $sub_title = '', $class = '') {
@@ -536,6 +526,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Adds metaboxes to articles custom post type
 	*
+	* @return void
 	*/
 	public static function article_meta_boxes() {
 		add_meta_box ('em_issues', 'Issue', array(get_called_class(), 'do_issue_meta_box'), 'em_article', 'side', 'core');
@@ -545,10 +536,10 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	}
 
 	/**
-	* Helper function to return a meta box where the user can choose multiple items of another post type
+	* Helper function to return the HTML of a meta box where the user can choose multiple items of another post type
 	*
-	* @param array $objects
-	* @param string $name
+	* @param array $objects - an array of evangelical_magazine_* objects
+	* @param string $name - the unique name/id of this metabox
 	* @return string
 	*/
 	public static function _get_checkbox_meta_box($objects, $name) {
@@ -576,7 +567,10 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Outputs the author meta box
 	*
-	* @param mixed $article
+	* Called by the add_meta_box function
+	*
+	* @param WP_Post $article
+	* @return void
 	*/
 	public static function do_author_meta_box($article) {
 		$authors = evangelical_magazine_author::get_all_authors();
@@ -586,7 +580,10 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Outputs the section meta box
 	*
-	* @param mixed $article
+	* Called by the add_meta_box function
+	*
+	* @param WP_Post $article
+	* @return void
 	*/
 	public static function do_section_meta_box($article) {
 		$sections = evangelical_magazine_section::get_all_sections();
@@ -596,7 +593,10 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Outputs the issue meta box
 	*
-	* @param mixed $article
+	* Called by the add_meta_box function
+	*
+	* @param WP_Post $article
+	* @return void
 	*/
 	public static function do_issue_meta_box($post) {
 		$issues = evangelical_magazine_issue::get_all_issues();
@@ -623,7 +623,10 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Outputs the series meta box
 	*
-	* @param mixed $article
+	* Called by the add_meta_box function
+	*
+	* @param WP_Post $article
+	* @return void
 	*/
 	public static function do_series_meta_box($post) {
 		$series = evangelical_magazine_series::get_all_series();
@@ -653,8 +656,8 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns the most recently published articles
 	*
-	* @param array $args
-	* @return evangelical_magazine_article
+	* @param int $number_of_articles - the maximum number of article to be returned
+	* @return null|evangelical_magazine_article
 	*/
 	public static function get_recent_articles($number_of_articles = 10) {
 		$default_args = array ('post_type' => 'em_article', 'orderby' => 'date', 'order' => 'DESC', 'posts_per_page' => $number_of_articles, 'paged' => 1, 'post_status' => 'publish');
@@ -664,8 +667,8 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	/**
 	* Returns the next article to be published
 	*
-	* @param array $args
-	* @return evangelical_magazine_article
+	* @param array $args - WP_Query arguments
+	* @return null|evangelical_magazine_article
 	*/
 	public static function get_next_future_article($args = array()) {
 		$default_args = array ('post_type' => 'em_article', 'orderby' => 'date', 'order' => 'ASC', 'posts_per_page' => 1, 'post_status' => 'future');
@@ -679,8 +682,8 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	* Returns the most popular articles
 	*
 	* @param integer $limit - the maximum number of articles to return
-	* @param array $exclude_article_ids
-	* @return evangelical_magazine_article[]
+	* @param array $exclude_article_ids - an array of article ids to be exlcuded
+	* @return null|evangelical_magazine_article[]
 	*/
 	public static function get_top_articles ($limit = -1, $exclude_article_ids = array()) {
 		global $wpdb;
@@ -707,7 +710,8 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	*
 	* Filters manage_edit-em_article_columns
 	*
-	* @param mixed $columns
+	* @param array $columns
+	* @return array
 	*/
 	public static function filter_columns ($columns) {
 		global $evangelical_magazine;
@@ -730,8 +734,9 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	*
 	* Filters manage_em_article_posts_custom_column
 	*
-	* @param string $column
-	* @param int $post_id
+	* @param string $column - the name of the column
+	* @param int $post_id - the post_id for this row
+	* @return void
 	*/
 	public static function output_columns ($column, $post_id) {
 		global $post;
@@ -787,6 +792,7 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	* Runs on the pre_get_posts action
 	*
 	* @param WP_Query $query
+	* @return void
 	*/
 	public static function sort_by_columns ($query) {
 		if  (is_admin()) {

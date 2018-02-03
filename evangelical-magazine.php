@@ -3,7 +3,7 @@
 Plugin Name: Evangelical Magazine
 Description: Customisations for the Evangelical Magazine
 Plugin URI: http://www.evangelicalmagazine.com/
-Version: 0.1
+Version: 0.2
 Author: Mark Barnes
 Author URI: http://www.markbarnes.net/
 */
@@ -17,6 +17,7 @@ class evangelical_magazine {
 	/**
 	* Main hooks and activation
 	*
+	* @return void
 	*/
 	public function __construct() {
 		//Make sure classes autoload
@@ -49,9 +50,13 @@ class evangelical_magazine {
 		add_filter ('the_author', array (__CLASS__, 'filter_author_name'));
 		add_filter ('the_content_feed', array (__CLASS__, 'filter_feed_for_mailchimp'));
 
+		//Image sizes
 		add_image_size ('article_rss', 560, 373, true);
 
+		//Instant articles
 		$ia = new evangelical_magazine_facebook_instant_articles();
+
+		//Google Analytics
 		$this->use_google_analytics = file_exists($this->plugin_dir_path('google-api-credentials.json')) && file_exists($this->plugin_dir_path('libraries/google-api-php-client/vendor/autoload.php'));
 		if ($this->use_google_analytics) {
 			require_once $this->plugin_dir_path('libraries/google-api-php-client/vendor/autoload.php');
@@ -62,6 +67,7 @@ class evangelical_magazine {
 	/**
 	* Runs when plugin is activated. Can be extended through actions.
 	*
+	* @return void
 	*/
 	public static function on_activation() {
 		do_action ('evangelical_magazine_activate');
@@ -71,6 +77,7 @@ class evangelical_magazine {
 	/**
 	* Runs when plugin is deactivated. Can be extended through actions.
 	*
+	* @return void
 	*/
 	public static function on_deactivation() {
 		do_action ('evangelical_magazine_deactivate');
@@ -84,6 +91,7 @@ class evangelical_magazine {
 	* Autoloads classes
 	*
 	* @param string $class_name
+	* @return void
 	*/
 	public static function autoload_classes ($class_name) {
 		$prefix  = 'evangelical_magazine_';
@@ -113,6 +121,8 @@ class evangelical_magazine {
 
 	/**
 	* Flushes the rewrite rules
+	*
+	* @return void
 	*/
 	public static function flush_rewrite_rules () {
 		global $wp_rewrite;
@@ -156,6 +166,7 @@ class evangelical_magazine {
 	/**
 	* Registers the custom post types
 	*
+	* @return void
 	*/
 	static function register_custom_post_types() {
 		//Sections
@@ -229,6 +240,8 @@ class evangelical_magazine {
 
 	/**
 	* Sets up the actions and filters required to add custom columns to the Edit Articles page
+	*
+	* @return void
 	*/
 	public static function setup_custom_post_type_columns() {
 		add_filter ('manage_edit-em_article_columns', array ('evangelical_magazine_article', 'filter_columns'));
@@ -236,9 +249,9 @@ class evangelical_magazine {
 		add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_article', 'make_columns_sortable'));
 		add_action ('pre_get_posts', array ('evangelical_magazine_article', 'sort_by_columns'));
 		add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
-		add_filter ('post_row_actions', array (__CLASS__, 'filter_post_row_actions'), 10, 2);
-		if (isset($_GET['recalc_fb']) && is_admin()) {
-			$post_id = (int)$_GET['recalc_fb'];
+		add_filter ('post_row_actions', array (__CLASS__, 'adds_recalc_views_to_article_actions'), 10, 2);
+		if (isset($_GET['recalc_views']) && is_admin()) {
+			$post_id = (int)$_GET['recalc_views'];
 			$transient_name = "em_fb_valid_{$post_id}";
 			delete_transient($transient_name);
 		}
@@ -247,7 +260,8 @@ class evangelical_magazine {
 	/**
 	* Makes sure all the additional metabox data is saved.
 	*
-	* @param integer $post_id
+	* @param integer $post_id - the current post_id
+	* @return void
 	*/
 	public static function save_cpt_data ($post_id) {
 		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -282,6 +296,7 @@ class evangelical_magazine {
 	/**
 	* Removes unwanted admin menus
 	*
+	* @return void
 	*/
 	public static function remove_admin_menus() {
 		remove_menu_page ('edit.php');
@@ -291,8 +306,8 @@ class evangelical_magazine {
 	/**
 	* Returns the appropriate object when all we know is the ID
 	*
-	* @param int $id
-	* @return mixed
+	* @param int $id - the post_id
+	* @return mixed - the object with that id
 	*/
 	public static function get_object_from_id($id) {
 		$post = get_post($id);
@@ -302,12 +317,12 @@ class evangelical_magazine {
 	/**
 	* Converts a WP_Post object to the correct magazine object
 	*
-	* @param WP_Post $post
-	* @return mixed
+	* @param WP_Post $post - a post object
+	* @return mixed - an evangelical_magazine_ object, or false if the post_id if not
 	*/
 	public static function get_object_from_post($post) {
 		if (is_a($post, 'WP_Post')) {
-			if (substr ($post->post_type,0,3) == 'em_') {
+			if (substr ($post->post_type, 0, 3) == 'em_') {
 				$class_name = 'evangelical_magazine_'.substr($post->post_type, 3);
 				return new $class_name ($post);
 			}
@@ -321,7 +336,7 @@ class evangelical_magazine {
 	* Useful for creating slugs for magazine issues (e.g. 'September/October')
 	* Filters sanitize_title.
 	*
-	* @param string $title
+	* @param string $title - the title of this post
 	* @param string $raw_title
 	* @param string $context
 	* @return string
@@ -333,6 +348,7 @@ class evangelical_magazine {
 	/**
 	* Adds styling to the admin head.
 	*
+	* @return void
 	*/
 	public static function add_styles_to_admin_head () {
 		echo '<style type="text/css">.column-title {width: 30%}</style>';
@@ -340,8 +356,9 @@ class evangelical_magazine {
 
 	/**
 	* Outputs the mediaRSS namespace to the RSS feeds
-	*
 	* Called on the rss2_ns and atom_ns actions
+	*
+	* @return void
 	*/
 	public static function add_mediarss_namespace() {
 		echo "xmlns:media=\"http://search.yahoo.com/mrss/\"\r\n";
@@ -349,8 +366,9 @@ class evangelical_magazine {
 
 	/**
 	* Adds the featured image to the RSS feeds
-	*
 	* Adds both a media:content and enclosure
+	*
+	* @return void
 	*/
 	public static function add_featured_image_to_rss () {
 		global $post;
@@ -369,8 +387,8 @@ class evangelical_magazine {
 	* Replaces the post author with the actual author(s) of the article.
 	* Filters the_author
 	*
-	* @param string $display_name
-	* @return string
+	* @param string $display_name - the display name of the author
+	* @return string - the new display name
 	*/
 	public static function filter_author_name ($display_name) {
 		global $post;
@@ -386,33 +404,31 @@ class evangelical_magazine {
 	}
 
 	/**
-	* Adds the 'recalc_fb' row action to articles
-	*
+	* Adds the 'recalc_views' row action to articles
 	* Filters post_row_actions
 	*
-	* @param array $actions
-	* @param WP_Post $post
-	* @return array
+	* @param array $actions - the existing actions
+	* @param WP_Post $post - the current post
+	* @return array - the filtered actions
 	*/
-	public static function filter_post_row_actions ($actions, $post) {
+	public static function adds_recalc_views_to_article_actions ($actions, $post) {
 		global $current_screen;
 		if ($post->post_type == 'em_article') {
 			$possible_variables = array ('paged', 'orderby', 'order', 'author', 'all_posts', 'post_status');
-			$arguments = array('recalc_fb' => $post->ID);
+			$arguments = array('recalc_views' => $post->ID);
 			foreach ($possible_variables as $p) {
 				if (isset($_GET[$p])) {
 					$arguments[$p] = $_GET[$p];
 				}
 			}
 			$url = esc_url(add_query_arg ($arguments, admin_url ($current_screen->parent_file)));
-			$actions ['recalc_fb'] = "<a href=\"{$url}\">Recalc FB</a>";
+			$actions ['recalc_views'] = "<a href=\"{$url}\">Recalc views</a>";
 		}
 		return $actions;
 	}
 
 	/**
 	* Enables an "?output=excerpt" parameter on the main feed, so it's possible to have both a full RSS feed and a excerpted one.
-	*
 	* The resulting feed is fed to MailChimp.
 	*
 	* @param string $content
@@ -451,6 +467,7 @@ class evangelical_magazine {
 	* Updates the Facebook stats for multiple objects in one request
 	*
 	* @param array $ids - an array of post ids or valid evangelical_magazine_* objects
+	* @return void
 	*/
 	public function update_facebook_stats_if_required ($ids) {
 		$chunks = array_chunk ($ids, 50);
@@ -495,6 +512,7 @@ class evangelical_magazine {
 	* Updates the Google Analytics stats for multiple objects in one request
 	*
 	* @param array $ids - an array of post ids or valid evangelical_magazine_* objects
+	* @return void
 	*/
 	public function update_google_analytics_stats_if_required ($ids) {
 		$urls = $objects = $index = array();
@@ -502,9 +520,7 @@ class evangelical_magazine {
 			if (gettype ($id) == 'object') {
 				$objects[$id->get_id()] = $id;
 			} else {
-				/**
-				* @var evangelical_magazine_article[]
-				*/
+				/**	@var evangelical_magazine_article[]	*/
 				$objects[$id] = SELF::get_object_from_id($id);
 			}
 		}
@@ -526,6 +542,12 @@ class evangelical_magazine {
 		}
 	}
 
+	/**
+	* Updates all Facebook and Google Analytics stats that are out of date
+	*
+	* @param int[]|evangelical_magazine_article[] $ids - an array of post ids or valid evangelical_magazine_article objects
+	* @return void
+	*/
 	public function update_all_stats_if_required ($ids) {
 		$this->update_facebook_stats_if_required($ids);
 		if ($this->use_google_analytics) {
@@ -533,6 +555,13 @@ class evangelical_magazine {
 		}
 	}
 
+	/**
+	* Updates all Facebook and Google Analytics stats that are out of date
+	* Can be called statically.
+	*
+	* @param int[]|evangelical_magazine_article[] $ids - an array of post ids or valid evangelical_magazine_article objects
+	* @return void
+	*/
 	public static function update_all_stats_for_articles_static() {
 		global $evangelical_magazine;
 		$all_articles = evangelical_magazine_article::get_all_articles(array('post_status' => 'publish'));

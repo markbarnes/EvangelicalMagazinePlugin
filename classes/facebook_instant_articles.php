@@ -12,6 +12,8 @@ class evangelical_magazine_facebook_instant_articles {
 
 	/**
 	* Adds all the actions and filters required for Facebook Instant Articles
+	*
+	* @return void
 	*/
 	public function __construct() {
 		add_filter ('instant_articles_post_types', create_function('', 'return array ("em_article");'));
@@ -21,9 +23,11 @@ class evangelical_magazine_facebook_instant_articles {
 
 	/**
 	* Filters the author name for instant articles
+	* Filters instant_articles_authors
 	*
-	* @param object $author
-	* @return object
+	* @param stdClass[] $authors - an array of author information
+	* @param post_id - the post_id of the current article
+	* @return stdClass[]
 	*/
 	public static function replace_author_names ($authors, $post_id) {
 		/** @var evangelical_magazine_article */
@@ -34,6 +38,14 @@ class evangelical_magazine_facebook_instant_articles {
 		return $authors;
 	}
 
+	/**
+	* Adds the author description to the bottom of instant articles
+	* Filters instant_articles_content
+	*
+	* @param string $content	The content of the article
+	* @param int $post_id		The post id
+	* @return string
+	*/
 	public static function add_author_descriptions_to_content ($content, $post_id) {
 		/** @var evangelical_magazine_article */
 		$object = evangelical_magazine::get_object_from_id($post_id);
@@ -48,6 +60,5 @@ class evangelical_magazine_facebook_instant_articles {
 			}
 		}
 		return $content;
-
 	}
 }

@@ -9,9 +9,25 @@
 class evangelical_magazine_author extends evangelical_magazine_not_articles {
 
 	/**
-	* Returns the post content of an author post
+	* Returns the name of the author
 	*
-	* @param boolean $link_name
+	* @param bool $link - whether to add a HTML link to the author around the name
+	* @param bool $schema - whether to add schema.org microdata
+	* @param bool $edit_link - whether to add a HTML link to edit the author around the name (overrides other options)
+	* @return string
+	*/
+	public function get_name($link = false, $schema = false, $edit_link = false) {
+		$name = parent::get_name($link, $schema, $edit_link);
+		if ($schema) {
+			$name = $this->html_tag('span', $name, array('itemprop' => 'author', 'itemtype' => 'http://schema.org/Person', 'itemscope' => true));
+		}
+		return $name;
+	}
+
+	/**
+	* Returns the description of the author
+	*
+	* @param boolean $link_name - whether to add a HTML link to the authors' name, if that is included in the description
 	* @return string
 	*/
 	public function get_description($link_name = true) {
@@ -35,9 +51,8 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
 	/**
 	* Returns all articles by this author
 	*
-	* @param integer $limit
-	* @param integer[] $exclude_article_ids
-	* @return evangelical_magazine_article[]
+	* @param array $args - WP_Query arguments
+	* @return null|evangelical_magazine_article[]
 	*/
 	public function _get_articles ($args = array()) {
 		$meta_query = array(array('key' => self::AUTHOR_META_NAME, 'value' => $this->get_id()));
@@ -48,8 +63,8 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
 	/**
 	* Returns an array of article IDs for all articles from an author, ordered by date
 	*
-	* @param array $args
-	* @return integer[]
+	* @param array $args - WP_Query arguments
+	* @return null|integer[]
 	*/
 	public function get_article_ids($args = array()) {
 		$meta_query = array(array('key' => self::AUTHOR_META_NAME, 'value' => $this->get_id()));
@@ -60,8 +75,8 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
 	/**
 	* Returns an array of all the author objects
 	*
-	* @param array $args
-	* @return evangelical_magazine_author[]
+	* @param array $args - WP_Query arguments
+	* @return null|evangelical_magazine_author[]
 	*/
 	public static function get_all_authors($args = array()) {
 		$default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
@@ -71,8 +86,8 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
 	/**
 	* Returns an array of all the author ids
 	*
-	* @param array $args
-	* @return integer[]
+	* @param array $args - WP_Query arguments
+	* @return null|integer[]
 	*/
 	public static function get_all_author_ids($args = array()) {
 		$default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
@@ -82,8 +97,8 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
 	/**
 	* Returns an array of authors, sorted by popularity
 	*
-	* @param integer $limit
-	* @return evangelical_magazine_author[]
+	* @param int $limit - the maximum number of authors to return
+	* @return null|evangelical_magazine_author[]
 	*/
 	public static function get_top_authors ($limit = -1) {
 		global $wpdb;
@@ -107,8 +122,8 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
 			foreach ($author_ids as $id) {
 				$authors[] = new evangelical_magazine_author($id);
 			}
+			return $authors;
 		}
-		return $authors;
 	}
 
 	/**
@@ -127,7 +142,8 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles {
 	/**
 	* Sorts an array of authors into alphabetical order (by first name)
 	*
-	* @param mixed $authors
+	* @param evangelical_magazine_author[] $authors
+	* @return evangelical_magazine_author[]
 	*/
 	public static function sort_authors_alphabetically(&$authors) {
 		uasort($authors, array(__CLASS__, '_compare_authors_alphabetically'));
