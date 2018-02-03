@@ -497,7 +497,7 @@ class evangelical_magazine {
 				$index[wp_parse_url($url, PHP_URL_PATH)] = $object->get_id();
 			}
 		}
-		if ($all_urls) {
+		if (isset($all_urls) && $all_urls) {
 			$chunks = array_chunk ($all_urls, 10);
 			foreach ($chunks as $chunked_urls) {
 				$stats = $this->analytics->get_page_views($chunked_urls);
