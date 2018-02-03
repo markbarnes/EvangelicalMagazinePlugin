@@ -244,16 +244,22 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public static function setup_custom_post_type_columns() {
+		global $evangelical_magazine;
 		add_filter ('manage_edit-em_article_columns', array ('evangelical_magazine_article', 'filter_columns'));
 		add_action ('manage_em_article_posts_custom_column', array ('evangelical_magazine_article', 'output_columns'), 10, 2);
 		add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_article', 'make_columns_sortable'));
 		add_action ('pre_get_posts', array ('evangelical_magazine_article', 'sort_by_columns'));
 		add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
-		add_filter ('post_row_actions', array (__CLASS__, 'adds_recalc_views_to_article_actions'), 10, 2);
-		if (isset($_GET['recalc_views']) && is_admin()) {
-			$post_id = (int)$_GET['recalc_views'];
-			$transient_name = "em_fb_valid_{$post_id}";
-			delete_transient($transient_name);
+		add_filter ('post_row_actions', array (__CLASS__, 'adds_recalc_stats_to_article_actions'), 10, 2);
+		if (isset($_GET['recalc_stats']) && is_admin()) {
+			$article = new evangelical_magazine_article((int)$_GET['recalc_stats']);
+			if ($article) {
+				delete_transient($article->get_facebook_transient_name());
+				if ($evangelical_magazine->use_google_analytics) {
+					delete_transient($article->get_google_analytics_transient_name());
+				}
+				$evangelical_magazine->update_all_stats_if_required ($article->get_id());
+			}
 		}
 	}
 
@@ -404,25 +410,25 @@ class evangelical_magazine {
 	}
 
 	/**
-	* Adds the 'recalc_views' row action to articles
+	* Adds the 'recalc_stats' row action to articles
 	* Filters post_row_actions
 	*
 	* @param array $actions - the existing actions
 	* @param WP_Post $post - the current post
 	* @return array - the filtered actions
 	*/
-	public static function adds_recalc_views_to_article_actions ($actions, $post) {
+	public static function adds_recalc_stats_to_article_actions ($actions, $post) {
 		global $current_screen;
 		if ($post->post_type == 'em_article') {
 			$possible_variables = array ('paged', 'orderby', 'order', 'author', 'all_posts', 'post_status');
-			$arguments = array('recalc_views' => $post->ID);
+			$arguments = array('recalc_stats' => $post->ID);
 			foreach ($possible_variables as $p) {
 				if (isset($_GET[$p])) {
 					$arguments[$p] = $_GET[$p];
 				}
 			}
 			$url = esc_url(add_query_arg ($arguments, admin_url ($current_screen->parent_file)));
-			$actions ['recalc_views'] = "<a href=\"{$url}\">Recalc views</a>";
+			$actions ['recalc_stats'] = "<a href=\"{$url}\">Recalc stats</a>";
 		}
 		return $actions;
 	}
@@ -549,6 +555,9 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public function update_all_stats_if_required ($ids) {
+		if (!is_array($ids)) {
+			$ids = (array)$ids;
+		}
 		$this->update_facebook_stats_if_required($ids);
 		if ($this->use_google_analytics) {
 			$this->update_google_analytics_stats_if_required($ids);
