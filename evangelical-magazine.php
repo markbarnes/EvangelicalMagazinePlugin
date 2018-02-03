@@ -22,8 +22,9 @@ class evangelical_magazine {
 		//Make sure classes autoload
 		spl_autoload_register(array(__CLASS__, 'autoload_classes'));
 
-		// Register activation hook
+		// Register activation/deactivation hooks
 		register_activation_hook (__FILE__, array(__CLASS__, 'on_activation'));
+		register_deactivation_hook ( __FILE__, array(__CLASS__, 'on_deactivation'));
 
 		// Add main actions
 		add_action ('evangelical_magazine_activate', array(__CLASS__, 'flush_rewrite_rules'));
@@ -36,6 +37,12 @@ class evangelical_magazine {
 		add_action ('atom_ns', array(__CLASS__, 'add_mediarss_namespace'));
 		add_action ('rss2_item', array(__CLASS__, 'add_featured_image_to_rss'));
 		add_action ('atom_entry', array(__CLASS__, 'add_featured_image_to_rss'));
+
+		//Configure WP Cron
+		add_action ('evangelical_magazine_cron', array (__CLASS__, 'update_all_stats_for_articles_static'));
+		if (!wp_next_scheduled('evangelical_magazine_cron')) {
+			wp_schedule_event (time(), 'twicedaily', 'evangelical_magazine_cron');
+		}
 
 		//Add filters
 		add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
@@ -53,12 +60,24 @@ class evangelical_magazine {
 	}
 
 	/**
-	* Runs when plugin is activated. Setup in this way so it can be extended through actions.
+	* Runs when plugin is activated. Can be extended through actions.
 	*
 	*/
 	public static function on_activation() {
 		do_action ('evangelical_magazine_activate');
 		add_role ('subs-admin', 'Subscriptions administrator', array ('gravityforms_view_entries' => true, 'gravityforms_edit_entries' => true, 'gravityforms_delete_entries' => true, 'gravityforms_export_entries' => true, 'gravityforms_view_entry_notes' => true, 'gravityforms_edit_entry_notes' => true, 'gravityforms_preview_forms' => true));
+	}
+
+	/**
+	* Runs when plugin is deactivated. Can be extended through actions.
+	*
+	*/
+	public static function on_deactivation() {
+		do_action ('evangelical_magazine_deactivate');
+		remove_role ('subs-admin');
+		if ($next_cron_time = wp_next_scheduled ('evangelical_magazine_cron')) {
+			wp_unschedule_event($next_cron_time, 'evangelical_magazine_cron');
+		};
 	}
 
 	/**
@@ -215,7 +234,7 @@ class evangelical_magazine {
 		add_filter ('manage_edit-em_article_columns', array ('evangelical_magazine_article', 'filter_columns'));
 		add_action ('manage_em_article_posts_custom_column', array ('evangelical_magazine_article', 'output_columns'), 10, 2);
 		add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_article', 'make_columns_sortable'));
-		add_action ('current_screen', array ('evangelical_magazine_article', 'update_all_stats_for_articles'));
+		add_action ('current_screen', array ('evangelical_magazine_article', 'update_all_stats_for_articles_static'));
 		add_action ('pre_get_posts', array ('evangelical_magazine_article', 'sort_by_columns'));
 		add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
 		add_filter ('post_row_actions', array (__CLASS__, 'filter_post_row_actions'), 10, 2);
@@ -513,6 +532,12 @@ class evangelical_magazine {
 		if ($this->use_google_analytics) {
 			$this->update_google_analytics_stats_if_required($ids);
 		}
+	}
+
+	public static function update_all_stats_for_articles_static() {
+		global $evangelical_magazine;
+		$all_articles = evangelical_magazine_article::get_all_articles(array('post_status' => 'publish'));
+		$evangelical_magazine->update_all_stats_if_required($all_articles);
 	}
 }
 
