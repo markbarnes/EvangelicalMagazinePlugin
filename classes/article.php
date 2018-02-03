@@ -806,13 +806,4 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 			}
 		}
 	}
-
-	/**
-	* Update Facebook and Google Analytics stats for all articles, as required
-	*/
-	public function update_all_stats_for_articles() {
-		global $evangelical_magazine;
-		$articles = self::get_all_articles();
-		$evangelical_magazine->update_all_stats_if_required($articles);
-	}
 }
