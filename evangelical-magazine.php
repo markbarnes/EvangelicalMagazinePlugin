@@ -234,7 +234,6 @@ class evangelical_magazine {
 		add_filter ('manage_edit-em_article_columns', array ('evangelical_magazine_article', 'filter_columns'));
 		add_action ('manage_em_article_posts_custom_column', array ('evangelical_magazine_article', 'output_columns'), 10, 2);
 		add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_article', 'make_columns_sortable'));
-		add_action ('current_screen', array (__CLASS__, 'update_all_stats_for_articles_static'));
 		add_action ('pre_get_posts', array ('evangelical_magazine_article', 'sort_by_columns'));
 		add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
 		add_filter ('post_row_actions', array (__CLASS__, 'filter_post_row_actions'), 10, 2);
