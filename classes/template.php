@@ -498,6 +498,7 @@ abstract class evangelical_magazine_template {
 	public function update_facebook_stats($engagement_count) {
 		update_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, $engagement_count);
 		$secs_since_published = time() - strtotime($this->get_post_date());
+		$secs_since_published = $secs_since_published < 3600 ? 3600 : $secs_since_published;
 		set_transient ($this->get_facebook_transient_name(), true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
 	}
 
@@ -545,6 +546,7 @@ abstract class evangelical_magazine_template {
 	public function update_google_analytics_stats($page_views) {
 		update_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, $page_views);
 		$secs_since_published = time() - strtotime($this->get_post_date());
+		$secs_since_published = $secs_since_published < 3600 ? 3600 : $secs_since_published;
 		set_transient ($this->get_google_analytics_transient_name(), true, $secs_since_published > 604800 ? 604800 : $secs_since_published);
 	}
 
