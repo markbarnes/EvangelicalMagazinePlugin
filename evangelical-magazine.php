@@ -480,6 +480,7 @@ class evangelical_magazine {
 			$requests = $objects = array();
 			foreach ($chunk as $id) {
 				if (gettype ($id) == 'object') {
+					/** @var evangelical_magazine_article[] $objects */
 					$objects[] = $id;
 				} else {
 					$objects[] = SELF::get_object_from_id($id);
