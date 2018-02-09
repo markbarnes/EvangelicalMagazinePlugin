@@ -467,12 +467,16 @@ class evangelical_magazine_article extends evangelical_magazine_template {
 	*
 	* @param int $limit - the maximum number of articles to return
 	* @param bool $exclude_this_article - true if the present article should be excluded
-	* @return evangelical_magazine_article[]
+	* @return bool|evangelical_magazine_article[] - returns false if the article is not in a series
 	*/
 	public function get_articles_in_same_series($limit = 99, $exclude_this_article = false) {
 		$series = $this->get_series();
-		$exclude_ids = $exclude_this_article ? (array)$this->get_id() : array();
-		return $series->get_articles($limit, $exclude_ids);
+		if ($series) {
+			$exclude_ids = $exclude_this_article ? (array)$this->get_id() : array();
+			return $series->get_articles($limit, $exclude_ids);
+		} else {
+			return false;
+		}
 	}
 
 	/**
