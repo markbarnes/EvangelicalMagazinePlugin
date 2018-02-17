@@ -37,6 +37,7 @@ class evangelical_magazine {
 		add_action ('atom_ns', array(__CLASS__, 'add_mediarss_namespace'));
 		add_action ('rss2_item', array(__CLASS__, 'add_featured_image_to_rss'));
 		add_action ('atom_entry', array(__CLASS__, 'add_featured_image_to_rss'));
+		add_action ('admin_bar_menu', array(__CLASS__, 'add_toolbar_items'), 40);
 
 		//Configure WP Cron
 		add_action ('evangelical_magazine_cron', array (__CLASS__, 'update_all_stats_for_articles_static'));
@@ -576,6 +577,51 @@ class evangelical_magazine {
 		global $evangelical_magazine;
 		$all_articles = evangelical_magazine_article::get_all_articles(array('post_status' => 'publish'));
 		$evangelical_magazine->update_all_stats_if_required($all_articles);
+	}
+
+	/**
+	* Adds quick access to the custom post types from the front-end toolbar
+	*
+	* @param WP_Admin_Bar $admin_bar
+	* @return void
+	*/
+	public static function add_toolbar_items($admin_bar) {
+		if (!is_admin()) {
+			$args = array(
+				'id'    => 'em',
+				'parent' => 'site-name',
+				'href'  => admin_url('edit.php?post_type=em_issue')
+			);
+			$admin_bar->add_group ($args);
+			$args = array(
+				'id'    => 'em_issues',
+				'title' => 'Issues',
+				'parent' => 'em',
+				'href'  => admin_url('edit.php?post_type=em_issue')
+			);
+			$admin_bar->add_node ($args);
+			$args = array(
+				'id'    => 'em_series',
+				'title' => 'Series',
+				'parent' => 'em',
+				'href'  => admin_url('edit.php?post_type=em_series')
+			);
+			$admin_bar->add_node ($args);
+			$args = array(
+				'id'    => 'em_authors',
+				'title' => 'Authors',
+				'parent' => 'em',
+				'href'  => admin_url('edit.php?post_type=em_author')
+			);
+			$admin_bar->add_node ($args);
+			$args = array(
+				'id'    => 'em_articles',
+				'title' => 'Articles',
+				'parent' => 'em',
+				'href'  => admin_url('edit.php?post_type=em_article')
+			);
+			$admin_bar->add_node ($args);
+		}
 	}
 }
 
