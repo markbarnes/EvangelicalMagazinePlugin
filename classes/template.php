@@ -22,6 +22,10 @@ abstract class evangelical_magazine_template {
 	const ISSUE_DATE_META_NAME = 'evangelical_magazine_issue_date';
 	const FB_ENGAGEMENT_META_NAME = 'evangelical_magazine_fb_engagement';
 	const GOOGLE_ANALYTICS_META_NAME = 'evangelical_magazine_google_analytics';
+	const REVIEW_PRICE_META_NAME = 'evangelical_magazine_price';
+	const REVIEW_PUBLISHER_META_NAME = 'evangelical_magazine_publisher';
+	const REVIEW_CREATOR_META_NAME = 'evangelical_magazine_creator';
+	const REVIEW_PURCHASE_URL_META_NAME = 'evangelical_magazine_purchase_url';
 
 	/**
 	* @var WP_Post $post_data - All the custom posttype data is stored in $post_data as a WP_Post object

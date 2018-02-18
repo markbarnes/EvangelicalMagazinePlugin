@@ -6,7 +6,7 @@
 * @author Mark Barnes
 * @access public
 */
-class evangelical_magazine_section extends evangelical_magazine_not_articles {
+class evangelical_magazine_section extends evangelical_magazine_not_articles_or_reviews {
 
 	/**
 	* Returns all the articles in the series

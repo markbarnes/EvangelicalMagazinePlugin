@@ -9,7 +9,7 @@
 * @author Mark Barnes
 * @access public
 */
-abstract class evangelical_magazine_not_articles extends evangelical_magazine_template {
+abstract class evangelical_magazine_not_articles_or_reviews extends evangelical_magazine_template {
 
 	/**
 	* Helper function to gets the post popular articles in an object

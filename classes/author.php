@@ -6,7 +6,7 @@
 * @author Mark Barnes
 * @access public
 */
-class evangelical_magazine_author extends evangelical_magazine_not_articles {
+class evangelical_magazine_author extends evangelical_magazine_not_articles_or_reviews {
 
 	/**
 	* Returns the name of the author

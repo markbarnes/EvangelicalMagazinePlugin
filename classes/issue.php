@@ -6,7 +6,7 @@
 * @author Mark Barnes
 * @access public
 */
-class evangelical_magazine_issue extends evangelical_magazine_not_articles {
+class evangelical_magazine_issue extends evangelical_magazine_not_articles_or_reviews {
 
 	/** @var int - the earliest year for which it is possible for an issue to exist */
 	const EARLIEST_YEAR = 2010;
