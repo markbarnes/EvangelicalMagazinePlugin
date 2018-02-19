@@ -22,6 +22,7 @@ abstract class evangelical_magazine_template {
 	const ISSUE_DATE_META_NAME = 'evangelical_magazine_issue_date';
 	const FB_ENGAGEMENT_META_NAME = 'evangelical_magazine_fb_engagement';
 	const GOOGLE_ANALYTICS_META_NAME = 'evangelical_magazine_google_analytics';
+	const REVIEW_SORT_ORDER_META_NAME = 'evangelical_magazine_review_sort_order';
 	const REVIEW_PRICE_META_NAME = 'evangelical_magazine_price';
 	const REVIEW_PUBLISHER_META_NAME = 'evangelical_magazine_publisher';
 	const REVIEW_CREATOR_META_NAME = 'evangelical_magazine_creator';
@@ -373,6 +374,19 @@ abstract class evangelical_magazine_template {
 			}
 			return $post_ids;
 		}
+	}
+
+	/**
+	* Helper function to help subclasses return all the section object_ids from a WP_Query
+	*
+	* Wrapper for _get_object_ids_from_query()
+	*
+	* @param array $args - WP_Query arguments
+	* @return null|int[]
+	*/
+	protected static function _get_section_ids_from_query ($args) {
+		$default_args ['post_type'] = 'em_section';
+		return self::_get_object_ids_from_query($args, $default_args);
 	}
 
 	/**

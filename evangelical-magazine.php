@@ -33,6 +33,7 @@ class evangelical_magazine {
 		add_action ('admin_init', array (__CLASS__, 'setup_custom_post_type_columns'));
 		add_action ('save_post', array(__CLASS__, 'save_cpt_data'));
 		add_action ('admin_menu', array(__CLASS__, 'remove_admin_menus'));
+		add_action ('admin_menu', array(__CLASS__, 'add_admin_menu_separator'));
 		add_action ('rss2_ns', array(__CLASS__, 'add_mediarss_namespace'));
 		add_action ('atom_ns', array(__CLASS__, 'add_mediarss_namespace'));
 		add_action ('rss2_item', array(__CLASS__, 'add_featured_image_to_rss'));
@@ -49,6 +50,7 @@ class evangelical_magazine {
 		add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
 		add_filter ('the_author', array (__CLASS__, 'filter_author_name'));
 		add_filter ('the_content_feed', array (__CLASS__, 'filter_feed_for_mailchimp'));
+		add_filter ('enter_title_here', array ('evangelical_magazine_review', 'filter_title_placeholder'));
 
 		//Image sizes
 		add_image_size ('article_rss', 560, 373, true);
@@ -164,7 +166,35 @@ class evangelical_magazine {
 	}
 
 	/**
-	* Registers the custom post types
+	* Generates an array of labels for custom taxonomies
+	*
+	* @param string $plural - the plural form of the word used in the labels
+	* @param string $singular - the singular form of the word used in the labels
+	* @return array - the label array
+	*/
+	static function generate_taxonomy_label ($plural, $singular) {
+		$plural_l = strtolower($plural);
+		return array( 'name' => $plural,
+		              'singular_name' => $singular,
+		              'all_items' => "All {$plural}",
+		              'edit_item' => "Edit {$singular}",
+		              'view_item' => "View {$singular}",
+		              'update_item' => "Update {$singular}",
+		              'add_new_item' => "Add New {$singular}",
+		              'new_item_name' => "New {$singular} Name",
+		              'parent_item' => "Parent {$singular}",
+		              'parent_item_colon' => "Parent {$singular}:",
+		              'search_items' => "Search {$plural}",
+		              'popular_items' => "Popular {$plural}",
+		              'separate_items_with_commas' => "Separate {$plural_l} with commas",
+		              'add_or_remove_items' => "Add or remove {$plural_l}",
+		              'choose_from_most_used' => "Choose from the most used {$plural_l}",
+		              'not_found' => "No {$plural_l} found."
+					  );
+	}
+
+	/**
+	* Registers the custom post types and taxonomies
 	*
 	* @return void
 	*/
@@ -176,7 +206,7 @@ class evangelical_magazine {
 						'public' => true,
 						'show_in_menu' => true,
 						'exclude_from_search' => true,
-						'menu_position' => 4,
+						'menu_position' => 30,
 						'menu_icon' => 'dashicons-portfolio',
 						'supports' => array ('title', 'editor'),
 						'has_archive' => true,
@@ -189,7 +219,7 @@ class evangelical_magazine {
 						'description' => 'Information about each issue is stored here',
 						'public' => true,
 						'show_in_menu' => true,
-						'menu_position' => 5,
+						'menu_position' => 31,
 						'menu_icon' => 'dashicons-id-alt',
 						'supports' => array ('title', 'thumbnail', 'editor'),
 						'has_archive' => true,
@@ -204,7 +234,7 @@ class evangelical_magazine {
 						'public' => true,
 						'show_ui' => true,
 						'show_in_menu' => true,
-						'menu_position' => 6,
+						'menu_position' => 32,
 						'menu_icon' => 'dashicons-index-card',
 						'supports' => array ('title', 'thumbnail', 'editor'),
 						'has_archive' => false,
@@ -216,7 +246,7 @@ class evangelical_magazine {
 						'description' => 'Information about each author is stored here',
 						'public' => true,
 						'show_in_menu' => true,
-						'menu_position' => 7,
+						'menu_position' => 33,
 						'menu_icon' => 'dashicons-admin-users',
 						'supports' => array ('title', 'thumbnail', 'editor'),
 						'has_archive' => true,
@@ -229,7 +259,7 @@ class evangelical_magazine {
 						'description' => 'Information about each article is stored here',
 						'public' => true,
 						'show_in_menu' => true,
-						'menu_position' => 8,
+						'menu_position' => 34,
 						'menu_icon' => 'dashicons-media-text',
 						'supports' => array ('title', 'thumbnail', 'editor'),
 						'has_archive' => true,
@@ -237,6 +267,31 @@ class evangelical_magazine {
 						'register_meta_box_cb' => array ('evangelical_magazine_article', 'article_meta_boxes'),
 						'rewrite' => array('slug' => 'article', 'with_front' => false));
 		register_post_type ('em_article', $args);
+		//Reviews
+		$args = array ( 'label' => 'Reviews',
+						'labels' => self::generate_post_label ('Reviews', 'Review'),
+						'description' => 'Information about each review is stored here',
+						'public' => true,
+						'show_in_menu' => true,
+						'menu_position' => 35,
+						'menu_icon' => 'dashicons-awards',
+						'supports' => array ('title', 'thumbnail', 'editor'),
+						'has_archive' => true,
+						'query_var' => 'reviews',
+						'register_meta_box_cb' => array ('evangelical_magazine_review', 'review_meta_boxes'),
+						'rewrite' => array('slug' => 'review', 'with_front' => false));
+		register_post_type ('em_review', $args);
+		//Taxonomies
+		$args = array (	'label' => 'Resource type',
+						'labels' => self::generate_taxonomy_label('Resource Types', 'Resource Type'),
+						'public' => true,
+						'show_in_menu' => true,
+						'show_tagcloud' => false,
+						'show_admin_column' => true,
+						'hierarchical' => true,
+						'rewrite' => array ('slug' => 'type', 'with_front' => false)
+						);
+		register_taxonomy ('em_review_resource_type', 'em_review', $args);
 	}
 
 	/**
@@ -283,6 +338,9 @@ class evangelical_magazine {
 		} elseif (isset($_POST['post_type']) && $_POST['post_type'] == 'em_issue') {
 			$issue = new evangelical_magazine_issue ($post_id);
 			$issue->save_meta_data();
+		} elseif (isset($_POST['post_type']) && $_POST['post_type'] == 'em_review') {
+			$review = new evangelical_magazine_review ($post_id);
+			$review->save_meta_data();
 		}
 	}
 
@@ -308,6 +366,27 @@ class evangelical_magazine {
 	public static function remove_admin_menus() {
 		remove_menu_page ('edit.php');
 		remove_menu_page ('edit-comments.php');
+	}
+
+	/**
+	* Adds an additional separator into the menu
+	* @see https://wordpress.stackexchange.com/questions/2666/add-a-separator-to-the-admin-menu
+	*
+	* @return void
+	*/
+	public static function add_admin_menu_separator() {
+		global $menu;
+		$position = 29;
+		$index = 0;
+		foreach($menu as $offset => $section) {
+			if (substr($section[2],0,9)=='separator')
+				$index++;
+			if ($offset>=$position) {
+		    	$menu[$position] = array('','read',"separator{$index}",'','wp-menu-separator');
+		    	break;
+		    }
+		}
+		ksort($menu);
 	}
 
 	/**
@@ -619,6 +698,13 @@ class evangelical_magazine {
 				'title' => 'Articles',
 				'parent' => 'em',
 				'href'  => admin_url('edit.php?post_type=em_article')
+			);
+			$admin_bar->add_node ($args);
+			$args = array(
+				'id'    => 'em_reviews',
+				'title' => 'Reviews',
+				'parent' => 'em',
+				'href'  => admin_url('edit.php?post_type=em_review')
 			);
 			$admin_bar->add_node ($args);
 		}

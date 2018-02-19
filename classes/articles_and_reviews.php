@@ -11,8 +11,9 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 	* @var evangelical_magazine_author[] $authors - an array of authors of this article
 	* @var evangelical_magazine_issue $issue - the issue this article is in
 	* @var int $page_num - the page number of this article
+	* @var evangelical_magazine_section[] $sections - an array of sections this article is in
 	*/
-	protected $authors, $issue, $page_num;
+	protected $authors, $issue, $page_num, $sections;
 
 	/**
 	* Returns the title of the article or review
@@ -138,6 +139,59 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 		}
 	}
 
+	/**
+	* Returns true if the article is in a section
+	*
+	* @return bool
+	*/
+	public function has_sections() {
+		return (bool)$this->sections;
+	}
+
+	/**
+	* Returns an array of sections objects for this article
+	*
+	* @return evangelical_magazine_section[]
+	*/
+	public function get_sections() {
+		return $this->sections;
+	}
+
+	/**
+	* Returns an array of section post IDs for this article
+	*
+	* @return integer[]
+	*/
+	public function get_section_ids() {
+		$section = get_post_meta ($this->get_id(), self::SECTION_META_NAME);
+		return (array)$section;
+	}
+
+	/**
+	* Returns the name the first section
+	*
+	* @return string
+	*/
+	public function get_section_name($link = false, $schema = false, $edit_link = false) {
+		if ($this->has_sections()) {
+			$sections = $this->get_sections();
+			return $sections[0]->get_name($link, $schema, $edit_link);
+		}
+	}
+
+	/**
+	* Populates $this->sections
+	*
+	* @return void
+	*/
+	protected function generate_sections_array() {
+		$section_ids = $this->get_section_ids();
+		if ($section_ids) {
+			foreach ($section_ids as $section_id) {
+				$this->sections[] = new evangelical_magazine_section($section_id);
+			}
+		}
+	}
 
 	/**
 	* Returns the URL of the featured image

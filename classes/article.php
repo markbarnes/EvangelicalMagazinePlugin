@@ -10,10 +10,9 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 
 	/**
 	* @var int $order_in_series - the order of this article within a series
-	* @var evangelical_magazine_section[] $sections - an array of sections this article is in
 	* @var evangelical_magazine_series $series - the series this article is in
 	*/
-	private $order_in_series, $sections, $series;
+	private $order_in_series, $series;
 
 	/**
 	* Instantiate the class by passing the WP_Post object or a post_id
@@ -106,60 +105,6 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 	*/
 	public function get_series_order() {
 		return $this->order_in_series;
-	}
-
-	/**
-	* Returns true if the article is in a section
-	*
-	* @return bool
-	*/
-	public function has_sections() {
-		return (bool)$this->sections;
-	}
-
-	/**
-	* Returns an array of sections objects for this article
-	*
-	* @return evangelical_magazine_section[]
-	*/
-	public function get_sections() {
-		return $this->sections;
-	}
-
-	/**
-	* Returns an array of section post IDs for this article
-	*
-	* @return integer[]
-	*/
-	public function get_section_ids() {
-		$section = get_post_meta ($this->get_id(), self::SECTION_META_NAME);
-		return (array)$section;
-	}
-
-	/**
-	* Returns the name the first section
-	*
-	* @return string
-	*/
-	public function get_section_name($link = false, $schema = false, $edit_link = false) {
-		if ($this->has_sections()) {
-			$sections = $this->get_sections();
-			return $sections[0]->get_name($link, $schema, $edit_link);
-		}
-	}
-
-	/**
-	* Populates $this->sections
-	*
-	* @return void
-	*/
-	private function generate_sections_array() {
-		$section_ids = $this->get_section_ids();
-		if ($section_ids) {
-			foreach ($section_ids as $section_id) {
-				$this->sections[] = new evangelical_magazine_section($section_id);
-			}
-		}
 	}
 
 	/**
