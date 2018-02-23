@@ -14,7 +14,7 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 	* @var string $publisher - the publisher of the item being reviewed
 	* @var string $purchase_url - a URL at which the item being reviewed can be purchased
 	*/
-	private $creator, $price, $publisher, $purchase_url;
+	private $creator, $media_type, $price, $publisher, $purchase_url;
 
 	/**
 	* Instantiate the class by passing the WP_Post object or a post_id
@@ -34,6 +34,7 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 			$this->issue = null;
 		}
 		$this->creator = get_post_meta($this->get_id(), self::REVIEW_CREATOR_META_NAME, true);
+		$this->media_type = get_the_terms ($this->get_id(), SELF::REVIEW_MEDIA_TYPE_TAXONOMY_NAME);;
 		$this->page_num = get_post_meta($this->get_id(), self::PAGE_NUM_META_NAME, true);
 		$this->price = get_post_meta($this->get_id(), self::REVIEW_PRICE_META_NAME, true);
 		$this->publisher = get_post_meta($this->get_id(), self::REVIEW_PUBLISHER_META_NAME, true);
@@ -42,20 +43,83 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 		$this->generate_authors_array();
 	}
 
-	public function get_creator() {
-		return $this->creator;
+	/**
+	* Returns the creator of the item being reviewed (e.g. author or artist)
+	*
+	* @param string $prefix - a string to be prepended to the creator
+	* @param string $suffix - a string to be appended to the creator
+	* @return string|void
+	*/
+	public function get_creator($prefix = '', $suffix = '') {
+		if ($this->creator) {
+			return $prefix.$this->creator.$suffix;
+		}
 	}
 
-	public function get_price() {
-		return $this->price;
+	/**
+	* Returns the price of the item being reviewed
+	*
+	* @param string $prefix - a string to be prepended to the price
+	* @param string $suffix - a string to be appended to the price
+	* @return string|void
+	*/
+	public function get_price($prefix = '', $suffix = '') {
+		if ($this->price) {
+			return $prefix.$this->price.$suffix;
+		}
 	}
 
-	public function get_publisher() {
-		return $this->publisher;
+	/**
+	* Returns the publisher of the item being reviewed
+	*
+	* @param string $prefix - a string to be prepended to the publisher
+	* @param string $suffix - a string to be appended to the publisher
+	* @return string|void
+	*/
+	public function get_publisher($prefix = '', $suffix = '') {
+		if ($this->publisher) {
+			return $prefix.$this->publisher.$suffix;
+		}
 	}
 
-	public function get_purchase_url() {
-		return $this->purchase_url;
+	/**
+	* Returns the purchase URL of the item being reviewed
+	*
+	* @param string $prefix - a string to be prepended to the purchase URL
+	* @param string $suffix - a string to be appended to the purchase URL
+	* @return string|void
+	*/
+	public function get_purchase_url($prefix = '', $suffix = '') {
+		if ($this->purchase_url) {
+			return $prefix.$this->purchase_url.$suffix;
+		}
+	}
+
+	/**
+	* Returns the media type of the item being reviewed
+	*
+	* @param string $prefix - a string to be prepended to the media type
+	* @param string $suffix - a string to be appended to the media type
+	* @return string|void
+	*/
+	public function get_media_type_name($prefix = '', $suffix = '') {
+		if ($this->media_type) {
+			return $prefix.$this->media_type[0]->name.$suffix;
+		}
+	}
+
+	/**
+	* Returns the creator type of them item being reviewed (e.g. author, artist, creator, etc.)
+	*
+	* return string
+	*/
+	public function get_creator_type() {
+		$mtn = $this->get_media_type_name();
+		switch (strtolower($mtn)) {
+			case 'book' : return 'Author';
+			case 'music' : return 'Artist';
+			default: return 'Creator';
+		}
 	}
 
 	/**

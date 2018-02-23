@@ -27,6 +27,7 @@ abstract class evangelical_magazine_template {
 	const REVIEW_PUBLISHER_META_NAME = 'evangelical_magazine_publisher';
 	const REVIEW_CREATOR_META_NAME = 'evangelical_magazine_creator';
 	const REVIEW_PURCHASE_URL_META_NAME = 'evangelical_magazine_purchase_url';
+	const REVIEW_MEDIA_TYPE_TAXONOMY_NAME = 'em_review_media_type';
 
 	/**
 	* @var WP_Post $post_data - All the custom posttype data is stored in $post_data as a WP_Post object
