@@ -282,8 +282,8 @@ class evangelical_magazine {
 						'rewrite' => array('slug' => 'review', 'with_front' => false));
 		register_post_type ('em_review', $args);
 		//Taxonomies
-		$args = array (	'label' => 'Resource type',
-						'labels' => self::generate_taxonomy_label('Resource Types', 'Resource Type'),
+		$args = array (	'label' => 'Media type',
+						'labels' => self::generate_taxonomy_label('Media Types', 'Media Type'),
 						'public' => true,
 						'show_in_menu' => true,
 						'show_tagcloud' => false,
@@ -291,7 +291,7 @@ class evangelical_magazine {
 						'hierarchical' => true,
 						'rewrite' => array ('slug' => 'type', 'with_front' => false)
 						);
-		register_taxonomy ('em_review_resource_type', 'em_review', $args);
+		register_taxonomy ('em_review_media_type', 'em_review', $args);
 	}
 
 	/**
