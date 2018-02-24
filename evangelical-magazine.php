@@ -30,6 +30,7 @@ class evangelical_magazine {
 		// Add main actions
 		add_action ('evangelical_magazine_activate', array(__CLASS__, 'flush_rewrite_rules'));
 		add_action ('init', array (__CLASS__, 'register_custom_post_types'));
+		add_action ('init', array (__CLASS__, 'add_mailchimp_rss_feed'));
 		add_action ('admin_init', array (__CLASS__, 'setup_custom_post_type_columns'));
 		add_action ('save_post', array(__CLASS__, 'save_cpt_data'));
 		add_action ('admin_menu', array(__CLASS__, 'remove_admin_menus'));
@@ -49,7 +50,6 @@ class evangelical_magazine {
 		//Add filters
 		add_filter ('sanitize_title', array(__CLASS__, 'pre_sanitize_title'), 9, 3);
 		add_filter ('the_author', array (__CLASS__, 'filter_author_name'));
-		add_filter ('the_content_feed', array (__CLASS__, 'filter_feed_for_mailchimp'));
 		add_filter ('enter_title_here', array ('evangelical_magazine_review', 'filter_title_placeholder'));
 		add_filter ('the_title', array ('evangelical_magazine_review', 'add_review_type_to_title'), 10, 2);
 
@@ -518,39 +518,35 @@ class evangelical_magazine {
 	}
 
 	/**
-	* Enables an "?output=excerpt" parameter on the main feed, so it's possible to have both a full RSS feed and a excerpted one.
-	* The resulting feed is fed to MailChimp.
+	* Filters the content of the Mailchimp feed to show an excerpt of 175 words
+	*
+	* Filters the_content_feed, but only when the feed query is set to 'mailchimp'
 	*
 	* @param string $content
 	* @return string
 	*/
 	public static function filter_feed_for_mailchimp ($content) {
-		global $post;
-		if (isset($_GET['output']) && $_GET['output']=='excerpt') {
-			$link = esc_url (get_permalink());
-			$content = strip_shortcodes ($content);
-			$content = apply_filters ('the_content', $content);
-			$content = str_replace(']]>', ']]&gt;', $content);
-			$content = strip_tags ($content, '<em>,<b>,<i>,<strong>,<br>,<p>,<ul>,<ol>,<li>,<h1>,<h2>,<h3>,<h4>,<h5>');
-			$max_words = 175;
-			$tokens = array();
-			preg_match_all('/(<[^>]+>|[^<>\s]+)\s*/u', $content, $tokens);
-			$output = '';
-			$count = 0;
-			foreach ($tokens[0] as $token) {
-				if ($count >= $max_words && preg_match('/[\,\;\?\.\!]\s*$/uS', $token)) {
-					$output .= trim($token);
-					break;
-				}
-				$count++;
-				$output .= $token;
+		$link = esc_url (get_permalink());
+		$content = strip_shortcodes ($content);
+		$content = apply_filters ('the_content', $content);
+		$content = str_replace(']]>', ']]&gt;', $content);
+		$content = strip_tags ($content, '<em>,<b>,<i>,<strong>,<br>,<p>,<ul>,<ol>,<li>,<h1>,<h2>,<h3>,<h4>,<h5>');
+		$max_words = 175;
+		$tokens = array();
+		preg_match_all('/(<[^>]+>|[^<>\s]+)\s*/u', $content, $tokens);
+		$output = '';
+		$count = 0;
+		foreach ($tokens[0] as $token) {
+			if ($count >= $max_words && preg_match('/[\,\;\?\.\!]\s*$/uS', $token)) {
+				$output .= trim($token);
+				break;
 			}
-			$output .= "&hellip; <a href=\"{$link}\">(continue reading)</a>";
-			$content = trim(force_balance_tags($output));
-			return $content;
-		} else {
-			return $content;
+			$count++;
+			$output .= $token;
 		}
+		$output .= "&hellip; <a href=\"{$link}\">(continue reading)</a>";
+		$content = trim(force_balance_tags($output));
+		return $content;
 	}
 
 	/**
@@ -718,9 +714,56 @@ class evangelical_magazine {
 		}
 	}
 
+	/**
+	* Adds the custom fields used for reviews to Relevanssi's index
+	*
+	* Filters relevanssi_index_custom_fields
+	*
+	* @param array $custom_fields - the existing fields to index
+	* @return array
+	*/
 	public static function add_custom_fields_to_relevanssi ($custom_fields) {
 		$fields_to_add = array (evangelical_magazine_review::REVIEW_CREATOR_META_NAME, evangelical_magazine_review::REVIEW_PUBLISHER_META_NAME);
 		return array_merge ((array)$custom_fields, $fields_to_add);
+	}
+
+	/**
+	* Adds the mailchimp RSS feed, and adds the action to filter the query for that feed
+	*
+	* Run on 'init'
+	*
+	* @return void
+	*/
+	public static function add_mailchimp_rss_feed() {
+		add_feed ('mailchimp', array (__CLASS__, 'generate_mailchimp_feed'));
+		add_action ('pre_get_posts', array (__CLASS__, 'modify_query_for_mailchimp_feed'));
+	}
+
+	/**
+	* Generates the mailchimp feed
+	*
+	* @uses wp-includes/feed-rss2.php
+	*
+	* @return void
+	*/
+	public static function generate_mailchimp_feed() {
+		include (WPINC.'/feed-rss2.php');
+		die();
+	}
+
+	/**
+	* Modifies the query for the mailchimp feed, and adds a filter for the content of the feed
+	*
+	* Runs on the pre_get_posts action.
+	*
+	* @param WP_Query $query - passed by reference
+	* @return void
+	*/
+	public static function modify_query_for_mailchimp_feed($query) {
+		if (is_feed() && isset ($query->query['feed']) && $query->query['feed'] == 'mailchimp') {
+			$query->query_vars['post_type'] = array ('em_article', 'em_review');
+			add_filter ('the_content_feed', array (__CLASS__, 'filter_feed_for_mailchimp'));
+		}
 	}
 }
 
