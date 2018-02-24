@@ -176,7 +176,9 @@ abstract class evangelical_magazine_not_articles_or_reviews extends evangelical_
 			$num_reviews = count ($review_ids);
 			if ($include_text) {
 				$return_values = array();
-				$return_values[] = $num_articles.($num_articles == 1 ? ' article' : ' articles');
+				if ($num_articles) {
+					$return_values[] = $num_articles.($num_articles == 1 ? ' article' : ' articles');
+				}
 				if ($num_reviews) {
 					$return_values[] = $num_reviews.($num_reviews == 1 ? ' review' : ' reviews');
 				}
