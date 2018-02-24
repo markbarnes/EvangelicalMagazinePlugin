@@ -556,21 +556,17 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public function update_facebook_stats_if_required ($ids) {
-		$requests = $ids = array();
-		foreach ($chunk as $id) {
+		$requests = array();
+		foreach ($ids as &$id) {
 			if (gettype ($id) == 'object') {
-				$ids[] = $id->get_id();
-			} else {
-				$ids[] = $id;
+				$id = $id->get_id();
 			}
-		}
-		foreach ($ids as $id) {
 			$transient_name = "em_fb_valid_{$id}";
 			$stats = get_transient($transient_name);
 			if (!$stats) {
 				$url = apply_filters ('evangelical_magazine_url_for_facebook', get_permalink($id));
 				$requests[] = array ('method' => 'GET', 'relative_url' => '?id='.urlencode($url).'&fields=share');
-				$lookup [$url] = $key;
+				$lookup [$url] = $id;
 			}
 		}
 		if ($requests) {
@@ -584,10 +580,11 @@ class evangelical_magazine {
 					if (!isset($response->error)) {
 						foreach ((array)$response as $r) {
 							$stats = json_decode($r->body);
+							$object = $this->get_object_from_id($lookup [$stats->id]);
 							if ($stats !== NULL && isset($stats->share)) {
-								$objects[$lookup[$stats->id]]->update_facebook_stats ($stats->share->share_count);
+								$object->update_facebook_stats ($stats->share->share_count);
 							} else {
-								$objects[$lookup[$stats->id]]->update_facebook_stats (0);
+								$object->update_facebook_stats (0);
 							}
 						}
 					}
