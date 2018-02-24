@@ -556,27 +556,28 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public function update_facebook_stats_if_required ($ids) {
-		$chunks = array_chunk ($ids, 50);
-		foreach ($chunks as $chunk) {
-			$requests = $objects = array();
-			foreach ($chunk as $id) {
-				if (gettype ($id) == 'object') {
-					/** @var evangelical_magazine_article[] $objects */
-					$objects[] = $id;
-				} else {
-					$objects[] = SELF::get_object_from_id($id);
-				}
+		$requests = $ids = array();
+		foreach ($chunk as $id) {
+			if (gettype ($id) == 'object') {
+				$ids[] = $id->get_id();
+			} else {
+				$ids[] = $id;
 			}
-			foreach ($objects as $key => $object) {
-				if (!$object->has_valid_facebook_stats()) {
-					$url = apply_filters ('evangelical_magazine_url_for_facebook', $object->get_link());
-					$requests[] = array ('method' => 'GET', 'relative_url' => '?id='.urlencode($url).'&fields=share');
-					$lookup [$url] = $key;
-				}
+		}
+		foreach ($ids as $id) {
+			$transient_name = "em_fb_valid_{$id}";
+			$stats = get_transient($transient_name);
+			if (!$stats) {
+				$url = apply_filters ('evangelical_magazine_url_for_facebook', get_permalink($id));
+				$requests[] = array ('method' => 'GET', 'relative_url' => '?id='.urlencode($url).'&fields=share');
+				$lookup [$url] = $key;
 			}
-			if ($requests) {
+		}
+		if ($requests) {
+			$request_chunks = array_chunk($requests, 50);
+			foreach ($request_chunks as $chunk) {
 				$args['access_token'] = evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret();
-				$args['batch'] = json_encode($requests);
+				$args['batch'] = json_encode($chunk);
 				$stats = wp_remote_post('https://graph.facebook.com/v2.8/', array ('body' => $args));
 				if (!is_a($stats, 'WP_Error')) {
 					$response = json_decode($stats['body']);
@@ -654,7 +655,7 @@ class evangelical_magazine {
 	*/
 	public static function update_all_stats_for_articles_static() {
 		global $evangelical_magazine;
-		$all_articles = evangelical_magazine_article::get_all_articles(array('post_status' => 'publish'));
+		$all_articles = evangelical_magazine_article::get_all_article_ids(array('post_status' => 'publish'));
 		$evangelical_magazine->update_all_stats_if_required($all_articles);
 	}
 
