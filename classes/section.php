@@ -9,27 +9,23 @@
 class evangelical_magazine_section extends evangelical_magazine_not_articles_or_reviews {
 
 	/**
+	* Returns the section meta name
+	*
+	*/
+	protected function get_meta_name() {
+		return self::SECTION_META_NAME;
+	}
+
+	/**
 	* Returns all the articles in the series
 	*
 	* @param array $args - WP_Query arguments
 	* @return null|evangelical_magazine_article[]
 	*/
-	public function _get_articles ($args) {
-		$meta_query = array(array('key' => self::SECTION_META_NAME, 'value' => $this->get_id(), 'compare' => '='));
-		$default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'meta_key' => self::ARTICLE_SORT_ORDER_META_NAME, 'orderby' => 'meta_value');
+	public function _get_articles ($args = array()) {
+		$meta_query = array(array('key' => $this->get_meta_name(), 'value' => $this->get_id(), 'compare' => '='));
+		$default_args = array ('meta_query' => $meta_query, 'meta_key' => self::ARTICLE_SORT_ORDER_META_NAME, 'orderby' => 'meta_value');
 		return self::_get_articles_from_query($args, $default_args);
-	}
-
-	/**
-	* Returns an array of article IDs for all articles in a section, ordered by date
-	*
-	* @param array $args - WP_Query arguments
-	* @return null|integer[]
-	*/
-	public function get_article_ids($args = array()) {
-		$meta_query = array(array('key' => self::SECTION_META_NAME, 'value' => $this->get_id()));
-		$default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'posts_per_page' => -1, 'orderby' => 'date');
-		return self::_get_object_ids_from_query($args, $default_args);
 	}
 
 	/**
@@ -43,13 +39,23 @@ class evangelical_magazine_section extends evangelical_magazine_not_articles_or_
 	}
 
 	/**
+	* Gets the most popular articles/reviews in the issue
+	*
+	* @param int $limit - the maximum number of articles to return
+	* @return null|evangelical_magazine_article[]
+	*/
+	public function get_top_articles_and_reviews ($limit = -1, $exclude_ids = array()) {
+		return $this->_get_top_articles_and_reviews_from_object ($limit, $this, $exclude_ids);
+	}
+
+	/**
 	* Returns an array of all the section objects
 	*
 	* @param array $args - WP_Query arguments
 	* @return null|evangelical_magazine_section[]
 	*/
 	public static function get_all_sections($args = array()) {
-		$default_args = array ('post_type' => 'em_section', 'orderby' => 'post_title', 'order' => 'ASC', 'posts_per_page' => -1);
+		$default_args = array ('orderby' => 'post_title', 'order' => 'ASC', 'posts_per_page' => -1);
 		return self::_get_sections_from_query($args, $default_args);
 	}
 }

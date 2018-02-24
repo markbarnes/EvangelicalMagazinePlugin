@@ -50,8 +50,33 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 	* @return evangelical_magazine_article[]
 	*/
 	public static function get_all_articles($args = array()) {
-		$default_args = array ('post_type' => 'em_article', 'orderby' => 'date', 'order' => 'ASC', 'posts_per_page' => -1);
+		$default_args = array ('orderby' => 'date', 'order' => 'ASC', 'posts_per_page' => -1);
 		return self::_get_articles_from_query($args, $default_args);
+	}
+
+	/**
+	* Returns an array of all the article objects
+	*
+	* @param array $args
+	* @return int[]
+	*/
+	public static function get_all_article_ids($args = array()) {
+		$default_args = array ('orderby' => 'date', 'order' => 'ASC', 'posts_per_page' => -1);
+		return self::_get_article_ids_from_query($args, $default_args);
+	}
+
+	/**
+	* Returns the title of the article
+	*
+	* @param boolean $link - whether to add a HTML link to the article around the title text
+	* @return string
+	*/
+	public function get_title($link = false) {
+		if ($link && !$this->is_future()) {
+			return $this->get_link_html($this->post_data->post_title);
+		} else {
+			return $this->post_data->post_title;
+		}
 	}
 
 	/**
@@ -194,42 +219,6 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 	}
 
 	/**
-	* Returns all articles by the same author(s) as this article
-	*
-	* @param int $limit - the maximum number of articles to return
-	* @param bool $exclude_this_article - true if the present article should be excluded
-	* @return evangelical_magazine_article[]
-	*/
-	public function get_articles_by_same_authors($limit = 5, $exclude_this_article = true) {
-		$author_ids = $this->get_author_ids();
-		if ($author_ids) {
-			$meta_query = array(array('key' => self::AUTHOR_META_NAME, 'value' => $author_ids, 'compare' => 'IN'));
-			$args = array ('post_type' => 'em_article', 'posts_per_page' => $limit, 'meta_query' => $meta_query, 'meta_key' => self::ARTICLE_SORT_ORDER_META_NAME, 'orderby' => 'meta_value');
-			if ($exclude_this_article) {
-				$args ['post__not_in'] = array($this->get_id());
-			}
-			return self::_get_articles_from_query($args);
-		}
-	}
-
-	/**
-	* Returns all articles in the same series as this article
-	*
-	* @param int $limit - the maximum number of articles to return
-	* @param bool $exclude_this_article - true if the present article should be excluded
-	* @return bool|evangelical_magazine_article[] - returns false if the article is not in a series
-	*/
-	public function get_articles_in_same_series($limit = 99, $exclude_this_article = false) {
-		$series = $this->get_series();
-		if ($series) {
-			$exclude_ids = $exclude_this_article ? (array)$this->get_id() : array();
-			return $series->get_articles($limit, $exclude_ids);
-		} else {
-			return false;
-		}
-	}
-
-	/**
 	* Gets the number times this article has been viewed
 	*
 	* @return integer
@@ -250,31 +239,6 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 	public function record_view_count()  {
 		$view_count = $this->get_view_count();
 		update_post_meta ($this->get_id(), self::VIEW_COUNT_META_NAME, $view_count+1);
-	}
-
-	/**
-	* Returns the HTML which produces the small article box
-	*
-	* @param bool $add_links - whether links should be added to the article name and image
-	* @param string $sub_title - any subtitle to be added
-	* @param string $class - any CSS classes to be added
-	* @return string
-	*/
-	public function get_small_box_html($add_links = true, $sub_title = '', $class = '') {
-		if (has_post_thumbnail($this->get_id())) {
-			$src = $this->get_image_url($image_size = 'article_large');
-			$style = "style=\"background-image: url('{$src}'); background-position: center center; background-size: cover\"";
-		} else {
-			$style = '';
-		}
-		$class = trim("small-article-box {$class}");
-		$class .= $this->is_future() ? ' future' : '';
-		$sub_title = $sub_title ? "<span class=\"sub-title\">{$sub_title}</span>" : '';
-		if ($add_links && !$this->is_future()) {
-			return "<aside class=\"{$class}\">{$sub_title}".$this->get_link_html("<div class=\"article-image\" {$style}></div>")."<div class=\"article-title\">{$this->get_title(true)}</div></aside>";
-		} else {
-			return "<aside class=\"{$class}\"><div class=\"article-image\" {$style}>{$sub_title}</div><div class=\"article-title\">{$this->get_title()}</div></aside>";
-		}
 	}
 
 	/**
@@ -332,31 +296,6 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 			echo '</select><br/>';
 			echo "<label>Order: <input type=\"text\" name=\"em_order\" size=\"2\" maxlength=\"2\" autocomplete=\"off\" value=\"{$existing_order}\"/></label>";
 			echo '<h4><a href="#em_series_add" class="hide-if-no-js">+ Add new series</a></h4>';
-		}
-	}
-
-	/**
-	* Returns the most recently published articles
-	*
-	* @param int $number_of_articles - the maximum number of article to be returned
-	* @return null|evangelical_magazine_article
-	*/
-	public static function get_recent_articles($number_of_articles = 10) {
-		$default_args = array ('post_type' => 'em_article', 'orderby' => 'date', 'order' => 'DESC', 'posts_per_page' => $number_of_articles, 'paged' => 1, 'post_status' => 'publish');
-		return self::_get_articles_from_query($default_args);
-	}
-
-	/**
-	* Returns the next article to be published
-	*
-	* @param array $args - WP_Query arguments
-	* @return null|evangelical_magazine_article
-	*/
-	public static function get_next_future_article($args = array()) {
-		$default_args = array ('post_type' => 'em_article', 'orderby' => 'date', 'order' => 'ASC', 'posts_per_page' => 1, 'post_status' => 'future');
-		$articles = self::_get_articles_from_query($args, $default_args);
-		if (is_array($articles)) {
-			return $articles[0];
 		}
 	}
 

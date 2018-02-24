@@ -9,6 +9,14 @@
 class evangelical_magazine_author extends evangelical_magazine_not_articles_or_reviews {
 
 	/**
+	* Returns the author meta name
+	*
+	*/
+	protected function get_meta_name() {
+		return self::AUTHOR_META_NAME;
+	}
+
+	/**
 	* Returns the name of the author
 	*
 	* @param bool $link - whether to add a HTML link to the author around the name
@@ -50,37 +58,13 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles_or_r
 	}
 
 	/**
-	* Returns all articles by this author
-	*
-	* @param array $args - WP_Query arguments
-	* @return null|evangelical_magazine_article[]
-	*/
-	public function _get_articles ($args = array()) {
-		$meta_query = array(array('key' => self::AUTHOR_META_NAME, 'value' => $this->get_id()));
-		$default_args = array ('post_type' => 'em_article', 'posts_per_page' => -1, 'meta_query' => $meta_query);
-		return self::_get_articles_from_query($args, $default_args);
-	}
-
-	/**
-	* Returns an array of article IDs for all articles from an author, ordered by date
-	*
-	* @param array $args - WP_Query arguments
-	* @return null|integer[]
-	*/
-	public function get_article_ids($args = array()) {
-		$meta_query = array(array('key' => self::AUTHOR_META_NAME, 'value' => $this->get_id()));
-		$default_args = array ('post_type' => 'em_article', 'meta_query' => $meta_query, 'posts_per_page' => -1, 'orderby' => 'date');
-		return self::_get_object_ids_from_query($args, $default_args);
-	}
-
-	/**
 	* Returns an array of all the author objects
 	*
 	* @param array $args - WP_Query arguments
 	* @return null|evangelical_magazine_author[]
 	*/
 	public static function get_all_authors($args = array()) {
-		$default_args = array ('post_type' => 'em_author', 'orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
+		$default_args = array ('orderby' => 'title', 'order' => 'ASC', 'posts_per_page' => -1);
 		return self::_get_authors_from_query($args, $default_args);
 	}
 

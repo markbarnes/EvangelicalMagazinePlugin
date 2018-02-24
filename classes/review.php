@@ -44,6 +44,36 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 	}
 
 	/**
+	* Returns an array of all the review objects
+	*
+	* @param array $args
+	* @return int[]
+	*/
+	public static function get_all_review_ids($args = array()) {
+		$default_args = array ('orderby' => 'date', 'order' => 'ASC', 'posts_per_page' => -1);
+		return self::_get_review_ids_from_query($args, $default_args);
+	}
+
+	/**
+	* Returns the title of the review
+	*
+	* @param boolean $link - whether to add a HTML link to the article around the title text
+	* @return string
+	*/
+	public function get_title($link = false) {
+		if ($media_type = $this->get_media_type_name()) {
+			$title = "{$media_type} review — {$this->post_data->post_title}";
+		} else {
+			$title = "Review — {$this->post_data->post_title}";
+		}
+		if ($link && !$this->is_future()) {
+			return $this->get_link_html($title);
+		} else {
+			return $title;
+		}
+	}
+
+	/**
 	* Returns the creator of the item being reviewed (e.g. author or artist)
 	*
 	* @param string $prefix - a string to be prepended to the creator
@@ -302,4 +332,26 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 		}
 		return $reviews_id;
 	}
+	/**
+	*
+	* Adds the review media type to the page title
+	*
+	* Used in various filters
+	*
+	* @param string $title - the current title
+	* @return string - the title witht the media type added
+	*/
+	public static function add_review_type_to_title ($title, $post_id = null) {
+		if ($post_id === null) {
+			global $post;
+			$post_id = $post;
+		}
+		$review = evangelical_magazine::get_object_from_post($post_id);
+		if ($review && $review->is_review())
+			return $review->get_title();
+		else {
+			return $title;
+		}
+	}
+
 }

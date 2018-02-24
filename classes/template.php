@@ -322,7 +322,7 @@ abstract class evangelical_magazine_template {
 	*/
 	protected static function _get_articles_and_reviews_from_query ($args, $default_args = '') {
 		$args ['post_type'] = array ('em_article', 'em_review');
-		$articles = self::_get_objects_from_query($args, $default_args);
+		return self::_get_objects_from_query($args, $default_args);
 	}
 
 	/**
@@ -415,6 +415,85 @@ abstract class evangelical_magazine_template {
 	}
 
 	/**
+	* Helper function to help subclasses return all the issue object_ids from a WP_Query
+	*
+	* Wrapper for _get_object_ids_from_query()
+	*
+	* @param array $args - WP_Query arguments
+	* @return null|int[]
+	*/
+	protected static function _get_issue_ids_from_query ($args) {
+		$args ['post_type'] = 'em_issue';
+		return self::_get_object_ids_from_query($args, array());
+	}
+
+	/**
+	* Helper function to help subclasses return all the series object_ids from a WP_Query
+	*
+	* Wrapper for _get_object_ids_from_query()
+	*
+	* @param array $args - WP_Query arguments
+	* @return null|int[]
+	*/
+	protected static function _get_series_ids_from_query ($args) {
+		$args ['post_type'] = 'em_series';
+		return self::_get_object_ids_from_query($args, array());
+	}
+
+	/**
+	* Helper function to help subclasses return all the author object_ids from a WP_Query
+	*
+	* Wrapper for _get_object_ids_from_query()
+	*
+	* @param array $args - WP_Query arguments
+	* @return null|int[]
+	*/
+	protected static function _get_author_ids_from_query ($args) {
+		$args ['post_type'] = 'em_author';
+		return self::_get_object_ids_from_query($args, array());
+	}
+
+	/**
+	* Helper function to help subclasses return all the article object_ids from a WP_Query
+	*
+	* Wrapper for _get_object_ids_from_query()
+	*
+	* @param array $args - WP_Query arguments
+	* @return null|int[]
+	*/
+	protected static function _get_article_ids_from_query ($args, $default_args = array()) {
+		$args ['post_type'] = 'em_article';
+		return self::_get_object_ids_from_query($args, $default_args);
+	}
+
+	/**
+	* Helper function to help subclasses return all the review object_ids from a WP_Query
+	*
+	* Wrapper for _get_object_ids_from_query()
+	*
+	* @param array $args - WP_Query arguments
+	* @return null|int[]
+	*/
+	protected static function _get_review_ids_from_query ($args, $default_args = array()) {
+		$args ['post_type'] = 'em_review';
+		return self::_get_object_ids_from_query($args, $default_args);
+	}
+
+	/**
+	* Helper function to help subclasses return all the article and/or review object_ids from a WP_Query
+	*
+	* Wrapper for _get_object_ids_from_query()
+	*
+	* @param array $args - WP_Query arguments
+	* @param array $default_args - WP_Query arguments
+	* @return null|int[]
+	*/
+	protected static function _get_article_and_review_ids_from_query ($args, $default_args = array()) {
+		$args ['post_type'] = array ('em_article', 'em_review');
+		return self::_get_object_ids_from_query($args, $default_args);
+	}
+
+	/**
 	* Returns all the object_ids from an array of objects
 	*
 	* @param array $objects - any evangelical_magazine_* objects
@@ -452,28 +531,28 @@ abstract class evangelical_magazine_template {
 	* @param int $limit - the maximum number of articles to return
 	* @return evangelical_magazine_article[]
 	*/
-	protected function _get_top_articles ($articles, $limit = -1) {
+	protected function _get_top_articles_and_reviews ($objects, $limit = -1) {
 		//We can't do this in one query, because WordPress won't return null values when you sort by meta_value
-		if ($articles) {
+		if ($objects) {
 			$index = array();
 			if (self::use_google_analytics()) {
 				$view_meta_key = self::GOOGLE_ANALYTICS_META_NAME;
 			} else {
 				$view_meta_key = self::VIEW_COUNT_META_NAME;
 			}
-			foreach ($articles as $key => $article) {
-				$view_count = get_post_meta($article->get_id(), $view_meta_key, true);
-				$index[$key] = round ($view_count/(time()-strtotime($article->get_post_date()))*84600 , 5);
+			foreach ($objects as $key => $object) {
+				$view_count = get_post_meta($object->get_id(), $view_meta_key, true);
+				$index[$key] = round ($view_count/(time()-strtotime($object->get_post_date()))*84600 , 5);
 			}
 			arsort($index);
 			if ($limit != -1) {
 				$index = array_slice ($index, 0, $limit, true);
 			}
-			$top_articles = array();
+			$top_articles_and_reviews = array();
 			foreach ($index as $key => $view_count) {
-				$top_articles[] = $articles[$key];
+				$top_articles_and_reviews[] = $objects[$key];
 			}
-			return $top_articles;
+			return $top_articles_and_reviews;
 		}
 	}
 
@@ -493,6 +572,15 @@ abstract class evangelical_magazine_template {
 	*/
 	public function is_article() {
 		return is_a($this, 'evangelical_magazine_article');
+	}
+
+	/**
+	* Returns true if the object is a review
+	*
+	* @return bool
+	*/
+	public function is_review() {
+		return is_a($this, 'evangelical_magazine_review');
 	}
 
 	/**

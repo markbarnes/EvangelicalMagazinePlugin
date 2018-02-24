@@ -3,7 +3,7 @@
 Plugin Name: Evangelical Magazine
 Description: Customisations for the Evangelical Magazine
 Plugin URI: http://www.evangelicalmagazine.com/
-Version: 0.2
+Version: 1.0
 Author: Mark Barnes
 Author URI: http://www.markbarnes.net/
 */
@@ -51,6 +51,10 @@ class evangelical_magazine {
 		add_filter ('the_author', array (__CLASS__, 'filter_author_name'));
 		add_filter ('the_content_feed', array (__CLASS__, 'filter_feed_for_mailchimp'));
 		add_filter ('enter_title_here', array ('evangelical_magazine_review', 'filter_title_placeholder'));
+		add_filter ('the_title', array ('evangelical_magazine_review', 'add_review_type_to_title'), 10, 2);
+
+		//Revelanssi filters
+		add_filter ('relevanssi_index_custom_fields', array (__CLASS__, 'add_custom_fields_to_relevanssi'));
 
 		//Image sizes
 		add_image_size ('article_rss', 560, 373, true);
@@ -712,6 +716,11 @@ class evangelical_magazine {
 			);
 			$admin_bar->add_node ($args);
 		}
+	}
+
+	public static function add_custom_fields_to_relevanssi ($custom_fields) {
+		$fields_to_add = array (evangelical_magazine_review::REVIEW_CREATOR_META_NAME, evangelical_magazine_review::REVIEW_PUBLISHER_META_NAME);
+		return array_merge ((array)$custom_fields, $fields_to_add);
 	}
 }
 
