@@ -63,7 +63,7 @@ abstract class evangelical_magazine_not_articles_or_reviews extends evangelical_
 	*/
 	protected function _get_top_articles_from_object ($limit = -1, $object, $exclude_article_ids = array()) {
 		$articles = $object->get_articles(-1, $exclude_article_ids);
-		return self::_get_top_articles ($articles, $limit);
+		return self::_get_top_articles_and_reviews ($articles, $limit);
 	}
 
 	/**
@@ -169,7 +169,7 @@ abstract class evangelical_magazine_not_articles_or_reviews extends evangelical_
 	* @return integer
 	*/
 	public function get_article_and_review_count($include_text = false, $include_likes = false, $include_reviews = false) {
-		$article_ids = $this->get_article_ids();
+		$article_ids = (array)$this->get_article_ids();
 		$review_ids =  $include_reviews ? (array)$this->get_review_ids() : array();
 		if ($article_ids | $review_ids) {
 			$num_articles = count ($article_ids);
