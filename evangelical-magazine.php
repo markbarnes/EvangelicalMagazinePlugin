@@ -666,10 +666,16 @@ class evangelical_magazine {
 		if (!is_admin()) {
 			$args = array(
 				'id'    => 'em',
-				'parent' => 'site-name',
-				'href'  => admin_url('edit.php?post_type=em_issue')
+				'parent' => 'site-name'
 			);
 			$admin_bar->add_group ($args);
+			$args = array(
+				'id'    => 'em_sections',
+				'title' => 'Sections',
+				'parent' => 'em',
+				'href'  => admin_url('edit.php?post_type=em_section')
+			);
+			$admin_bar->add_node ($args);
 			$args = array(
 				'id'    => 'em_issues',
 				'title' => 'Issues',
