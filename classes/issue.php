@@ -120,6 +120,16 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles_or_re
 	}
 
 	/**
+	* Gets the most popular articles in the issue
+	*
+	* @param integer $limit - the maximum number of articles to return
+	* @return null|evangelical_magazine_article[]
+	*/
+	public function get_top_articles_and_reviews ($limit = -1) {
+		return $this->_get_top_articles_and_reviews_from_object ($limit, $this);
+	}
+
+	/**
 	* Gets the articles with future post_dates in this issue
 	*
 	* @param array $args - WP_Query arguments

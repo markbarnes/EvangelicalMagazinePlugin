@@ -158,7 +158,7 @@ abstract class evangelical_magazine_not_articles_or_reviews extends evangelical_
 	* @return integer
 	*/
 	public function get_article_count($include_text = false, $include_likes = false) {
-		return $this->get_article_and_review_count($include_text, $include_likes);
+		return $this->get_article_and_review_count($include_text, $include_likes, false);
 	}
 	/**
 	* Returns the number of articles and/or reviews in an object
@@ -168,7 +168,7 @@ abstract class evangelical_magazine_not_articles_or_reviews extends evangelical_
 	* @param book $include_reviews - whether or not reviews should be inclued.
 	* @return integer
 	*/
-	public function get_article_and_review_count($include_text = false, $include_likes = false, $include_reviews = false) {
+	public function get_article_and_review_count($include_text = false, $include_likes = false, $include_reviews = true) {
 		$article_ids = (array)$this->get_article_ids();
 		$review_ids =  $include_reviews ? (array)$this->get_review_ids() : array();
 		if ($article_ids | $review_ids) {
@@ -197,7 +197,7 @@ abstract class evangelical_magazine_not_articles_or_reviews extends evangelical_
 					$return_value = implode (', ', $return_values).$last;
 				}
 			} else {
-				$return_value = $num_articles;
+				$return_value = $num_articles+$num_reviews;
 			}
 			return $return_value;
 		}
