@@ -345,8 +345,10 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 		if ($post_id === null) {
 			global $post;
 			$post_id = $post;
+			$review = evangelical_magazine::get_object_from_post($post_id);
+		} else {
+			$review = evangelical_magazine::get_object_from_id($post_id);
 		}
-		$review = evangelical_magazine::get_object_from_post($post_id);
 		if ($review && $review->is_review())
 			return $review->get_title();
 		else {
