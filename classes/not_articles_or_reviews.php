@@ -84,10 +84,13 @@ abstract class evangelical_magazine_not_articles_or_reviews extends evangelical_
 	*
 	* @param int $limit - the maximum number of articles to return
 	* @param int[] $exclude_article_ids - article ids to be excluded
+	* @param array $args - WP_Query arguments
 	* @return null|evangelical_magazine_article[]
 	*/
-	public function get_articles ($limit = -1, $exclude_article_ids = array()) {
-		return $this->_get_articles(array ('posts_per_page' => $limit, 'post__not_in' => (array)$exclude_article_ids));
+	public function get_articles ($limit = -1, $exclude_article_ids = array(), $args = array()) {
+		$default_args = array ('posts_per_page' => $limit, 'post__not_in' => (array)$exclude_article_ids);
+		$args = wp_parse_args($args, $default_args);
+		return $this->_get_articles($args);
 	}
 
 	/**
