@@ -171,7 +171,7 @@ abstract class evangelical_magazine_not_articles_or_reviews extends evangelical_
 	public function get_article_and_review_count($include_text = false, $include_likes = false, $include_reviews = true) {
 		$article_ids = (array)$this->get_article_ids();
 		$review_ids =  $include_reviews ? (array)$this->get_review_ids() : array();
-		if ($article_ids | $review_ids) {
+		if ($article_ids || $review_ids) {
 			$num_articles = count ($article_ids);
 			$num_reviews = count ($review_ids);
 			if ($include_text) {
