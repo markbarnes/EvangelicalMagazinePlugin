@@ -188,7 +188,7 @@ abstract class evangelical_magazine_template {
 	}
 
 	/**
-	* Returns an array containing the URL, width and height of the featured image
+	* Returns an array containing the URL, width, height, mimetype and filesize of the featured image
 	*
 	* @param string $image_size - the size of the image to be returned
 	* @return array - with keys 'url', 'width', 'height', 'mimetype' and 'filesize'
@@ -571,6 +571,15 @@ abstract class evangelical_magazine_template {
 	*/
 	public function is_article() {
 		return is_a($this, 'evangelical_magazine_article');
+	}
+
+	/**
+	* Returns true if the object is an article or a review
+	*
+	* @return bool
+	*/
+	public function is_article_or_review() {
+		return ($this->is_article() || $this->is_review());
 	}
 
 	/**
