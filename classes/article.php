@@ -133,6 +133,22 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 	}
 
 	/**
+	* Returns the next article in the same series as this one
+	*
+	* Returns null if this article is not in a series, false if this article is the last in the series, or the article object otherwise
+	*
+	* @return null|false|evangelical_magazine_article
+	*/
+	public function get_next_in_series() {
+		if ($this->has_series()) {
+			$position = $this->get_series_order();
+			$series = $this->get_series();
+			$next = $series->get_article_by_order ($position+1);
+			return $next;
+		}
+	}
+
+	/**
 	* Saves the metadata when the post is edited
 	*
 	* Called during the 'save_post' action

@@ -311,6 +311,26 @@ abstract class evangelical_magazine_template {
 	}
 
 	/**
+	* Helper function to help subclasses return a single article from a WP_Query
+	*
+	* Wrapper for _get_objects()
+	*
+	* @param array $args - WP_Query arguments
+	* @param array $default_args - WP_Query arguments
+	* @return null|evangelical_magazine_article
+	*/
+	protected static function _get_article_from_query ($args, $default_args = '') {
+		$args = wp_parse_args (array('post_type' => 'em_article', 'posts_per_page' => 1), $args);
+		$default_args = wp_parse_args (array ('offset' => 0), $default_args);
+		$article = self::_get_objects_from_query($args, $default_args);
+		if ($article && is_array($article)) {
+			return $article[0];
+		} else {
+			return $article;
+		}
+	}
+
+	/**
 	* Helper function to help subclasses return all the articles and reviews from a WP_Query
 	*
 	* Wrapper for _get_objects()
