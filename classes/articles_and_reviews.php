@@ -240,25 +240,6 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 	}
 
 	/**
-	* Returns the URL of the featured image
-	*
-	* @param string $image_size - the size of the image to be returned
-	* @return string
-	*/
-	public function get_image_url($image_size = 'thumbnail') {
-		$image_sizes = get_intermediate_image_sizes();
-		if ($this->is_future() && substr($image_size, -3) != '_bw' && in_array("{$image_size}_bw", $image_sizes)) {
-			$image_size = "{$image_size}_bw";
-		}
-		if (has_post_thumbnail($this->get_id())) {
-			$src = wp_get_attachment_image_src (get_post_thumbnail_id($this->get_id()), $image_size);
-			if ($src) {
-				return $src[0];
-			}
-		}
-	}
-
-	/**
 	* Returns the date of the issue
 	*
 	* @return array - an array with the keys 'year' and 'month'
