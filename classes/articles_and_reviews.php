@@ -385,4 +385,27 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 			echo '<h4><a id="em_issue_add" href="#" class="hide-if-no-js">+ Add new issue</a></h4>';
 		}
 	}
+
+	/**
+	* Gets the number times this article has been viewed
+	*
+	* @return integer
+	*/
+	public function get_view_count() {
+		if (self::use_google_analytics()) {
+			return get_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, true);
+		} else {
+			return get_post_meta($this->get_id(), self::VIEW_COUNT_META_NAME, true);
+		}
+	}
+
+	/**
+	* Increases the view count by one
+	*
+	* @return void
+	*/
+	public function record_view_count()  {
+		$view_count = $this->get_view_count();
+		update_post_meta ($this->get_id(), self::VIEW_COUNT_META_NAME, $view_count+1);
+	}
 }
