@@ -62,7 +62,7 @@ class evangelical_magazine_google_analytics {
 				$response = json_decode($this->http->get($url)->getBody()->getContents());
 				if ($response && isset($response->items) && isset($response->items[0]->webProperties[0]->profiles[0]->id)) {
 					$this->profile_id = $response->items[0]->webProperties[0]->profiles[0]->id;
-					set_transient ('em_google_profile_id', $this->profile_id, 60*60*24*7); // 1 week
+					set_transient ('em_google_profile_id', $this->profile_id, WEEK_IN_SECONDS);
 				}
 			}
 		}
