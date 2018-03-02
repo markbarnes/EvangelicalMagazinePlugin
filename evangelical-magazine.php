@@ -57,7 +57,7 @@ class evangelical_magazine {
 		add_filter ('relevanssi_index_custom_fields', array (__CLASS__, 'add_custom_fields_to_relevanssi'));
 
 		//Image sizes
-		add_image_size ('article_rss', 560, 373, true);
+		add_image_size ('article_rss', 560, 280, true);
 
 		//Instant articles
 		$ia = new evangelical_magazine_facebook_instant_articles();
