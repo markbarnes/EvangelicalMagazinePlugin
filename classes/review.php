@@ -95,7 +95,7 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 	*/
 	public function get_price($prefix = '', $suffix = '') {
 		if ($this->price) {
-			return $prefix.$this->price.$suffix;
+			return $prefix.(((float)$this->price != 0) ? '£' : '').$this->price.$suffix;
 		}
 	}
 
