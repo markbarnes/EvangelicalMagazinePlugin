@@ -393,9 +393,9 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 	*/
 	public function get_view_count() {
 		if (self::use_google_analytics()) {
-			return get_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, true);
+			return (int)get_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, true);
 		} else {
-			return get_post_meta($this->get_id(), self::VIEW_COUNT_META_NAME, true);
+			return (int)get_post_meta($this->get_id(), self::VIEW_COUNT_META_NAME, true);
 		}
 	}
 
