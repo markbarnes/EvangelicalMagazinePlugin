@@ -305,7 +305,7 @@ abstract class evangelical_magazine_template {
 	* @param array $default_args - WP_Query arguments
 	* @return null|evangelical_magazine_article[]
 	*/
-	protected static function _get_articles_from_query ($args, $default_args = '') {
+	protected static function _get_articles_from_query ($args, $default_args = array()) {
 		$args ['post_type'] = 'em_article';
 		return self::_get_objects_from_query($args, $default_args);
 	}
@@ -319,7 +319,7 @@ abstract class evangelical_magazine_template {
 	* @param array $default_args - WP_Query arguments
 	* @return null|evangelical_magazine_article
 	*/
-	protected static function _get_article_from_query ($args, $default_args = '') {
+	protected static function _get_article_from_query ($args, $default_args = array()) {
 		$args = wp_parse_args (array('post_type' => 'em_article', 'posts_per_page' => 1), $args);
 		$default_args = wp_parse_args (array ('offset' => 0), $default_args);
 		$article = self::_get_objects_from_query($args, $default_args);
@@ -339,7 +339,7 @@ abstract class evangelical_magazine_template {
 	* @param array $default_args - WP_Query arguments
 	* @return null|array
 	*/
-	protected static function _get_articles_and_reviews_from_query ($args, $default_args = '') {
+	protected static function _get_articles_and_reviews_from_query ($args, $default_args = array()) {
 		$args ['post_type'] = array ('em_article', 'em_review');
 		return self::_get_objects_from_query($args, $default_args);
 	}
@@ -353,7 +353,7 @@ abstract class evangelical_magazine_template {
 	* @param array $default_args - WP_Query arguments
 	* @return null|evangelical_magazine_section[]
 	*/
-	protected static function _get_sections_from_query ($args, $default_args = '') {
+	protected static function _get_sections_from_query ($args, $default_args = array()) {
 		$args ['post_type'] = 'em_section';
 		return self::_get_objects_from_query($args, $default_args);
 	}
@@ -367,7 +367,7 @@ abstract class evangelical_magazine_template {
 	* @param array $default_args - WP_Query arguments
 	* @return null|evangelical_magazine_series[]
 	*/
-	protected static function _get_series_from_query ($args, $default_args = '') {
+	protected static function _get_series_from_query ($args, $default_args = array()) {
 		$args ['post_type'] = 'em_series';
 		return self::_get_objects_from_query($args, $default_args);
 	}
@@ -381,7 +381,7 @@ abstract class evangelical_magazine_template {
 	* @param array $default_args - WP_Query arguments
 	* @return null|evangelical_magazine_issue[]
 	*/
-	protected static function _get_issues_from_query ($args, $default_args = '') {
+	protected static function _get_issues_from_query ($args, $default_args = array()) {
 		$args ['post_type'] = 'em_issue';
 		return self::_get_objects_from_query($args, $default_args);
 	}
@@ -396,7 +396,7 @@ abstract class evangelical_magazine_template {
 	* @uses evangelical_magazine_template::_get_objects()
 	* @return null|evangelical_magazine_author[]
 	*/
-	protected static function _get_authors_from_query ($args, $default_args = '') {
+	protected static function _get_authors_from_query ($args, $default_args = array()) {
 		$args ['post_type'] = 'em_author';
 		return self::_get_objects_from_query($args, $default_args);
 	}
