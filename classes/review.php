@@ -225,7 +225,10 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 			}
 			//Price
 			if (isset($_POST['em_price'])) {
-				$this->price = (float)str_replace('£', '', $_POST['em_price']);
+				if ($_POST['em_price'] === '0') {
+					$_POST['em_price'] = 'free';
+				}
+				$this->price = ($_POST['em_price'] === 'free') ? $_POST['em_price'] : (float)str_replace('£', '', $_POST['em_price']);
 				update_post_meta ($this->get_id(), self::REVIEW_PRICE_META_NAME, $this->price);
 			} else {
 				delete_post_meta ($this->get_id(), self::REVIEW_PRICE_META_NAME);
