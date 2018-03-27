@@ -560,7 +560,7 @@ abstract class evangelical_magazine_template {
 				$view_meta_key = self::VIEW_COUNT_META_NAME;
 			}
 			foreach ($objects as $key => $object) {
-				$view_count = get_post_meta($object->get_id(), $view_meta_key, true);
+				$view_count = (int)get_post_meta($object->get_id(), $view_meta_key, true);
 				$index[$key] = round ($view_count/(time()-strtotime($object->get_post_date()))*DAY_IN_SECONDS, 5);
 			}
 			arsort($index);
