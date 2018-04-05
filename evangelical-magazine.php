@@ -483,7 +483,7 @@ class evangelical_magazine {
 	public static function filter_author_name ($display_name) {
 		global $post;
 		if ($object = self::get_object_from_post($post)) {
-			if ($object->is_article()) {
+			if ($object->is_article_or_review()) {
 				return $object->get_author_names();
 			} else {
 				return 'editor';
