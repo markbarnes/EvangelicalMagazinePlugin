@@ -544,7 +544,9 @@ class evangelical_magazine {
 			$count++;
 			$output .= $token;
 		}
-		$output .= "&hellip; <a href=\"{$link}\">(continue reading)</a>";
+		if ($count >= $max_words) {
+			$output .= "&hellip; <a href=\"{$link}\">(continue reading)</a>";
+		}
 		$content = trim(force_balance_tags($output));
 		return $content;
 	}
