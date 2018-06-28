@@ -283,14 +283,7 @@ abstract class evangelical_magazine_template {
 		if ($query->posts) {
 			$objects = array();
 			foreach ($query->posts as $post) {
-				if (substr($post->post_type, 0,3) == 'em_') {
-					$class = 'evangelical_magazine_'.substr($post->post_type, 3);
-					if (class_exists($class)) {
-						$objects[] = new $class($post);
-					} else {
-						trigger_error ("Invalid class: {$class}", E_USER_ERROR);
-					}
-				}
+				$objects[] = evangelical_magazine::get_object_from_post($post);
 			}
 			return $objects;
 		}

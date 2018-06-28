@@ -412,9 +412,13 @@ class evangelical_magazine {
 	*/
 	public static function get_object_from_post($post) {
 		if (is_a($post, 'WP_Post')) {
-			if (substr ($post->post_type, 0, 3) == 'em_') {
-				$class_name = 'evangelical_magazine_'.substr($post->post_type, 3);
-				return new $class_name ($post);
+			if (substr($post->post_type, 0,3) == 'em_') {
+				$class = 'evangelical_magazine_'.substr($post->post_type, 3);
+				if (class_exists($class)) {
+					return new $class ($post);
+				} else {
+					trigger_error ("Invalid class: {$class}", E_USER_ERROR);
+				}
 			}
 		}
 		return false;

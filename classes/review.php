@@ -347,8 +347,7 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 	public static function add_review_type_to_title ($title, $post_id = null) {
 		if ($post_id === null) {
 			global $post;
-			$post_id = $post;
-			$review = evangelical_magazine::get_object_from_post($post_id);
+			$review = evangelical_magazine::get_object_from_post($post);
 		} else {
 			$review = evangelical_magazine::get_object_from_id($post_id);
 		}
