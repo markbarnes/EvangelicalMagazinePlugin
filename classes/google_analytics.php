@@ -27,7 +27,12 @@ class evangelical_magazine_google_analytics {
 		$this->client->addScope('https://www.googleapis.com/auth/analytics.readonly');
 		$credentials_file = evangelical_magazine::plugin_dir_path('google-api-credentials.json');
 		putenv('GOOGLE_APPLICATION_CREDENTIALS='.$credentials_file);
-		$this->http = $this->client->authorize();
+		$this->http = $this->client->authorize($this->get_guzzle_client());
+	}
+
+	private function get_guzzle_client () {
+		$options = apply_filters ('evangelical_magazine_guzzle_interface_options', array());
+		return new GuzzleHttp\Client($options);
 	}
 
 	/**
@@ -41,7 +46,7 @@ class evangelical_magazine_google_analytics {
 			$this->access_token = get_transient('em_google_access_token');
 		}
 		if (!$this->access_token || $force_renewal) {
-			$this->client->fetchAccessTokenWithAssertion();
+			$this->client->fetchAccessTokenWithAssertion($this->get_guzzle_client());
 			$access_token = $this->client->getAccessToken();
 			set_transient('em_google_access_token', $access_token['access_token'], (int)($access_token['expires_in']*0.9));
 			$this->access_token = $access_token['access_token'];
