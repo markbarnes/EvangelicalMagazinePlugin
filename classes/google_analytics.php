@@ -30,6 +30,13 @@ class evangelical_magazine_google_analytics {
 		$this->http = $this->client->authorize($this->get_guzzle_client());
 	}
 
+	/**
+	* Returns an instance of the GuzzleHttp client
+	*
+	* Client options can be filtered with evangelical_magazine_guzzle_interface_options
+	*
+	* @return GuzzleHttp\Client
+	*/
 	private function get_guzzle_client () {
 		$options = apply_filters ('evangelical_magazine_guzzle_interface_options', array());
 		return new GuzzleHttp\Client($options);
@@ -39,7 +46,7 @@ class evangelical_magazine_google_analytics {
 	* Returns the Google Analytics access token
 	*
 	* @param boolean $force_renewal - if true, will override the cached value
-	* @return string
+	* @return string - the Google Analytics access token
 	*/
 	private function get_access_token($force_renewal = false) {
 		if (!$force_renewal) {
@@ -57,7 +64,7 @@ class evangelical_magazine_google_analytics {
 	/**
 	* Returns the Google Analytics profile id
 	*
-	* @return string
+	* @return string - the Google Analytics profile ID
 	*/
 	private function get_profile_id() {
 		if (!$this->profile_id) {

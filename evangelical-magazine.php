@@ -433,7 +433,7 @@ class evangelical_magazine {
 	* @param string $title - the title of this post
 	* @param string $raw_title
 	* @param string $context
-	* @return string
+	* @return string - the amended title
 	*/
 	public static function pre_sanitize_title ($title, $raw_title = '', $context = 'display') {
 		return str_replace ('/', '-', $title);
