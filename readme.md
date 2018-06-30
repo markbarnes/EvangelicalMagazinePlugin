@@ -12,8 +12,12 @@ The plugin (optionally) uses Google Analytics data to calculate the most viewed 
 1. Download the latest version of [`google-api-php-client.zip`](https://github.com/google/google-api-php-client/releases).
 2. Extract the `src` and `vendor` folders, and place them in `libraries/google-api-client`
 3. Open `google-api-credentials_sample.json` and follow the instructions there.
+4. The sub-folder vendor/google/apiclient-services is not required, and can be deleted to conserve space and simplify debugging.
 
 If Google Analytics is not configured, the plugin will default to its own simple statistics.
+
+## Screenshot
+![Admin page](https://github.com/markbarnes/EvangelicalMagazinePlugin/blob/master/screenshots/admin.png)
 
 ## Support
 No support is offered for this plugin. It was not created with distribution in mind, has no user-configurable options and although it may work out of the box in another context (so long as you edit `classes/fb_access_tokens_sample.php`), it's intended to be forked. It's published here purely as a help to other developers (particularly those working for non-profits) who need something similar and want to minimize development time.
