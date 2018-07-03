@@ -231,7 +231,7 @@ abstract class evangelical_magazine_template {
 			$alt_attribute = htmlspecialchars($alt_attribute, ENT_HTML5);
 			if ($src) {
 				$html = "<img src=\"{$src[0]}\" width=\"{$src[1]}\" height=\"{$src[2]}\" alt=\"{$alt_attribute}\"/>";
-				return $link ? $this->get_link_html($html, $link_class) : $html;
+				return $link ? $this->get_link_html($html, array('class' => $link_class)) : $html;
 			}
 		}
 	}
