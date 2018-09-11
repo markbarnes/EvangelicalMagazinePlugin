@@ -103,26 +103,6 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 	}
 
 	/**
-	* Returns all articles in the same series as this article
-	*
-	* @param int $limit - the maximum number of articles to return
-	* @param bool $exclude_this_article - true if the present article should be excluded
-	* @return bool|evangelical_magazine_article[] - returns false if the article is not in a series
-	*/
-	public function get_articles_in_same_series($limit = 99, $exclude_this_article = false) {
-		if ($this->is_review()) {
-			return false;
-		}
-		$series = $this->get_series();
-		if ($series) {
-			$exclude_ids = $exclude_this_article ? (array)$this->get_id() : array();
-			return $series->get_articles($limit, $exclude_ids);
-		} else {
-			return false;
-		}
-	}
-
-	/**
 	* Returns all articles/reviews by the same author(s) as this article/review
 	*
 	* @param int $limit - the maximum number of articles/reviews to return
