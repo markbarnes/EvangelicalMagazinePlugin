@@ -106,16 +106,16 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 	* Returns all articles/reviews by the same author(s) as this article/review
 	*
 	* @param int $limit - the maximum number of articles/reviews to return
-	* @param bool $exclude_this - true if the present article/review should be excluded
+	* @param bool $exclude_ids - an array of article/review ids to be excluded
 	* @return evangelical_magazine_article[]|evangelical_magazine_review[]
 	*/
-	public function get_articles_and_reviews_by_same_authors($limit = 5, $exclude_this = true) {
+	public function get_articles_and_reviews_by_same_authors($limit = 5, $exclude_ids = array()) {
 		$author_ids = $this->get_author_ids();
 		if ($author_ids) {
 			$meta_query = array(array('key' => self::AUTHOR_META_NAME, 'value' => $author_ids, 'compare' => 'IN'));
 			$args = array ('posts_per_page' => $limit, 'meta_query' => $meta_query, 'meta_key' => self::ARTICLE_SORT_ORDER_META_NAME, 'orderby' => 'meta_value');
-			if ($exclude_this) {
-				$args ['post__not_in'] = array($this->get_id());
+			if ($exclude_ids) {
+				$args ['post__not_in'] = $exclude_ids;
 			}
 			return self::_get_articles_and_reviews_from_query($args);
 		}
