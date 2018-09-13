@@ -388,4 +388,151 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 		$view_count = $this->get_view_count();
 		update_post_meta ($this->get_id(), self::VIEW_COUNT_META_NAME, $view_count+1);
 	}
+
+	/**
+	* Adds columns to the Articles admin pages
+	*
+	* Filters manage_edit-em_article_columns
+	*
+	* @param array $columns
+	* @return array
+	*/
+	public static function filter_article_columns ($columns) {
+		global $evangelical_magazine;
+		$columns ['article_author'] = 'Author';
+		$columns ['issue_details'] = 'Issue';
+		$columns ['section'] = 'Section';
+		$columns ['series'] = 'Series';
+        $columns ['fb_reactions'] = 'Reactions';
+        $columns ['fb_shares'] = 'Shares';
+        $columns ['fb_comments'] = 'Comments';
+        if (self::use_google_analytics()) {
+			$columns ['views'] = 'Views';
+			$column_order = array ('cb', 'title', 'article_author', 'issue_details', 'section', 'series', 'views', 'fb_reactions', 'fb_shares', 'fb_comments', 'date');
+		} else {
+			$column_order = array ('cb', 'title', 'article_author', 'issue_details', 'section', 'series', 'fb_reactions', 'fb_shares', 'fb_comments', 'date');
+		}
+		return array_merge(array_flip($column_order), $columns);
+	}
+
+	/**
+	* Adds columns to the Articles admin pages
+	*
+	* Filters manage_edit-em_review_columns
+	*
+	* @param array $columns
+	* @return array
+	*/
+	public static function filter_review_columns ($columns) {
+		global $evangelical_magazine;
+		$columns ['article_author'] = 'Author';
+		$columns ['issue_details'] = 'Issue';
+        $columns ['fb_reactions'] = 'Reactions';
+        $columns ['fb_shares'] = 'Shares';
+        $columns ['fb_comments'] = 'Comments';
+        if (self::use_google_analytics()) {
+			$columns ['views'] = 'Views';
+			$column_order = array ('cb', 'title', 'taxonomy-em_review_media_type', 'article_author', 'issue_details', 'views', 'fb_reactions', 'fb_shares', 'fb_comments', 'date');
+		} else {
+			$column_order = array ('cb', 'title', 'taxonomy-em_review_media_type', 'article_author', 'issue_details', 'fb_reactions', 'fb_shares', 'fb_comments', 'date');
+		}
+		return array_merge(array_flip($column_order), $columns);
+	}
+
+	/**
+	* Outputs the additional columns on the Articles and Reviews admin pages
+	*
+	* Filters manage_em_article_posts_custom_column and manage_em_review_posts_custom_column
+	*
+	* @param string $column - the name of the column
+	* @param int $post_id - the post_id for this row
+	* @return void
+	*/
+	public static function output_columns ($column, $post_id) {
+		global $evangelical_magazine, $post;
+		/** @var evangelical_magazine_articles_and_reviews */
+		$object = evangelical_magazine::get_object_from_post($post);
+		if ($object->is_article_or_review()) {
+			if ($object->is_published()) {
+				if ($column == 'fb_reactions' || $column == 'fb_shares' || $column == 'fb_comments') {
+					echo number_format($object->get_facebook_stats(substr($column,3)));
+				}
+				elseif ($column == 'views') {
+					echo number_format($object->get_google_analytics_stats());
+				}
+			}
+			if ($column == 'article_author') {
+				$authors = $object->get_authors();
+				if ($authors) {
+					$author_names = array();
+					foreach ($authors as $author) {
+						$author_names[] = $author->get_name (false, false, true);
+					}
+					echo implode('<br/>', $author_names);
+				}
+			}
+			elseif ($column == 'issue_details') {
+				echo $object->get_issue_name(false, false, true).',&nbsp;pg&nbsp;'.$object->get_page_num();
+			}
+			elseif ($column == 'section') {
+				echo $object->get_section_name(false, false, true);
+			}
+			elseif ($column == 'series') {
+				echo $object->get_series_name(false, false, true);
+			}
+		}
+	}
+
+	/**
+	* Sets the custom columns to be sortable
+	*
+	* Filters manage_edit-em_article_sortable_columns and manage_edit-em_review_sortable_columns
+	*
+	* @param array $columns
+	* @return array
+	*/
+	public static function make_columns_sortable ($columns) {
+		global $evangelical_magazine;
+		$columns ['fb_reactions'] = 'fb_reactions';
+		$columns ['fb_shares'] = 'fb_shares';
+		$columns ['fb_comments'] = 'fb_comments';
+		$columns ['issue_details'] = 'issue_details';
+		if (self::use_google_analytics()) {
+			$columns ['views'] = 'views';
+		}
+		return $columns;
+	}
+
+	/**
+	* Modifies the query to sort by columns, if requested
+	*
+	* Runs on the pre_get_posts action
+	*
+	* @param WP_Query $query
+	* @return void
+	*/
+	public static function sort_by_columns ($query) {
+		if  (is_admin()) {
+			$screen = get_current_screen();
+			if ($screen->id == 'edit-em_article' || $screen->id == 'edit-em_review') {
+				$orderby = $query->get('orderby');
+				if ($orderby && $orderby == 'fb_reactions') {
+					$query->set ('meta_key', self::FB_REACTIONS_META_NAME);
+					$query->set ('orderby','meta_value_num');
+				} elseif ($orderby && $orderby == 'fb_shares') {
+					$query->set ('meta_key', self::FB_SHARES_META_NAME);
+					$query->set ('orderby','meta_value_num');
+				} elseif ($orderby && $orderby == 'fb_comments') {
+					$query->set ('meta_key', self::FB_COMMENTS_META_NAME);
+					$query->set ('orderby','meta_value_num');
+				} elseif ($orderby && $orderby == 'views') {
+					$query->set ('meta_key', self::GOOGLE_ANALYTICS_META_NAME);
+					$query->set ('orderby','meta_value_num');
+				} elseif ($orderby && $orderby == 'issue_details') {
+					$query->set ('meta_key', self::ARTICLE_SORT_ORDER_META_NAME);
+					$query->set ('orderby','meta_value');
+				}
+			}
+		}
+	}
 }

@@ -3,7 +3,7 @@
 Plugin Name: Evangelical Magazine
 Description: Customisations for the Evangelical Magazine
 Plugin URI: http://www.evangelicalmagazine.com/
-Version: 1.02
+Version: 1.03
 Author: Mark Barnes
 Author URI: http://www.markbarnes.net/
 */
@@ -305,20 +305,24 @@ class evangelical_magazine {
 	*/
 	public static function setup_custom_post_type_columns() {
 		global $evangelical_magazine;
-		add_filter ('manage_edit-em_article_columns', array ('evangelical_magazine_article', 'filter_columns'));
-		add_action ('manage_em_article_posts_custom_column', array ('evangelical_magazine_article', 'output_columns'), 10, 2);
-		add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_article', 'make_columns_sortable'));
-		add_action ('pre_get_posts', array ('evangelical_magazine_article', 'sort_by_columns'));
+		add_filter ('manage_edit-em_article_columns', array ('evangelical_magazine_articles_and_reviews', 'filter_article_columns'));
+		add_action ('manage_em_article_posts_custom_column', array ('evangelical_magazine_articles_and_reviews', 'output_columns'), 10, 2);
+		add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_articles_and_reviews', 'make_columns_sortable'));
+		add_filter ('manage_edit-em_review_columns', array ('evangelical_magazine_articles_and_reviews', 'filter_review_columns'));
+		add_action ('manage_em_review_posts_custom_column', array ('evangelical_magazine_articles_and_reviews', 'output_columns'), 10, 2);
+		add_filter ('manage_edit-em_review_sortable_columns', array ('evangelical_magazine_articles_and_reviews', 'make_columns_sortable'));
+		add_action ('pre_get_posts', array ('evangelical_magazine_articles_and_reviews', 'sort_by_columns'));
 		add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
-		add_filter ('post_row_actions', array (__CLASS__, 'adds_recalc_stats_to_article_actions'), 10, 2);
+		add_filter ('post_row_actions', array (__CLASS__, 'adds_recalc_stats_to_actions'), 10, 2);
 		if (isset($_GET['recalc_stats']) && is_admin()) {
-			$article = new evangelical_magazine_article((int)$_GET['recalc_stats']);
-			if ($article) {
-				delete_transient($article->get_facebook_transient_name());
+			/** @var evangelical_magazine_articles_and_reviews */
+			$object = evangelical_magazine::get_object_from_id((int)$_GET['recalc_stats']);
+			if ($object && $object->is_article_or_review()) {
+				delete_transient($object->get_facebook_transient_name());
 				if ($evangelical_magazine->use_google_analytics) {
-					delete_transient($article->get_google_analytics_transient_name());
+					delete_transient($object->get_google_analytics_transient_name());
 				}
-				$evangelical_magazine->update_all_stats_if_required ($article->get_id());
+				$evangelical_magazine->update_all_stats_if_required ($object->get_id());
 			}
 		}
 	}
@@ -498,16 +502,16 @@ class evangelical_magazine {
 	}
 
 	/**
-	* Adds the 'recalc_stats' row action to articles
+	* Adds the 'recalc_stats' row action to articles and reviews
 	* Filters post_row_actions
 	*
 	* @param array $actions - the existing actions
 	* @param WP_Post $post - the current post
 	* @return array - the filtered actions
 	*/
-	public static function adds_recalc_stats_to_article_actions ($actions, $post) {
+	public static function adds_recalc_stats_to_actions ($actions, $post) {
 		global $current_screen;
-		if ($post->post_type == 'em_article') {
+		if ($post->post_type == 'em_article' || $post->post_type == 'em_review') {
 			$possible_variables = array ('paged', 'orderby', 'order', 'author', 'all_posts', 'post_status');
 			$arguments = array('recalc_stats' => $post->ID);
 			foreach ($possible_variables as $p) {
