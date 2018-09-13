@@ -580,6 +580,15 @@ abstract class evangelical_magazine_template {
 	}
 
 	/**
+	* Returns true if the object is an issue
+	*
+	* @return bool
+	*/
+	public function is_issue() {
+		return is_a($this, 'evangelical_magazine_issue');
+	}
+
+	/**
 	* Returns true if the object is an article
 	*
 	* @return bool
@@ -758,5 +767,56 @@ abstract class evangelical_magazine_template {
 	*/
 	protected function html_tag ($tag, $contents, $attributes = array()) {
 		return "<{$tag} {$this->attr_html($attributes)}>{$contents}</{$tag}>";
+	}
+
+	/**
+	* Outputs the additional columns on the admin pages
+	*
+	* Filters manage_em_*_posts_custom_column
+	*
+	* @param string $column - the name of the column
+	* @param int $post_id - the post_id for this row
+	* @return void
+	*/
+	public static function output_columns ($column, $post_id) {
+		global $evangelical_magazine, $post;
+		/** @var evangelical_magazine_template */
+		$object = evangelical_magazine::get_object_from_post($post);
+		if ($column == 'featured_image') {
+			$image_size = $object->is_issue() ? 'issue_small' : 'author_tiny';
+			$image_details = $object->get_image_html($image_size, false, '', $object->get_name());
+			if ($image_details) {
+				echo $object->get_edit_link_html($image_details);
+			}
+		}
+		if ($object->is_article_or_review()) {
+			if ($object->is_published()) {
+				if ($column == 'fb_reactions' || $column == 'fb_shares' || $column == 'fb_comments') {
+					echo number_format($object->get_facebook_stats(substr($column,3)));
+				}
+				elseif ($column == 'views') {
+					echo number_format($object->get_google_analytics_stats());
+				}
+			}
+			if ($column == 'article_author') {
+				$authors = $object->get_authors();
+				if ($authors) {
+					$author_names = array();
+					foreach ($authors as $author) {
+						$author_names[] = $author->get_name (false, false, true);
+					}
+					echo implode('<br/>', $author_names);
+				}
+			}
+			elseif ($column == 'issue_details') {
+				echo $object->get_issue_name(false, false, true).',&nbsp;pg&nbsp;'.$object->get_page_num();
+			}
+			elseif ($column == 'section') {
+				echo $object->get_section_name(false, false, true);
+			}
+			elseif ($column == 'series') {
+				echo $object->get_series_name(false, false, true);
+			}
+		}
 	}
 }

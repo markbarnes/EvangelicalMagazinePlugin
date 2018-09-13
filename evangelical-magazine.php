@@ -3,7 +3,7 @@
 Plugin Name: Evangelical Magazine
 Description: Customisations for the Evangelical Magazine
 Plugin URI: http://www.evangelicalmagazine.com/
-Version: 1.03
+Version: 1.04
 Author: Mark Barnes
 Author URI: http://www.markbarnes.net/
 */
@@ -305,14 +305,19 @@ class evangelical_magazine {
 	*/
 	public static function setup_custom_post_type_columns() {
 		global $evangelical_magazine;
-		add_filter ('manage_edit-em_article_columns', array ('evangelical_magazine_articles_and_reviews', 'filter_article_columns'));
-		add_action ('manage_em_article_posts_custom_column', array ('evangelical_magazine_articles_and_reviews', 'output_columns'), 10, 2);
+		// Add columns and output actions
+		$post_types_to_add = array ('article', 'review', 'issue', 'series', 'author');
+		foreach ($post_types_to_add as $p) {
+			add_filter ("manage_edit-em_{$p}_columns", array ("evangelical_magazine_{$p}", 'filter_columns'));
+			add_action ("manage_em_{$p}_posts_custom_column", array ("evangelical_magazine_template", 'output_columns'), 10, 2);
+		}
+		// Make sortable
 		add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_articles_and_reviews', 'make_columns_sortable'));
-		add_filter ('manage_edit-em_review_columns', array ('evangelical_magazine_articles_and_reviews', 'filter_review_columns'));
-		add_action ('manage_em_review_posts_custom_column', array ('evangelical_magazine_articles_and_reviews', 'output_columns'), 10, 2);
 		add_filter ('manage_edit-em_review_sortable_columns', array ('evangelical_magazine_articles_and_reviews', 'make_columns_sortable'));
 		add_action ('pre_get_posts', array ('evangelical_magazine_articles_and_reviews', 'sort_by_columns'));
+		// Add styles
 		add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
+		// Recalc stats
 		add_filter ('post_row_actions', array (__CLASS__, 'adds_recalc_stats_to_actions'), 10, 2);
 		if (isset($_GET['recalc_stats']) && is_admin()) {
 			/** @var evangelical_magazine_articles_and_reviews */
@@ -449,7 +454,13 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public static function add_styles_to_admin_head () {
-		echo '<style type="text/css">.column-title {width: 30%} .column-views, .column-fb_shares {width: 75px} .column-fb_reactions, .column-fb_comments {width: 100px}</style></style>';
+		echo '<style type="text/css">.column-featured_image {width: 58px}
+									 .column-featured_image img {width: 58px; height: 58px}
+									 .post-type-em_issue .column-featured_image {width: 75px}
+									 .post-type-em_issue .column-featured_image img {width: 75px; height: 106px}
+									 .column-views, .column-fb_shares {width: 75px}
+									 .column-fb_reactions, .column-fb_comments {width: 100px}
+		</style>';
 	}
 
 	/**

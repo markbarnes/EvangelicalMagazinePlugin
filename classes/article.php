@@ -338,4 +338,32 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 			return $articles;
 		}
 	}
+
+	/**
+	* Adds columns to the Articles admin pages
+	*
+	* Filters manage_edit-em_article_columns
+	*
+	* @param array $columns
+	* @return array
+	*/
+	public static function filter_columns ($columns) {
+		global $evangelical_magazine;
+		$columns ['featured_image'] = 'Image';
+		$columns ['article_author'] = 'Author';
+		$columns ['issue_details'] = 'Issue';
+		$columns ['section'] = 'Section';
+		$columns ['series'] = 'Series';
+        $columns ['fb_reactions'] = 'Reactions';
+        $columns ['fb_shares'] = 'Shares';
+        $columns ['fb_comments'] = 'Comments';
+        if (self::use_google_analytics()) {
+			$columns ['views'] = 'Views';
+		}
+        $column_order = array_merge (array ('cb', 'featured_image', 'title', 'article_author', 'issue_details', 'section', 'series'),
+        							 isset($columns ['views']) ? array ('views') : array(),
+									 array ('fb_reactions', 'fb_shares', 'fb_comments', 'date')
+									);
+		return array_merge(array_flip($column_order), $columns);
+	}
 }

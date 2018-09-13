@@ -357,4 +357,30 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 			return $title;
 		}
 	}
+
+	/**
+	* Adds columns to the Reviews admin pages
+	*
+	* Filters manage_edit-em_review_columns
+	*
+	* @param array $columns
+	* @return array
+	*/
+	public static function filter_columns ($columns) {
+		global $evangelical_magazine;
+		$columns ['featured_image'] = 'Image';
+		$columns ['review_author'] = 'Author';
+		$columns ['issue_details'] = 'Issue';
+        $columns ['fb_reactions'] = 'Reactions';
+        $columns ['fb_shares'] = 'Shares';
+        $columns ['fb_comments'] = 'Comments';
+        if (self::use_google_analytics()) {
+			$columns ['views'] = 'Views';
+		}
+        $column_order = array_merge (array ('cb', 'featured_image', 'title', 'review_author', 'issue_details'),
+        							 isset($columns ['views']) ? array ('views') : array(),
+									 array ('fb_reactions', 'fb_shares', 'fb_comments', 'date')
+									);
+		return array_merge(array_flip($column_order), $columns);
+	}
 }

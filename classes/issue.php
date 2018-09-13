@@ -200,4 +200,19 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles_or_re
 		}
 		echo '</select>';
 	}
+
+	/**
+	* Adds columns to the Issues admin pages
+	*
+	* Filters manage_edit-em_issue_columns
+	*
+	* @param array $columns
+	* @return array
+	*/
+	public static function filter_columns ($columns) {
+		global $evangelical_magazine;
+		$columns ['featured_image'] = 'Image';
+        $column_order = array ('cb', 'featured_image', 'title', 'date');
+		return array_merge(array_flip($column_order), $columns);
+	}
 }

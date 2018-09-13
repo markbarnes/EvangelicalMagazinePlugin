@@ -133,4 +133,19 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles_or_r
 	public static function sort_authors_alphabetically(&$authors) {
 		uasort($authors, array(__CLASS__, '_compare_authors_alphabetically'));
 	}
+
+	/**
+	* Adds columns to the Author admin pages
+	*
+	* Filters manage_edit-em_author_columns
+	*
+	* @param array $columns
+	* @return array
+	*/
+	public static function filter_columns ($columns) {
+		global $evangelical_magazine;
+		$columns ['featured_image'] = 'Image';
+        $column_order = array ('cb', 'featured_image', 'title', 'date');
+		return array_merge(array_flip($column_order), $columns);
+	}
 }
