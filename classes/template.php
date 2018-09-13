@@ -20,7 +20,9 @@ abstract class evangelical_magazine_template {
 	const SECTION_META_NAME = 'evangelical_magazine_section';
 	const VIEW_COUNT_META_NAME = 'evangelical_magazine_view_count';
 	const ISSUE_DATE_META_NAME = 'evangelical_magazine_issue_date';
-	const FB_ENGAGEMENT_META_NAME = 'evangelical_magazine_fb_engagement';
+	const FB_REACTIONS_META_NAME = 'evangelical_magazine_fb_reactions';
+	const FB_SHARES_META_NAME = 'evangelical_magazine_fb_shares';
+	const FB_COMMENTS_META_NAME = 'evangelical_magazine_fb_comments';
 	const GOOGLE_ANALYTICS_META_NAME = 'evangelical_magazine_google_analytics';
 	const REVIEW_SORT_ORDER_META_NAME = 'evangelical_magazine_review_sort_order';
 	const REVIEW_PRICE_META_NAME = 'evangelical_magazine_price';
@@ -625,33 +627,45 @@ abstract class evangelical_magazine_template {
 	}
 
 	/**
+	* Returns an array of the Facebook stats metanames
+	*
+	* @return array
+	*/
+	private function get_facebook_metanames() {
+		return array ('reactions' => self::FB_REACTIONS_META_NAME, 'comments' => self::FB_COMMENTS_META_NAME, 'shares' => self::FB_SHARES_META_NAME);
+	}
+
+	/**
 	* Gets the Facebook stats for this object
 	*
+	* @param string $stat_type - one of 'reactions', 'comments', or 'shares'
 	* @return int
 	*/
-	public function get_facebook_stats() {
-		if (!$this->has_valid_facebook_stats()) {
-			$url = apply_filters ('evangelical_magazine_url_for_facebook', $this->get_link());
-			$json = wp_remote_request('https://graph.facebook.com/v2.8/?id='.urlencode($url).'&fields=og_object{engagement{count}},share&access_token='.evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret());
-			$stats = json_decode(wp_remote_retrieve_body($json), true);
-			if ($stats !== NULL && isset($stats['share'])) {
-				$this->update_facebook_stats ($stats['share']['share_count']);
-			}
-		}
-		return get_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, true);
+	public function get_facebook_stats($stat_type = 'reactions') {
+		global $evangelical_magazine;
+		$evangelical_magazine->update_facebook_stats_if_required(array($this->get_id()));
+		$meta_names = $this->get_facebook_metanames();
+		return get_post_meta($this->get_id(), $meta_names[$stat_type], true);
 	}
 
 	/**
 	* Updates the Facebook engagement metadata for this object
 	*
 	* @param int $engagement_count
+	* @param string $stat_type - one of 'reactions', 'comments', or 'shares'
 	* @return void
 	*/
 	public function update_facebook_stats($engagement_count) {
-		update_post_meta($this->get_id(), self::FB_ENGAGEMENT_META_NAME, $engagement_count);
-		$secs_since_published = time() - strtotime($this->get_post_date());
-		$secs_since_published = $secs_since_published < HOUR_IN_SECONDS ? HOUR_IN_SECONDS : $secs_since_published;
-		set_transient ($this->get_facebook_transient_name(), true, $secs_since_published > WEEK_IN_SECONDS ? WEEK_IN_SECONDS : $secs_since_published);
+		if ($engagement_count) {
+			$meta_names = $this->get_facebook_metanames();
+			$elements = array ('comment_count' => 'comments', 'reaction_count' => 'reactions', 'share_count' => 'shares');
+			foreach ($elements as $k => $v) {
+				update_post_meta($this->get_id(), $meta_names[$v], $engagement_count->$k);
+			}
+			$secs_since_published = time() - strtotime($this->get_post_date());
+			$secs_since_published = $secs_since_published < HOUR_IN_SECONDS ? HOUR_IN_SECONDS : $secs_since_published;
+			set_transient ($this->get_facebook_transient_name(), true, $secs_since_published > WEEK_IN_SECONDS ? WEEK_IN_SECONDS : $secs_since_published);
+		}
 	}
 
 	/**

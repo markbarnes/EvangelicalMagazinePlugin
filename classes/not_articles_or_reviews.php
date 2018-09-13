@@ -189,9 +189,9 @@ abstract class evangelical_magazine_not_articles_or_reviews extends evangelical_
 					$likes = 0;
 					$ids = array_merge ($article_ids, $review_ids);
 					foreach ($ids as $id) {
-						/**	@var evangelical_magazine_article */
+						/**	@var evangelical_magazine_articles_and_reviews */
 						$object = evangelical_magazine::get_object_from_id($id);
-						$likes += $object->get_facebook_stats();
+						$likes += $object->get_facebook_stats('reactions');
 					}
 					if ($likes) {
 						$return_values[] = number_format($likes).($likes == 1 ? ' like' : ' likes');

@@ -353,12 +353,14 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 		$columns ['issue_details'] = 'Issue';
 		$columns ['section'] = 'Section';
 		$columns ['series'] = 'Series';
-		$columns ['fb_engagement'] = 'FB Engagement';
-		if (self::use_google_analytics()) {
+        $columns ['fb_reactions'] = 'Reactions';
+        $columns ['fb_shares'] = 'Shares';
+        $columns ['fb_comments'] = 'Comments';
+        if (self::use_google_analytics()) {
 			$columns ['views'] = 'Views';
-			$column_order = array ('cb', 'title', 'article_author', 'issue_details', 'section', 'series', 'views', 'fb_engagement', 'date');
+			$column_order = array ('cb', 'title', 'article_author', 'issue_details', 'section', 'series', 'views', 'fb_reactions', 'fb_shares', 'fb_comments', 'date');
 		} else {
-			$column_order = array ('cb', 'title', 'article_author', 'issue_details', 'section', 'series', 'fb_engagement', 'date');
+			$column_order = array ('cb', 'title', 'article_author', 'issue_details', 'section', 'series', 'fb_reactions', 'fb_shares', 'fb_comments', 'date');
 		}
 		return array_merge(array_flip($column_order), $columns);
 	}
@@ -375,13 +377,15 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 	public static function output_columns ($column, $post_id) {
 		global $post;
 		$article = new evangelical_magazine_article($post);
-		if ($article->is_published() && $column == 'fb_engagement') {
-			echo number_format($article->get_facebook_stats());
+		if ($article->is_published()) {
+			if ($column == 'fb_reactions' || $column == 'fb_shares' || $column == 'fb_comments') {
+				echo number_format($article->get_facebook_stats(substr($column,3)));
+			}
+			elseif ($column == 'views') {
+				echo number_format($article->get_google_analytics_stats());
+			}
 		}
-		elseif ($article->is_published() && $column == 'views') {
-			echo number_format($article->get_google_analytics_stats());
-		}
-		elseif ($column == 'article_author') {
+		if ($column == 'article_author') {
 			$authors = $article->get_authors();
 			if ($authors) {
 				$author_names = array();
@@ -412,7 +416,9 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 	*/
 	public static function make_columns_sortable ($columns) {
 		global $evangelical_magazine;
-		$columns ['fb_engagement'] = 'fb_engagement';
+		$columns ['fb_reactions'] = 'fb_reactions';
+		$columns ['fb_shares'] = 'fb_shares';
+		$columns ['fb_comments'] = 'fb_comments';
 		$columns ['issue_details'] = 'issue_details';
 		if (self::use_google_analytics()) {
 			$columns ['views'] = 'views';
@@ -433,8 +439,14 @@ class evangelical_magazine_article extends evangelical_magazine_articles_and_rev
 			$screen = get_current_screen();
 			if ($screen->id == 'edit-em_article') {
 				$orderby = $query->get('orderby');
-				if ($orderby && $orderby == 'fb_engagement') {
-					$query->set ('meta_key', self::FB_ENGAGEMENT_META_NAME);
+				if ($orderby && $orderby == 'fb_reactions') {
+					$query->set ('meta_key', self::FB_REACTIONS_META_NAME);
+					$query->set ('orderby','meta_value_num');
+				} elseif ($orderby && $orderby == 'fb_shares') {
+					$query->set ('meta_key', self::FB_SHARES_META_NAME);
+					$query->set ('orderby','meta_value_num');
+				} elseif ($orderby && $orderby == 'fb_comments') {
+					$query->set ('meta_key', self::FB_COMMENTS_META_NAME);
 					$query->set ('orderby','meta_value_num');
 				} elseif ($orderby && $orderby == 'views') {
 					$query->set ('meta_key', self::GOOGLE_ANALYTICS_META_NAME);

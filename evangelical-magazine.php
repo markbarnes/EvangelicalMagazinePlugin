@@ -3,7 +3,7 @@
 Plugin Name: Evangelical Magazine
 Description: Customisations for the Evangelical Magazine
 Plugin URI: http://www.evangelicalmagazine.com/
-Version: 1.0
+Version: 1.02
 Author: Mark Barnes
 Author URI: http://www.markbarnes.net/
 */
@@ -445,7 +445,7 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public static function add_styles_to_admin_head () {
-		echo '<style type="text/css">.column-title {width: 30%}</style>';
+		echo '<style type="text/css">.column-title {width: 30%} .column-views, .column-fb_shares {width: 75px} .column-fb_reactions, .column-fb_comments {width: 100px}</style></style>';
 	}
 
 	/**
@@ -571,7 +571,7 @@ class evangelical_magazine {
 			$stats = get_transient($transient_name);
 			if (!$stats) {
 				$url = apply_filters ('evangelical_magazine_url_for_facebook', get_permalink($id));
-				$requests[] = array ('method' => 'GET', 'relative_url' => '?id='.urlencode($url).'&fields=share');
+				$requests[] = array ('method' => 'GET', 'relative_url' => '?id='.urlencode($url).'&fields=engagement');
 				$lookup [$url] = $id;
 			}
 		}
@@ -580,17 +580,20 @@ class evangelical_magazine {
 			foreach ($request_chunks as $chunk) {
 				$args['access_token'] = evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret();
 				$args['batch'] = json_encode($chunk);
-				$stats = wp_remote_post('https://graph.facebook.com/v2.8/', array ('body' => $args));
+				$stats = wp_remote_post('https://graph.facebook.com/v3.1/', array ('body' => $args));
 				if (!is_a($stats, 'WP_Error')) {
 					$response = json_decode($stats['body']);
 					if (!isset($response->error)) {
 						foreach ((array)$response as $r) {
 							$stats = json_decode($r->body);
+							/**
+							* @var evangelical_magazine_template
+							*/
 							$object = $this->get_object_from_id($lookup [$stats->id]);
-							if ($stats !== NULL && isset($stats->share)) {
-								$object->update_facebook_stats ($stats->share->share_count);
+							if ($stats !== NULL && isset($stats->engagement)) {
+								$object->update_facebook_stats ($stats->engagement);
 							} else {
-								$object->update_facebook_stats (0);
+								$object->update_facebook_stats (array());
 							}
 						}
 					}
