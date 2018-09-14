@@ -458,9 +458,16 @@ class evangelical_magazine {
 									 .column-featured_image img {width: 58px; height: 58px}
 									 .post-type-em_issue .column-featured_image {width: 75px}
 									 .post-type-em_issue .column-featured_image img {width: 75px; height: 106px}
-									 .column-views, .column-fb_shares {width: 75px}
-									 .column-fb_reactions, .column-fb_comments {width: 100px}
 									 @media screen and (max-width: 782px) { .wp-list-table #the-list tr .column-featured_image, th#featured_image { display: none}}
+									 @media screen and (max-width: 1100px) {
+									 	.wp-list-table #the-list tr .column-views, th.column-views { display: none}
+									 	.wp-list-table #the-list tr .column-fb_reactions, th.column-fb_reactions { display: none}
+									 	.wp-list-table #the-list tr .column-fb_shares, th.column-fb_shares { display: none}
+									 	.wp-list-table #the-list tr .column-fb_comments, th.column-fb_comments { display: none}
+									 }
+									 @media screen and (min-width: 782px) {
+									 	.column-title { width: 25%}
+									 }
 		</style>';
 	}
 
