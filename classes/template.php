@@ -798,7 +798,7 @@ abstract class evangelical_magazine_template {
 					echo number_format($object->get_google_analytics_stats());
 				}
 			}
-			if ($column == 'article_author') {
+			if ($column == 'article_author' || $column == 'review_author' ) {
 				$authors = $object->get_authors();
 				if ($authors) {
 					$author_names = array();
