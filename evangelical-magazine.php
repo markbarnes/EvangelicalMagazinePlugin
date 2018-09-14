@@ -460,6 +460,7 @@ class evangelical_magazine {
 									 .post-type-em_issue .column-featured_image img {width: 75px; height: 106px}
 									 .column-views, .column-fb_shares {width: 75px}
 									 .column-fb_reactions, .column-fb_comments {width: 100px}
+									 @media screen and (max-width: 782px) { .wp-list-table #the-list tr .column-featured_image, th#featured_image { display: none}}
 		</style>';
 	}
 
