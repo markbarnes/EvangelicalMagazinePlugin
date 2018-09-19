@@ -19,6 +19,7 @@ class evangelical_magazine_facebook_instant_articles {
 		add_filter ('instant_articles_post_types', create_function('', 'return array ("em_article");'));
 		add_filter ('instant_articles_authors', array (__CLASS__, 'replace_author_names'), 10, 2);
 		add_filter ('instant_articles_content', array (__CLASS__, 'add_author_descriptions_to_content'), 10, 2);
+		add_filter ('instant_articles_amp_article_html', array (__CLASS__, 'fix_instant_articles_amp_article_html')); // @see https://github.com/Automattic/facebook-instant-articles-wp/issues/824#issuecomment-422718325
 	}
 
 	/**
@@ -60,5 +61,18 @@ class evangelical_magazine_facebook_instant_articles {
 			}
 		}
 		return $content;
+	}
+
+	/**
+	* Converts extended characters to HTML entities to avoid an AMP bug
+	* Requires a customised version of the Facebook Instant Articles plugin
+	*
+	* @see https://github.com/Automattic/facebook-instant-articles-wp/issues/824#issuecomment-422718325
+	*
+	* @param string $article_html
+	* @return string
+	*/
+	public static function fix_instant_articles_amp_article_html ($article_html) {
+		return mb_convert_encoding( $article_html, 'HTML-ENTITIES', 'UTF-8' );
 	}
 }
