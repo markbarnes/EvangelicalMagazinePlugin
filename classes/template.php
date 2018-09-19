@@ -55,7 +55,9 @@ abstract class evangelical_magazine_template {
 	* @return integer
 	*/
 	public function get_id() {
-		return $this->post_data->ID;
+		if (is_object ($this->post_data)) {
+			return $this->post_data->ID;
+		}
 	}
 
 	/**

@@ -60,6 +60,7 @@ class evangelical_magazine {
 		add_image_size ('article_rss', 560, 280, true);
 
 		//Instant articles
+		add_filter ('instant_articles_amp_article_html', array (__CLASS__, 'fix_instant_articles_amp_article_html')); // @see https://github.com/Automattic/facebook-instant-articles-wp/issues/824#issuecomment-422718325
 		$ia = new evangelical_magazine_facebook_instant_articles();
 
 		//Google Analytics
@@ -796,6 +797,19 @@ class evangelical_magazine {
 			$query->query_vars['post_type'] = array ('em_article', 'em_review');
 			add_filter ('the_content_feed', array (__CLASS__, 'filter_feed_for_mailchimp'));
 		}
+	}
+
+	/**
+	* Converts extended characters to HTML entities to avoid an AMP bug
+	* Requires a customised version of the Facebook Instant Articles plugin
+	*
+	* @see https://github.com/Automattic/facebook-instant-articles-wp/issues/824#issuecomment-422718325
+	*
+	* @param string $article_html
+	* @return string
+	*/
+	public static function fix_instant_articles_amp_article_html ($article_html) {
+		return mb_convert_encoding( $article_html, 'HTML-ENTITIES', 'UTF-8' );
 	}
 }
 
