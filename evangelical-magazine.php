@@ -661,7 +661,7 @@ class evangelical_magazine {
 		if (isset($all_urls) && $all_urls) {
 			$chunks = array_chunk ($all_urls, 10);
 			foreach ($chunks as $chunked_urls) {
-				$stats = $this->analytics->get_page_views($chunked_urls);
+				$stats = $this->analytics->get_page_views($chunked_urls, '2016-01-01', 'today');
 				foreach ($stats as $path => $count) {
 					$objects[$index[$path]]->update_google_analytics_stats ($count);
 				}

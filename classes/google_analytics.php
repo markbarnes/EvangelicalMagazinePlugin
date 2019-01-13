@@ -85,9 +85,11 @@ class evangelical_magazine_google_analytics {
 	* Gets the number of Google Analytics page views for a single url or array of urls
 	*
 	* @param string|string[] $urls - a single url or array of urls
+	* @param string $start_date - the date stats should be calculated from, in the format 'yyyy-mm-dd'
+	* @param string $end_date - the date stats should be calculated to, in the format 'yyyy-mm-dd' (or use 'today')
 	* @return int|array - returns an integer if $urls was a string, and an arrays if $urls was an array. The array key is set to the path, and the value to the number of views.
 	*/
-	public function get_page_views($urls) {
+	public function get_page_views($urls, $start_date = '2016-01-01', $end_date = 'today') {
 		if (!is_array($urls)) {
 			$urls = (array)$urls;
 			$return_single_value = true;
@@ -101,7 +103,7 @@ class evangelical_magazine_google_analytics {
 			$filters[] = urlencode('ga:pagePath=='.wp_parse_url($url, PHP_URL_PATH));
 		}
 		$filter = implode ($filters, ',');
-		$url = "https://www.googleapis.com/analytics/v3/data/ga?ids=ga%3A{$profile_id}&start-date=2016-01-01&end-date=today&metrics=ga%3Apageviews&dimensions=ga%3ApagePath&filters={$filter}&access_token=".$access_token;
+		$url = "https://www.googleapis.com/analytics/v3/data/ga?ids=ga%3A{$profile_id}&start-date={$start_date}&end-date={$today}&metrics=ga%3Apageviews&dimensions=ga%3ApagePath&filters={$filter}&access_token=".$access_token;
 		$response = json_decode($this->http->get($url)->getBody()->getContents());
 		if (isset($response->rows)) {
 			if ($return_single_value) {
