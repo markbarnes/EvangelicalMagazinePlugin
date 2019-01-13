@@ -336,6 +336,7 @@ class evangelical_magazine {
 				delete_transient($object->get_facebook_transient_name());
 				if ($evangelical_magazine->use_google_analytics) {
 					delete_transient($object->get_google_analytics_transient_name());
+					delete_metadata ('post', $object->get_id(), evangelical_magazine_articles_and_reviews::GOOGLE_ANALYTICS_INITIAL_META_NAME);
 				}
 				$evangelical_magazine->update_all_stats_if_required ($object->get_id());
 			}
@@ -470,7 +471,7 @@ class evangelical_magazine {
 									 .post-type-em_issue .column-featured_image img {width: 75px; height: 106px}
 									 @media screen and (max-width: 782px) { .wp-list-table #the-list tr .column-featured_image, th#featured_image { display: none}}
 									 @media screen and (max-width: 1100px) {
-									 	.wp-list-table #the-list tr .column-views, th.column-views { display: none}
+									 	.wp-list-table #the-list tr .column-views, th.column-views, tr .column-initial_views, th.column-initial_views { display: none}
 									 	.wp-list-table #the-list tr .column-fb_reactions, th.column-fb_reactions { display: none}
 									 	.wp-list-table #the-list tr .column-fb_shares, th.column-fb_shares { display: none}
 									 	.wp-list-table #the-list tr .column-fb_comments, th.column-fb_comments { display: none}

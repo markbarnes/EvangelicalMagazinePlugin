@@ -376,9 +376,10 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
         $columns ['fb_comments'] = 'Comments';
         if (self::use_google_analytics()) {
 			$columns ['views'] = 'Views';
+			$columns ['initial_views'] = 'Initial Views';
 		}
         $column_order = array_merge (array ('cb', 'featured_image', 'title', 'taxonomy-em_review_media_type', 'review_author', 'issue_details'),
-        							 isset($columns ['views']) ? array ('views') : array(),
+        							 isset($columns ['views']) ? array ('views', 'initial_views') : array(),
 									 array ('fb_reactions', 'fb_shares', 'fb_comments', 'date')
 									);
 		return array_merge(array_flip($column_order), $columns);

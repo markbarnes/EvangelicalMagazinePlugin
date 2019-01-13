@@ -24,6 +24,7 @@ abstract class evangelical_magazine_template {
 	const FB_SHARES_META_NAME = 'evangelical_magazine_fb_shares';
 	const FB_COMMENTS_META_NAME = 'evangelical_magazine_fb_comments';
 	const GOOGLE_ANALYTICS_META_NAME = 'evangelical_magazine_google_analytics';
+	const GOOGLE_ANALYTICS_INITIAL_META_NAME = 'evangelical_magazine_google_analytics_initial';
 	const REVIEW_SORT_ORDER_META_NAME = 'evangelical_magazine_review_sort_order';
 	const REVIEW_PRICE_META_NAME = 'evangelical_magazine_price';
 	const REVIEW_PUBLISHER_META_NAME = 'evangelical_magazine_publisher';
@@ -680,21 +681,40 @@ abstract class evangelical_magazine_template {
 	}
 
 	/**
-	* Returns the name of the transient which indicates whether or not the Google Analytics engagement stat is cached
+	* Returns the name of the metadata where the Google Analytics engagement stat is cached
 	*
+	* @param string $start_date - the date stats should be calculated from, in the format 'yyyy-mm-dd'
+	* @param string $end_date - the date stats should be calculated to, in the format 'yyyy-mm-dd' (or use 'today')
 	* @return string
 	*/
-	public function get_google_analytics_transient_name() {
-		return "em_ga_valid_{$this->get_id()}";
+	public function get_google_analytics_metadata_name($start_date = '2016-01-01', $end_date = 'today') {
+		if ($start_date == '2016-01-01' && $end_date == 'today') {
+			return self::GOOGLE_ANALYTICS_META_NAME;
+		} else {
+			return self::GOOGLE_ANALYTICS_META_NAME."-{$start_date}-{$end_date}";
+		}
+	}
+
+	/**
+	* Returns the name of the transient which indicates whether or not the Google Analytics engagement stat is cached
+	*
+	* @param string $start_date - the date stats should be calculated from, in the format 'yyyy-mm-dd'
+	* @param string $end_date - the date stats should be calculated to, in the format 'yyyy-mm-dd' (or use 'today')
+	* @return string
+	*/
+	public function get_google_analytics_transient_name($start_date = '2016-01-01', $end_date = 'today') {
+		return "em_ga_valid_{$this->get_id()}_{$start_date}_{$end_date}";
 	}
 
 	/**
 	* Checks whether Google Analytics stats for this object have already been cached
 	*
+	* @param string $start_date - the date stats should be calculated from, in the format 'yyyy-mm-dd'
+	* @param string $end_date - the date stats should be calculated to, in the format 'yyyy-mm-dd' (or use 'today')
 	* @return bool
 	*/
-	public function has_valid_google_analytics_stats() {
-		$transient_name = $this->get_google_analytics_transient_name();
+	public function has_valid_google_analytics_stats($start_date = '2016-01-01', $end_date = 'today') {
+		$transient_name = $this->get_google_analytics_transient_name($start_date, $end_date);
 		$stats = get_transient($transient_name);
 		return (bool)$stats;
 	}
@@ -702,29 +722,60 @@ abstract class evangelical_magazine_template {
 	/**
 	* Gets the Google Analytics stats for this object
 	*
+	* @param string $start_date - the date stats should be calculated from, in the format 'yyyy-mm-dd'
+	* @param string $end_date - the date stats should be calculated to, in the format 'yyyy-mm-dd' (or use 'today')
 	* @return int
 	*/
-	public function get_google_analytics_stats() {
+	public function get_google_analytics_stats($start_date = '2016-01-01', $end_date = 'today') {
 		global $evangelical_magazine;
-		if (!$this->has_valid_google_analytics_stats()) {
+		if (!$this->has_valid_google_analytics_stats($start_date, $end_date)) {
 			$url = apply_filters ('evangelical_magazine_url_for_google_analytics', $this->get_link());
-			$stats = $evangelical_magazine->analytics->get_page_views($url);
-			$this->update_google_analytics_stats ($stats);
+			$stats = $evangelical_magazine->analytics->get_page_views($url, $start_date, $end_date);
+			$this->update_google_analytics_stats ($stats, $start_date, $end_date);
 		}
-		return get_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, true);
+		return get_post_meta($this->get_id(), $this->get_google_analytics_metadata_name($start_date, $end_date), true);
+	}
+
+	/**
+	* Gets the initial Google Analytics stats for this object (i.e. stats for the first two weeks after publication)
+	*
+	* @param string $start_date - the date stats should be calculated from, in the format 'yyyy-mm-dd'
+	* @param string $end_date - the date stats should be calculated to, in the format 'yyyy-mm-dd' (or use 'today')
+	* @return int
+	*/
+	public function get_initial_google_analytics_stats() {
+		global $evangelical_magazine;
+		$post_date = strtotime($this->get_post_date());
+		$start_date = date('Y-m-d', $post_date);
+		$end_date = strtotime ('+2 weeks', $post_date);
+		if ($end_date > time()) {
+			$end_date = 'today';
+		} else {
+			$end_date = date ('Y-m-d', $end_date);
+		}
+		if (!$this->has_valid_google_analytics_stats($start_date, $end_date)) {
+			$url = apply_filters ('evangelical_magazine_url_for_google_analytics', $this->get_link());
+			$stats = $evangelical_magazine->analytics->get_page_views($url, $start_date, $end_date);
+			$this->update_google_analytics_stats ($stats, $start_date, $end_date);
+			update_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_INITIAL_META_NAME, $stats);
+		}
+		return get_post_meta($this->get_id(), $this->get_google_analytics_metadata_name($start_date, $end_date), true);
 	}
 
 	/**
 	* Updates the Google Analytics metadata for this object
 	*
 	* @param int $page_views
+	* @param string $start_date - the date stats should be calculated from, in the format 'yyyy-mm-dd'
+	* @param string $end_date - the date stats should be calculated to, in the format 'yyyy-mm-dd' (or use 'today')
 	* @return void
 	*/
-	public function update_google_analytics_stats($page_views) {
-		update_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, $page_views);
+	public function update_google_analytics_stats($page_views, $start_date = '2016-01-01', $end_date = 'today') {
+		$meta_name = $this->get_google_analytics_metadata_name ($start_date, $end_date);
+		update_post_meta($this->get_id(), $meta_name, $page_views);
 		$secs_since_published = time() - strtotime($this->get_post_date());
 		$secs_since_published = max($secs_since_published, DAY_IN_SECONDS/4);
-		set_transient ($this->get_google_analytics_transient_name(), true, min ($secs_since_published, WEEK_IN_SECONDS));
+		set_transient ($this->get_google_analytics_transient_name($start_date, $end_date), true, min ($secs_since_published, WEEK_IN_SECONDS));
 	}
 
 	/**
@@ -798,6 +849,9 @@ abstract class evangelical_magazine_template {
 				}
 				elseif ($column == 'views') {
 					echo number_format($object->get_google_analytics_stats());
+				}
+				elseif ($column == 'initial_views') {
+					echo number_format($object->get_initial_google_analytics_stats());
 				}
 			}
 			if ($column == 'article_author' || $column == 'review_author' ) {

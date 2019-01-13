@@ -214,7 +214,10 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 		$section_ids = $this->get_section_ids();
 		if ($section_ids) {
 			foreach ($section_ids as $section_id) {
-				$this->sections[] = new evangelical_magazine_section($section_id);
+				$section = new evangelical_magazine_section($section_id);
+				if ($section->post_data) {
+					$this->sections[] = $section;
+				}
 			}
 		}
 	}
@@ -405,6 +408,7 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 		$columns ['issue_details'] = 'issue_details';
 		if (self::use_google_analytics()) {
 			$columns ['views'] = 'views';
+			$columns ['initial_views'] = 'initial_views';
 		}
 		return $columns;
 	}
@@ -433,6 +437,9 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 					$query->set ('orderby','meta_value_num');
 				} elseif ($orderby && $orderby == 'views') {
 					$query->set ('meta_key', self::GOOGLE_ANALYTICS_META_NAME);
+					$query->set ('orderby','meta_value_num');
+				} elseif ($orderby && $orderby == 'initial_views') {
+					$query->set ('meta_key', self::GOOGLE_ANALYTICS_INITIAL_META_NAME);
 					$query->set ('orderby','meta_value_num');
 				} elseif ($orderby && $orderby == 'issue_details') {
 					$query->set ('meta_key', self::ARTICLE_SORT_ORDER_META_NAME);
