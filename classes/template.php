@@ -723,8 +723,8 @@ abstract class evangelical_magazine_template {
 	public function update_google_analytics_stats($page_views) {
 		update_post_meta($this->get_id(), self::GOOGLE_ANALYTICS_META_NAME, $page_views);
 		$secs_since_published = time() - strtotime($this->get_post_date());
-		$secs_since_published = $secs_since_published < DAY_IN_SECONDS ? DAY_IN_SECONDS : $secs_since_published;
-		set_transient ($this->get_google_analytics_transient_name(), true, $secs_since_published > WEEK_IN_SECONDS ? WEEK_IN_SECONDS : $secs_since_published);
+		$secs_since_published = max($secs_since_published, DAY_IN_SECONDS/4);
+		set_transient ($this->get_google_analytics_transient_name(), true, min ($secs_since_published, WEEK_IN_SECONDS));
 	}
 
 	/**
