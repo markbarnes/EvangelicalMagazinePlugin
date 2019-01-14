@@ -32,6 +32,7 @@ class evangelical_magazine {
 		add_action ('init', array (__CLASS__, 'register_custom_post_types'));
 		add_action ('init', array (__CLASS__, 'add_mailchimp_rss_feed'));
 		add_action ('admin_init', array (__CLASS__, 'setup_custom_post_type_columns'));
+		add_action ('admin_init', array (__CLASS__, 'manage_custom_post_types'));
 		add_action ('save_post', array(__CLASS__, 'save_cpt_data'));
 		add_action ('admin_menu', array(__CLASS__, 'remove_admin_menus'));
 		add_action ('admin_menu', array(__CLASS__, 'add_admin_menu_separator'));
@@ -341,6 +342,15 @@ class evangelical_magazine {
 				$evangelical_magazine->update_all_stats_if_required ($object->get_id());
 			}
 		}
+	}
+
+	/**
+	* Adds an action to add filters when managing articles and reviews in admin
+	*
+	* @return void
+	*/
+	public static function manage_custom_post_types() {
+		add_action ('restrict_manage_posts',array ('evangelical_magazine_articles_and_reviews', 'add_filters_in_admin'), 10, 2);
 	}
 
 	/**

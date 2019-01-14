@@ -448,4 +448,43 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 			}
 		}
 	}
+
+	/**
+	* Outputs additional filters when managing articles and reviews
+	*
+	* @param string $post_type - the post type slug
+	* @param string $which - the location of the extra table nav markup
+	* @return void
+	*/
+	public static function add_filters_in_admin ($post_type, $which) {
+		if ($post_type == 'em_article') {
+			$filters = array ('author', 'issue', 'section', 'series');
+		} elseif ($post_type == 'em_review') {
+			$filters = array ('author', 'issue');
+		}
+		if (isset($filters)) {
+			foreach ($filters as $filter) {
+				$dropdown = array();
+				if ($filter == 'author') {
+					$show_all = 'All authors';
+					$objects = evangelical_magazine_author::get_all_authors();
+				} elseif ($filter == 'issue') {
+					$show_all = 'All issues';
+					$objects = evangelical_magazine_issue::get_all_issues();
+				} elseif ($filter == 'section') {
+					$show_all = 'All sections';
+					$objects = evangelical_magazine_section::get_all_sections();
+				} elseif ($filter == 'series') {
+					$show_all = 'All series';
+					$objects = evangelical_magazine_series::get_all_series();
+				}
+				echo "<select name='{$filter}' id='{$filter}' class='postform'>";
+				echo "<option value=\"\">{$show_all}</option>";
+				foreach ($objects as $object) {
+					echo "<option value=\"{$object->get_id()}\">{$object->get_name()}</option>";
+				}
+				echo '</select>';
+			}
+		}
+	}
 }
