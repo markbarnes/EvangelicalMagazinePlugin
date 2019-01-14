@@ -351,7 +351,8 @@ class evangelical_magazine {
 	*/
 	public static function manage_custom_post_types() {
 		add_action ('restrict_manage_posts',array ('evangelical_magazine_articles_and_reviews', 'add_filters_in_admin'), 10, 2);
-	}
+		add_action ('pre_get_posts', array ('evangelical_magazine_articles_and_reviews', 'filter_as_requested'));
+}
 
 	/**
 	* Makes sure all the additional metabox data is saved.

@@ -458,14 +458,14 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 	*/
 	public static function add_filters_in_admin ($post_type, $which) {
 		if ($post_type == 'em_article') {
-			$filters = array ('author', 'issue', 'section', 'series');
+			$filters = array ('article_author', 'issue', 'section', 'series');
 		} elseif ($post_type == 'em_review') {
-			$filters = array ('author', 'issue');
+			$filters = array ('article_author', 'issue');
 		}
 		if (isset($filters)) {
 			foreach ($filters as $filter) {
 				$dropdown = array();
-				if ($filter == 'author') {
+				if ($filter == 'article_author') {
 					$show_all = 'All authors';
 					$objects = evangelical_magazine_author::get_all_authors();
 				} elseif ($filter == 'issue') {
@@ -478,12 +478,47 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 					$show_all = 'All series';
 					$objects = evangelical_magazine_series::get_all_series();
 				}
+				if (isset($_GET[$filter])) {
+					$filtered_by = (int)$_GET[$filter];
+				} else {
+					$filtered_by = 0;
+				}
 				echo "<select name='{$filter}' id='{$filter}' class='postform'>";
-				echo "<option value=\"\">{$show_all}</option>";
+				echo "<option value=\"0\">{$show_all}</option>";
 				foreach ($objects as $object) {
-					echo "<option value=\"{$object->get_id()}\">{$object->get_name()}</option>";
+					$selected = ($filtered_by == $object->get_id()) ? ' selected="selected"' : '';
+					echo "<option{$selected} value=\"{$object->get_id()}\">{$object->get_name()}</option>";
 				}
 				echo '</select>';
+			}
+		}
+	}
+
+	/**
+	* Modifies the query to filter articles and reviews, if requested
+	*
+	* Runs on the pre_get_posts action
+	*
+	* @param WP_Query $query
+	* @return void
+	*/
+	public static function filter_as_requested ($query) {
+		if  (is_admin()) {
+			$screen = get_current_screen();
+			if (($screen->id == 'edit-em_article' || $screen->id == 'edit-em_review') && isset($query->query) && isset($query->query['post_type']) && ($query->query['post_type'] == 'em_article' || $query->query['post_type'] == 'em_review')) {
+				$filters = array ('article_author' => self::AUTHOR_META_NAME, 'issue' => self::ISSUE_META_NAME, 'section' => self::SECTION_META_NAME, 'series' => self::SERIES_META_NAME);
+				$meta_query_array = array();
+				foreach ($filters as $filter => $meta_name) {
+					if (isset($_GET[$filter])) {
+						$filter_by = (int)$_GET[$filter];
+						if ($filter_by) {
+							$meta_query_array[] = array('key' => $meta_name, 'value' => $filter_by, 'type' => 'NUMERIC', 'compare' => '=');
+						}
+					}
+				}
+				if ($meta_query_array) {
+					$query->set ('meta_query', array ('relation' => 'AND', $meta_query_array));
+				}
 			}
 		}
 	}
