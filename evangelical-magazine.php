@@ -3,7 +3,7 @@
 Plugin Name: Evangelical Magazine
 Description: Customisations for the Evangelical Magazine
 Plugin URI: http://www.evangelicalmagazine.com/
-Version: 1.04
+Version: 1.05
 Author: Mark Barnes
 Author URI: http://www.markbarnes.net/
 */

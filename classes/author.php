@@ -112,6 +112,22 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles_or_r
 	}
 
 	/**
+	* Returns an array of all the author objects beginning with a specific letter
+	*
+	* @param string $initial_letter - The initial letter(s)
+	* @return null|evangelical_magazine_author[]
+	*/
+	public static function get_authors_by_initial_letter($initial_letter) {
+		global $wpdb;
+		// WP_Query doesn't support LIKE %, so we need our own query
+		$sql = $wpdb->prepare("SELECT ID FROM {$wpdb->posts} WHERE post_type = 'em_author' AND post_status = 'publish' AND post_title LIKE %s", "{$initial_letter}%");
+		$author_ids = $wpdb->get_col ($sql);
+		if ($author_ids) {
+			return SELF::get_objects_from_ids($author_ids);
+		}
+	}
+
+	/**
 	* Helper function to sort authors alphabetically
 	*
 	* Designed to be called by one of PHP's array sort functions, such as uasort();
@@ -147,5 +163,29 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles_or_r
 		$columns ['featured_image'] = 'Image';
         $column_order = array ('cb', 'featured_image', 'title', 'date');
 		return array_merge(array_flip($column_order), $columns);
+	}
+
+	/**
+	* Returns a count of the authors
+	*
+	* @return integer
+	*/
+	public static function get_count() {
+		global $wpdb;
+		// For performance reasons, we don't do this through WP_Query
+		$author_count = $wpdb->get_var ("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_status='publish' AND post_type = 'em_author'");
+		return $author_count;
+	}
+
+	/**
+	* Returns an array of the initial letters of each author's name
+	*
+	* @return string[]
+	*/
+	public static function get_initial_letters_as_array() {
+		global $wpdb;
+		// For performance reasons, we don't do this through WP_Query
+		$initial_letters = $wpdb->get_col ("SELECT substr(post_title,1,1) as initial_letter FROM {$wpdb->posts} WHERE post_type='em_author' GROUP BY initial_letter");
+		return $initial_letters;
 	}
 }

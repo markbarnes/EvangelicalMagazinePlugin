@@ -527,6 +527,22 @@ abstract class evangelical_magazine_template {
 	}
 
 	/**
+	* Returns an array of objects, given an array of post_ids
+	*
+	* @param integer[] $ids
+	* @return array()
+	*/
+	public static function get_objects_from_ids ($ids) {
+		if ($ids) {
+			$objects = array();
+			foreach ($ids as $id) {
+				$objects[] = evangelical_magazine::get_object_from_id($id);
+			}
+			return $objects;
+		}
+	}
+
+	/**
 	* Helper function that returns the arguments needed to return future posts in addition to what is normally returned
 	*
 	* @return array - with the key 'post_status'
