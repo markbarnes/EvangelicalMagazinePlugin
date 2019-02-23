@@ -14,6 +14,8 @@ Author URI: http://www.markbarnes.net/
 */
 class evangelical_magazine {
 
+	private $made_http_request;
+
 	/**
 	* Main hooks and activation
 	*
@@ -22,6 +24,8 @@ class evangelical_magazine {
 	public function __construct() {
 		//Make sure classes autoload
 		spl_autoload_register(array(__CLASS__, 'autoload_classes'));
+
+		$this->made_http_request = false;
 
 		// Register activation/deactivation hooks
 		register_activation_hook (__FILE__, array(__CLASS__, 'on_activation'));
@@ -611,6 +615,9 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public function update_facebook_stats_if_required ($ids) {
+		if ($this->made_http_request && !is_admin()) { // Restrict to one http request per page load on frontend
+			return;
+		}
 		$requests = array();
 		foreach ($ids as &$id) {
 			if (gettype ($id) == 'object') {
@@ -629,6 +636,7 @@ class evangelical_magazine {
 			foreach ($request_chunks as $chunk) {
 				$args['access_token'] = evangelical_magazine_fb_access_tokens::get_app_id().'|'.evangelical_magazine_fb_access_tokens::get_app_secret();
 				$args['batch'] = json_encode($chunk);
+				$this->made_http_request = true;
 				$stats = wp_remote_post('https://graph.facebook.com/v3.1/', array ('body' => $args));
 				if (!is_a($stats, 'WP_Error')) {
 					$response = json_decode($stats['body']);
@@ -658,6 +666,9 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public function update_google_analytics_stats_if_required ($ids) {
+		if ($this->made_http_request && !is_admin()) { // Restrict to one http request per page load on frontend
+			return;
+		}
 		$urls = $objects = $index = array();
 		foreach ($ids as $id) {
 			if (gettype ($id) == 'object') {
@@ -676,6 +687,7 @@ class evangelical_magazine {
 		}
 		if (isset($all_urls) && $all_urls) {
 			$chunks = array_chunk ($all_urls, 10);
+			$this->made_http_request = true;
 			foreach ($chunks as $chunked_urls) {
 				$stats = $this->analytics->get_page_views($chunked_urls, '2016-01-01', 'today');
 				foreach ($stats as $path => $count) {
