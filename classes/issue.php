@@ -224,7 +224,7 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles_or_re
 	public static function get_all_published_dates() {
 		global $wpdb;
 		// For performance reasons, we don't do this through WP_Query
-		$sql = $wpdb->prepare("SELECT DISTINCT pm.meta_value FROM {$wpdb->postmeta} AS pm, {$wpdb->posts} AS p WHERE pm.meta_key LIKE '%s' AND p.post_status='publish' AND p.ID=pm.post_id ORDER by pm.meta_value", self::ISSUE_DATE_META_NAME);
+		$sql = $wpdb->prepare("SELECT DISTINCT pm.meta_value FROM {$wpdb->postmeta} AS pm, {$wpdb->posts} AS p WHERE pm.meta_key LIKE '%s' AND p.post_status='publish' AND p.ID=pm.post_id ORDER by pm.meta_value DESC", self::ISSUE_DATE_META_NAME);
 		return $wpdb->get_col($sql);
 	}
 
