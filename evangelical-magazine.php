@@ -316,30 +316,32 @@ class evangelical_magazine {
 	*/
 	public static function setup_custom_post_type_columns() {
 		global $evangelical_magazine;
-		// Add columns and output actions
-		$post_types_to_add = array ('article', 'review', 'issue', 'series', 'author');
-		foreach ($post_types_to_add as $p) {
-			add_filter ("manage_edit-em_{$p}_columns", array ("evangelical_magazine_{$p}", 'filter_columns'));
-			add_action ("manage_em_{$p}_posts_custom_column", array ("evangelical_magazine_template", 'output_columns'), 10, 2);
-		}
-		// Make sortable
-		add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_articles_and_reviews', 'make_columns_sortable'));
-		add_filter ('manage_edit-em_review_sortable_columns', array ('evangelical_magazine_articles_and_reviews', 'make_columns_sortable'));
-		add_action ('pre_get_posts', array ('evangelical_magazine_articles_and_reviews', 'sort_by_columns'));
-		// Add styles
-		add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
-		// Recalc stats
-		add_filter ('post_row_actions', array (__CLASS__, 'adds_recalc_stats_to_actions'), 10, 2);
-		if (isset($_GET['recalc_stats']) && is_admin()) {
-			/** @var evangelical_magazine_articles_and_reviews */
-			$object = evangelical_magazine::get_object_from_id((int)$_GET['recalc_stats']);
-			if ($object && $object->is_article_or_review()) {
-				delete_transient($object->get_facebook_transient_name());
-				if ($evangelical_magazine->use_google_analytics) {
-					delete_transient($object->get_google_analytics_transient_name());
-					delete_metadata ('post', $object->get_id(), evangelical_magazine_articles_and_reviews::GOOGLE_ANALYTICS_INITIAL_META_NAME);
+		if (!wp_doing_ajax()) {
+			// Add columns and output actions
+			$post_types_to_add = array ('article', 'review', 'issue', 'series', 'author');
+			foreach ($post_types_to_add as $p) {
+				add_filter ("manage_edit-em_{$p}_columns", array ("evangelical_magazine_{$p}", 'filter_columns'));
+				add_action ("manage_em_{$p}_posts_custom_column", array ("evangelical_magazine_template", 'output_columns'), 10, 2);
+			}
+			// Make sortable
+			add_filter ('manage_edit-em_article_sortable_columns', array ('evangelical_magazine_articles_and_reviews', 'make_columns_sortable'));
+			add_filter ('manage_edit-em_review_sortable_columns', array ('evangelical_magazine_articles_and_reviews', 'make_columns_sortable'));
+			add_action ('pre_get_posts', array ('evangelical_magazine_articles_and_reviews', 'sort_by_columns'));
+			// Add styles
+			add_action ('admin_head', array (__CLASS__, 'add_styles_to_admin_head'));
+			// Recalc stats
+			add_filter ('post_row_actions', array (__CLASS__, 'adds_recalc_stats_to_actions'), 10, 2);
+			if (isset($_GET['recalc_stats']) && is_admin()) {
+				/** @var evangelical_magazine_articles_and_reviews */
+				$object = evangelical_magazine::get_object_from_id((int)$_GET['recalc_stats']);
+				if ($object && $object->is_article_or_review()) {
+					delete_transient($object->get_facebook_transient_name());
+					if ($evangelical_magazine->use_google_analytics) {
+						delete_transient($object->get_google_analytics_transient_name());
+						delete_metadata ('post', $object->get_id(), evangelical_magazine_articles_and_reviews::GOOGLE_ANALYTICS_INITIAL_META_NAME);
+					}
+					$evangelical_magazine->update_all_stats_if_required ($object->get_id());
 				}
-				$evangelical_magazine->update_all_stats_if_required ($object->get_id());
 			}
 		}
 	}
@@ -350,8 +352,10 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public static function manage_custom_post_types() {
-		add_action ('restrict_manage_posts',array ('evangelical_magazine_articles_and_reviews', 'add_filters_in_admin'), 10, 2);
-		add_action ('pre_get_posts', array ('evangelical_magazine_articles_and_reviews', 'filter_as_requested'));
+		if (!wp_doing_ajax()) {
+			add_action ('restrict_manage_posts',array ('evangelical_magazine_articles_and_reviews', 'add_filters_in_admin'), 10, 2);
+			add_action ('pre_get_posts', array ('evangelical_magazine_articles_and_reviews', 'filter_as_requested'));
+		}
 }
 
 	/**
