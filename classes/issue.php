@@ -255,7 +255,7 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles_or_re
 	*/
 	public static function get_issues_by_year ($year) {
 		$meta_query = array(array('key' => self::ISSUE_DATE_META_NAME, 'value' => $year, 'compare' => 'LIKE'));
-		$args = array ('meta_query' => $meta_query, 'meta_key' => self::ISSUE_DATE_META_NAME, 'orderby' => 'meta_value', 'order' => 'DESC', 'posts_per_page' => -1);
+		$args = array ('meta_query' => $meta_query, 'meta_key' => self::ISSUE_DATE_META_NAME, 'orderby' => 'meta_value', 'order' => 'DESC', 'posts_per_page' => -1, 'post_status' => 'publish');
 		return self::_get_issues_from_query($args);
 	}
 }
