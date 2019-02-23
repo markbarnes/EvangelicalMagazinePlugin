@@ -215,4 +215,35 @@ class evangelical_magazine_issue extends evangelical_magazine_not_articles_or_re
         $column_order = array ('cb', 'featured_image', 'title', 'date');
 		return array_merge(array_flip($column_order), $columns);
 	}
+
+	/**
+	* Returns an array of all the issue dates of published issues
+	*
+	* @return string[]
+	*/
+	public static function get_all_published_dates() {
+		global $wpdb;
+		// For performance reasons, we don't do this through WP_Query
+		$sql = $wpdb->prepare("SELECT DISTINCT pm.meta_value FROM {$wpdb->postmeta} AS pm, {$wpdb->posts} AS p WHERE pm.meta_key LIKE '%s' AND p.post_status='publish' AND p.ID=pm.post_id ORDER by pm.meta_value", self::ISSUE_DATE_META_NAME);
+		return $wpdb->get_col($sql);
+	}
+
+	/**
+	* Returns an array of all the years for which there is a published issue
+	*
+	* @return int[]
+	*/
+	public static function get_all_published_years() {
+		$years = array();
+		$dates = self::get_all_published_dates();
+		if ($dates) {
+			foreach ($dates as $date) {
+				$year = (int)substr($date, 0, 4);
+				if ($year && !in_array($year, $years)) {
+					$years[] = $year;
+				}
+			}
+		}
+		return $years;
+	}
 }
