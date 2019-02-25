@@ -615,7 +615,7 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public function update_facebook_stats_if_required ($ids) {
-		if ($this->made_http_request && !is_admin()) { // Restrict to one http request per page load on frontend
+		if ($this->made_http_request && !is_admin() && !defined('DOING_CRON')) { // Restrict to one http request per page load on frontend
 			return;
 		}
 		$requests = array();
@@ -666,7 +666,7 @@ class evangelical_magazine {
 	* @return void
 	*/
 	public function update_google_analytics_stats_if_required ($ids) {
-		if ($this->made_http_request && !is_admin()) { // Restrict to one http request per page load on frontend
+		if ($this->made_http_request && !is_admin() && !defined('DOING_CRON')) { // Restrict to one http request per page load on frontend
 			return;
 		}
 		$urls = $objects = $index = array();
