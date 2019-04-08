@@ -49,7 +49,7 @@ class evangelical_magazine {
 		//Configure WP Cron
 		add_action ('evangelical_magazine_cron', array (__CLASS__, 'update_all_stats_for_articles_static'));
 		if (!wp_next_scheduled('evangelical_magazine_cron')) {
-			wp_schedule_event (time(), 'twicedaily', 'evangelical_magazine_cron');
+			wp_schedule_event (time(), 'hourly', 'evangelical_magazine_cron');
 		}
 
 		//Add filters
