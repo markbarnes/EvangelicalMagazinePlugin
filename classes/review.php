@@ -301,7 +301,7 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 	*/
 	public static function filter_title_placeholder($placeholder) {
 		$screen = get_current_screen();
-		if ($screen->post_type == 'em_review') {
+		if ($screen && $screen->post_type == 'em_review') {
 			return 'Enter the title of the resource being reviewed';
 		} else {
 			return $placeholder;

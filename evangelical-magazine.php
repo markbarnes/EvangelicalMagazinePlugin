@@ -394,7 +394,7 @@ class evangelical_magazine {
 	*/
 	public static function is_creating_post() {
 		$screen = get_current_screen();
-		if ($screen->action == 'add' && $screen->base == 'post') {
+		if ($screen && $screen->action == 'add' && $screen->base == 'post') {
 			return true;
 		} else {
 			return false;

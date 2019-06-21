@@ -424,7 +424,7 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 	public static function sort_by_columns ($query) {
 		if  (is_admin()) {
 			$screen = get_current_screen();
-			if ($screen->id == 'edit-em_article' || $screen->id == 'edit-em_review') {
+			if ($screen && ($screen->id == 'edit-em_article' || $screen->id == 'edit-em_review')) {
 				$orderby = $query->get('orderby');
 				if ($orderby && $orderby == 'fb_reactions') {
 					$query->set ('meta_key', self::FB_REACTIONS_META_NAME);
@@ -505,7 +505,7 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 	public static function filter_as_requested ($query) {
 		if  (is_admin()) {
 			$screen = get_current_screen();
-			if (($screen->id == 'edit-em_article' || $screen->id == 'edit-em_review') && isset($query->query) && isset($query->query['post_type']) && ($query->query['post_type'] == 'em_article' || $query->query['post_type'] == 'em_review')) {
+			if ($screen && ($screen->id == 'edit-em_article' || $screen->id == 'edit-em_review') && isset($query->query) && isset($query->query['post_type']) && ($query->query['post_type'] == 'em_article' || $query->query['post_type'] == 'em_review')) {
 				$filters = array ('article_author' => self::AUTHOR_META_NAME, 'issue' => self::ISSUE_META_NAME, 'section' => self::SECTION_META_NAME, 'series' => self::SERIES_META_NAME);
 				$meta_query_array = array();
 				foreach ($filters as $filter => $meta_name) {
