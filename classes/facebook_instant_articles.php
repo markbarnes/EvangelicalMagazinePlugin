@@ -16,10 +16,19 @@ class evangelical_magazine_facebook_instant_articles {
 	* @return void
 	*/
 	public function __construct() {
-		add_filter ('instant_articles_post_types', create_function('', 'return array ("em_article");'));
+		add_filter ('instant_articles_post_types', array (__CLASS__, 'return_instant_articles_post_types'));
 		add_filter ('instant_articles_authors', array (__CLASS__, 'replace_author_names'), 10, 2);
 		add_filter ('instant_articles_content', array (__CLASS__, 'add_author_descriptions_to_content'), 10, 2);
 		add_filter ('instant_articles_amp_article_html', array (__CLASS__, 'fix_instant_articles_amp_article_html')); // @see https://github.com/Automattic/facebook-instant-articles-wp/issues/824#issuecomment-422718325
+	}
+
+	/**
+	* Returns an array of post_types that should be turned into Instant Articles
+	*
+	* @return string[]
+	*/
+	public static function return_instant_articles_post_types() {
+		return array ('em_article', 'em_review');
 	}
 
 	/**
