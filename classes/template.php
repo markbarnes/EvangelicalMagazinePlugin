@@ -224,9 +224,10 @@ abstract class evangelical_magazine_template {
 	* @param boolean $link - whether or not the image should be hyperlinked
 	* @param string $link_class - a CSS class to be added to the link
 	* @param string $alt_attribute - the alt attribute for the image
+	* @param string $image_class - the CSS class to be added to the image
 	* @return string
 	*/
-	public function get_image_html($image_size = 'thumbnail', $link=false, $link_class = '', $alt_attribute = '') {
+	public function get_image_html($image_size = 'thumbnail', $link=false, $link_class = '', $alt_attribute = '', $image_class = '') {
 		if (has_post_thumbnail($this->get_id())) {
 			$image_id = get_post_thumbnail_id($this->get_id());
 			$src = wp_get_attachment_image_src ($image_id, $image_size);
@@ -235,7 +236,8 @@ abstract class evangelical_magazine_template {
 			}
 			$alt_attribute = htmlspecialchars($alt_attribute, ENT_HTML5);
 			if ($src) {
-				$html = "<img src=\"{$src[0]}\" width=\"{$src[1]}\" height=\"{$src[2]}\" alt=\"{$alt_attribute}\"/>";
+				$image_class = $image_class ? " class=\"{$image_class}\"" : '';
+				$html = "<img src=\"{$src[0]}\" width=\"{$src[1]}\" height=\"{$src[2]}\" alt=\"{$alt_attribute}\"{$image_class}/>";
 				return $link ? $this->get_link_html($html, array('class' => $link_class)) : $html;
 			}
 		}
