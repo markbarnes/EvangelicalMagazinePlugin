@@ -47,17 +47,6 @@ class evangelical_magazine_author extends evangelical_magazine_not_articles_or_r
 	}
 
 	/**
-	* Returns the HTML of a thumbnail and name of the author
-	*
-	* @var string $image_size - a registered WordPress image size
-	* @return string
-	*/
-	public function get_author_info_html($image_size = 'thumbnail') {
-		$alt_text = htmlspecialchars($this->get_name(), ENT_HTML5);
-		return "<div class=\"author-info\">".$this->get_link_html("<img class=\"author-image\" alt=\"{$alt_text}\" src=\"{$this->get_image_url($image_size)}\"/>")."<div class=\"author-description\">{$this->get_description()}</div></div>";
-	}
-
-	/**
 	* Returns an array of all the author objects
 	*
 	* @param array $args - WP_Query arguments
