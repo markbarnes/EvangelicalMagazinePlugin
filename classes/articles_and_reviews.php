@@ -273,31 +273,6 @@ abstract class evangelical_magazine_articles_and_reviews extends evangelical_mag
 	}
 
 	/**
-	* Returns the HTML which produces the small article box
-	*
-	* @param bool $add_links - whether links should be added to the article name and image
-	* @param string $sub_title - any subtitle to be added
-	* @param string $class - any CSS classes to be added
-	* @return string
-	*/
-	public function get_small_box_html($add_links = true, $sub_title = '', $class = '') {
-		if (has_post_thumbnail($this->get_id())) {
-			$src = $this->get_image_url($image_size = 'article_large');
-			$style = "style=\"background-image: url('{$src}'); background-position: center center; background-size: cover\"";
-		} else {
-			$style = '';
-		}
-		$class = trim("small-article-box {$class}");
-		$class .= $this->is_future() ? ' future' : '';
-		$sub_title = $sub_title ? "<span class=\"sub-title\">{$sub_title}</span>" : '';
-		if ($add_links && !$this->is_future()) {
-			return "<aside class=\"{$class}\">{$sub_title}".$this->get_link_html("<div class=\"article-image\" {$style}></div>")."<div class=\"article-title\">{$this->get_title(true)}</div></aside>";
-		} else {
-			return "<aside class=\"{$class}\"><div class=\"article-image\" {$style}>{$sub_title}</div><div class=\"article-title\">{$this->get_title()}</div></aside>";
-		}
-	}
-
-	/**
 	* Helper function to return the HTML of a meta box where the user can choose multiple items of another post type
 	*
 	* @param array $objects - an array of evangelical_magazine_* objects
