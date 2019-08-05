@@ -893,4 +893,23 @@ abstract class evangelical_magazine_template {
 			}
 		}
 	}
+
+	/**
+	* Returns the word count of post_content
+	*
+	* @return string
+	*/
+	public function get_word_count() {
+		return str_word_count($this->get_filtered_content());
+	}
+
+	/**
+	* Returns the estimated reading time of post_content, rounded to the nearest minute
+	*
+	* @return string
+	*/
+	public function get_reading_time() {
+		$time = round($this->get_word_count()/283,0); // For 283wpm see https://psyarxiv.com/xynwg/
+		return ($time == 0) ? 1 : $time;
+	}
 }
