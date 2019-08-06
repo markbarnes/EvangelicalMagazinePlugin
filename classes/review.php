@@ -384,4 +384,13 @@ class evangelical_magazine_review extends evangelical_magazine_articles_and_revi
 									);
 		return array_merge(array_flip($column_order), $columns);
 	}
+
+	/**
+	* Reviews can't be in a series, so this always returns false
+	*
+	* @return bool
+	*/
+	public function has_series() {
+		return false;
+	}
 }

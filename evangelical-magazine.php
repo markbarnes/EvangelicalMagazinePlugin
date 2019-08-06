@@ -3,7 +3,7 @@
 Plugin Name: Evangelical Magazine
 Description: Customisations for the Evangelical Magazine
 Plugin URI: http://www.evangelicalmagazine.com/
-Version: 1.8.1
+Version: 1.8.2
 Author: Mark Barnes
 Author URI: http://www.markbarnes.net/
 */
@@ -833,6 +833,24 @@ class evangelical_magazine {
 		if (is_feed() && isset ($query->query['feed']) && $query->query['feed'] == 'mailchimp') {
 			$query->query_vars['post_type'] = array ('em_article', 'em_review');
 			add_filter ('the_content_feed', array (__CLASS__, 'filter_feed_for_mailchimp'));
+		}
+	}
+
+	/**
+	* Returns an array of ids given an array of objects
+	*
+	* @param array $objects
+	* @return null|int[]
+	*/
+	public static function get_ids_from_objects($objects) {
+		if (is_array($objects) && $objects) {
+			$ids = array();
+			foreach ($objects as $object) {
+				if (is_object($object) && method_exists($object, 'get_id')) {
+					$ids[] = $object->get_id();
+				}
+			}
+			return $ids;
 		}
 	}
 }
