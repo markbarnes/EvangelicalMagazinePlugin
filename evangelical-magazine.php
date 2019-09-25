@@ -1,11 +1,18 @@
 <?php
 /**
-Plugin Name: Evangelical Magazine
-Description: Customisations for the Evangelical Magazine
-Plugin URI: http://www.evangelicalmagazine.com/
-Version: 1.8.2
-Author: Mark Barnes
-Author URI: http://www.markbarnes.net/
+* Evangelical Magazine
+*
+* @package		evangelical-magazine-plugin
+* @author		Mark Barnes
+* @copyright	2015-2019 Mark Barnes
+* @license		GPL-3.0-or-later
+*
+* Description:	Customisations for the Evangelical Magazine
+* Plugin Name:	Evangelical Magazine
+* Plugin URI:	http://www.evangelicalmagazine.com/
+* Version:		1.8.2
+* Author:		Mark Barnes
+* Author URI:	http://www.markbarnes.net/
 */
 
 /**
@@ -647,10 +654,8 @@ class evangelical_magazine {
 							* @var evangelical_magazine_template
 							*/
 							$object = $this->get_object_from_id($lookup [$stats->id]);
-							if ($stats !== NULL && isset($stats->engagement)) {
+							if ($object && $stats !== NULL && isset($stats->engagement)) {
 								$object->update_facebook_stats ($stats->engagement);
-							} else {
-								$object->update_facebook_stats (array());
 							}
 						}
 					}
