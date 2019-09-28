@@ -650,12 +650,14 @@ class evangelical_magazine {
 					if (!isset($response->error)) {
 						foreach ((array)$response as $r) {
 							$stats = json_decode($r->body);
-							/**
-							* @var evangelical_magazine_template
-							*/
-							$object = $this->get_object_from_id($lookup [$stats->id]);
-							if ($object && $stats !== NULL && isset($stats->engagement)) {
-								$object->update_facebook_stats ($stats->engagement);
+							if (isset($stats->id) && isset($lookup [$stats->id])) {
+								/**
+								* @var evangelical_magazine_template
+								*/
+								$object = $this->get_object_from_id($lookup [$stats->id]);
+								if ($object && isset($stats->engagement)) {
+									$object->update_facebook_stats ($stats->engagement);
+								}
 							}
 						}
 					}
