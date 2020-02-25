@@ -675,7 +675,7 @@ abstract class evangelical_magazine_template {
 		global $evangelical_magazine;
 		$evangelical_magazine->update_facebook_stats_if_required(array($this->get_id()));
 		$meta_names = $this->get_facebook_metanames();
-		return get_post_meta($this->get_id(), $meta_names[$stat_type], true);
+		return (int)get_post_meta($this->get_id(), $meta_names[$stat_type], true);
 	}
 
 	/**
