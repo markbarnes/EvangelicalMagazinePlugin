@@ -102,7 +102,7 @@ class evangelical_magazine_google_analytics {
 		foreach ($urls as $url) {
 			$filters[] = urlencode('ga:pagePath=='.wp_parse_url($url, PHP_URL_PATH));
 		}
-		$filter = implode ($filters, ',');
+		$filter = implode (',', $filters);
 		$url = "https://www.googleapis.com/analytics/v3/data/ga?ids=ga%3A{$profile_id}&start-date={$start_date}&end-date={$end_date}&metrics=ga%3Apageviews&dimensions=ga%3ApagePath&filters={$filter}&access_token=".$access_token;
 		$response = json_decode($this->http->get($url)->getBody()->getContents());
 		if (isset($response->rows)) {
